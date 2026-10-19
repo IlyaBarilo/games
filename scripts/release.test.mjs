@@ -3,9 +3,56 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { parseReleaseTag, stampBuild } from './version.mjs';
 import { assetNames } from './release.mjs';
 import { siteBaseUrl, applyMetadata } from './metadata.mjs';
+
+test('Release validation runs before npm install in a clean checkout and retains Git checks', () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'games-clean-release-'));
+    try {
+        // Copy the real scripts, but deliberately omit node_modules.
+        fs.cpSync(fileURLToPath(new URL('.', import.meta.url)), path.join(root, 'scripts'), { recursive: true });
+        assert(!fs.existsSync(path.join(root, 'node_modules')));
+        const stub = path.join(root, 'git-fixture.mjs');
+        fs.writeFileSync(stub, `import childProcess from 'node:child_process';
+import { syncBuiltinESMExports } from 'node:module';
+import assert from 'node:assert/strict';
+const calls = [], sha = '1234567890abcdef1234567890abcdef12345678';
+childProcess.spawnSync = (binary, args, options) => {
+    assert.equal(binary, 'git');
+    assert.equal(options.cwd, ${JSON.stringify(root)});
+    calls.push(args);
+    if (args[0] === 'rev-parse' && args[1] === 'HEAD') return { status: 0, stdout: sha };
+    if (args[0] === 'rev-parse' && args[1] === 'refs/tags/v0.1^{commit}') return { status: 0, stdout: process.env.GIT_FIXTURE === 'wrong-tag' ? 'different-commit' : sha };
+    if (args[0] === 'merge-base') {
+        assert.deepEqual(args, ['merge-base', '--is-ancestor', sha, 'refs/remotes/origin/main']);
+        return process.env.GIT_FIXTURE === 'outside-main' ? { status: 1, stderr: 'fixture commit is outside main' } : { status: 0, stdout: '' };
+    }
+    throw new Error('Unexpected Git command: ' + args.join(' '));
+};
+syncBuiltinESMExports();
+process.on('exit', code => { if (code === 0) assert.equal(calls.length, 3); });
+`);
+        const validate = mode => spawnSync(process.execPath, ['--import', pathToFileURL(stub).href, path.join(root, 'scripts/release.mjs'), 'validate'], {
+            cwd: root, env: { ...process.env, RELEASE_TAG: 'v0.1', GIT_FIXTURE: mode }, encoding: 'utf8', windowsHide: true
+        });
+        const success = validate('valid');
+        assert.equal(success.status, 0, success.stderr);
+        assert.match(success.stdout, /Release tag matches checkout and belongs to main/);
+        const wrongTag = validate('wrong-tag');
+        assert.notEqual(wrongTag.status, 0);
+        assert.match(wrongTag.stderr, /Checkout must match the release tag/);
+        const outsideMain = validate('outside-main');
+        assert.notEqual(outsideMain.status, 0);
+        assert.match(outsideMain.stderr, /fixture commit is outside main/);
+    } finally {
+        assert(path.resolve(root).startsWith(path.resolve(os.tmpdir()) + path.sep));
+        assert(path.basename(root).startsWith('games-clean-release-'));
+        fs.rmSync(root, { recursive: true, force: true });
+    }
+});
 
 test('Site metadata uses the page content and preserves the hosting subdirectory', () => {
     assert.equal(siteBaseUrl(''), null);

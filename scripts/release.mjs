@@ -3,10 +3,12 @@ import path from 'node:path';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
-import { pathToFileURL } from 'node:url';
-import { projectRoot } from './check.mjs';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { findSevenZip, createArchive } from './archive.mjs';
 import { parseReleaseTag } from './version.mjs';
+
+// Validation runs before npm ci, so this module must use only built-in dependencies.
+const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 export function assetNames(tag) {
     parseReleaseTag(tag);
