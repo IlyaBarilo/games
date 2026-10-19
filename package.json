@@ -1,0 +1,17 @@
+{
+  "name": "ilya-barilo-games",
+  "private": true,
+  "scripts": {
+    "check": "node scripts/check.mjs",
+    "test": "node scripts/test.mjs",
+    "build": "node scripts/build.mjs",
+    "test:release": "node --test scripts/release.test.mjs",
+    "verify:build": "node scripts/verify-build.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "markdown-it": "14.3.2"
+  }
+}

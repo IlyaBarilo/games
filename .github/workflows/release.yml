@@ -1,0 +1,80 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.event.release.tag_name }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    environment: release
+    permissions:
+      contents: write
+    defaults:
+      run:
+        shell: cmd
+    env:
+      RELEASE_TAG: ${{ github.event.release.tag_name }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.release.tag_name }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - name: Validate tag and main ancestry
+        run: node scripts/release.mjs validate
+      - run: npm ci --no-audit --no-fund
+      - run: npm run check
+      - run: npm test
+      - run: npm run test:release
+      - run: npm run build
+      - run: npm run verify:build
+      - name: Prepare release archives and checksums
+        run: node scripts/release.mjs package
+      - name: Attach files to the published release
+        run: node scripts/release.mjs upload
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+      - name: Prepare the released site for Pages
+        if: ${{ !github.event.release.prerelease }}
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist/web
+
+  pages:
+    name: Publish the released showcase
+    needs: release
+    if: ${{ !github.event.release.prerelease }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    concurrency:
+      group: github-pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Read the configured Pages settings
+        uses: actions/configure-pages@v6
+        with:
+          enablement: false
+      - name: Publish the Pages artifact
+        id: deployment
+        uses: actions/deploy-pages@v5

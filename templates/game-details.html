@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{title}} — Игры Ильи Барило</title>
+    <meta name="description" content="{{description}}">
+    <meta name="author" content="Илья Барило">
+    <link rel="icon" type="image/png" href="../../assets/favicon.png">
+    <link rel="stylesheet" href="../../assets/css/site.css">
+</head>
+<body>
+    <header class="site-header shell">
+        <a class="brand" href="../../index.html">Илья Барило / Игры</a>
+        <nav aria-label="Основная навигация"><a href="../../index.html#games">Коллекция</a></nav>
+    </header>
+    <main class="game-detail shell">
+        <a class="back-link" href="../../index.html#games">← Все игры</a>
+        <div class="detail-layout">
+            <div>
+                <p class="genre">{{genre}}</p>
+                <h1>{{title}}</h1>
+                <p class="lead">{{description}}</p>
+                <div><a class="button" href="{{play}}">Играть</a>{{difficulties}}</div>
+            </div>
+            <img class="detail-image" src="{{image}}" alt="{{title}}">
+        </div>
+        <article class="article-body">
+{{body}}
+        </article>
+    </main>
+    <footer class="site-footer shell"><span>Игры Ильи Барило</span><a href="../../index.html">Вернуться в коллекцию</a><a href="../../usage.html">Как скачать и играть</a><a href="../../terms.html">Условия использования</a><a href="../../third-party.html">Сторонние лицензии</a></footer>
+</body>
+</html>
