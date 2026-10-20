@@ -349,6 +349,45 @@ window.GAMES_CATALOG = {
             "available": true,
             "creator": "teacher",
             "directory": "games/bashnya-do-oblakov"
+        },
+        {
+            "id": "podvodnaya-ekspeditsiya",
+            "section": "puzzles-games",
+            "title": "Подводная экспедиция",
+            "genre": "Аркада / Лабиринт",
+            "description": "Собери четыре редких образца в коралловом лабиринте и вернись на станцию. Используй сонар, чтобы пройти мимо морских существ.",
+            "imageUrl": "games/podvodnaya-ekspeditsiya/podvodnaya-ekspeditsiya-small.jpg",
+            "link": "games/podvodnaya-ekspeditsiya/podvodnaya-ekspeditsiya.html?diff=3",
+            "difficulties": {
+                "1": {
+                    "text": "🐣",
+                    "label": "Уровень 1",
+                    "link": "games/podvodnaya-ekspeditsiya/podvodnaya-ekspeditsiya.html?diff=1"
+                },
+                "2": {
+                    "text": "🌱",
+                    "label": "Уровень 2",
+                    "link": "games/podvodnaya-ekspeditsiya/podvodnaya-ekspeditsiya.html?diff=2"
+                },
+                "3": {
+                    "text": "🙂",
+                    "label": "Уровень 3",
+                    "link": "games/podvodnaya-ekspeditsiya/podvodnaya-ekspeditsiya.html?diff=3"
+                },
+                "4": {
+                    "text": "🤔",
+                    "label": "Уровень 4",
+                    "link": "games/podvodnaya-ekspeditsiya/podvodnaya-ekspeditsiya.html?diff=4"
+                },
+                "5": {
+                    "text": "😎",
+                    "label": "Уровень 5",
+                    "link": "games/podvodnaya-ekspeditsiya/podvodnaya-ekspeditsiya.html?diff=5"
+                }
+            },
+            "available": true,
+            "creator": "teacher",
+            "directory": "games/podvodnaya-ekspeditsiya"
         }
     ]
 };

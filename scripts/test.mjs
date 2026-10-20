@@ -48,7 +48,7 @@ function resolveEvolution(search, saved = 5) {
     const context = { location: { search }, URLSearchParams, progress: { difficulty: saved } };
     return JSON.parse(vm.runInNewContext(progressCode + '\n' + selection + '\nJSON.stringify({selected:String(progress.difficulty),config:{difficulty:progress.difficulty},presets:["1","2","3","4","5"]});', context));
 }
-const numericGames = ["zvezdny-kurer","staya-svetlyachkov","bashnya-oblakov","bashnya-do-oblakov"];
+const numericGames = ["zvezdny-kurer","staya-svetlyachkov","bashnya-oblakov","bashnya-do-oblakov","podvodnaya-ekspeditsiya"];
 function resolveNumericGame(id, search) {
     const source = read('games/' + id + '/' + id + '.html');
     const parser = source.match(/function readDifficulty\(\)\s*\{[^}]*\}/)[0];
