@@ -48,7 +48,19 @@ function resolveEvolution(search, saved = 5) {
     const context = { location: { search }, URLSearchParams, progress: { difficulty: saved } };
     return JSON.parse(vm.runInNewContext(progressCode + '\n' + selection + '\nJSON.stringify({selected:String(progress.difficulty),config:{difficulty:progress.difficulty},presets:["1","2","3","4","5"]});', context));
 }
+const numericGames = ["zvezdny-kurer","staya-svetlyachkov","bashnya-oblakov","bashnya-do-oblakov"];
+function resolveNumericGame(id, search) {
+    const source = read('games/' + id + '/' + id + '.html');
+    const parser = source.match(/function readDifficulty\(\)\s*\{[^}]*\}/)[0];
+    const location = { search };
+    const selected = vm.runInNewContext(parser + ';readDifficulty()', { location, window: { location }, URLSearchParams });
+    return { selected: String(selected), config: { difficulty: selected }, presets: ['1','2','3','4','5'] };
+}
+for (const id of numericGames) for (const search of ['', '?diff=invalid', '?diff=0', '?diff=6', '?diff=2.5']) {
+    assert.equal(resolveNumericGame(id, search).selected, '3', id + ' must retain its default difficulty');
+}
 const contracts = {
+    ...Object.fromEntries(numericGames.map(id => [id, ["1", "2", "3", "4", "5"]])),
     'snake3d-turns': ['easy', 'normal', 'hard'],
     'tictac': ['simple', 'normal', 'hard', 'expert'],
     'tictac-robots': ['simple', 'normal', 'hard', 'expert'],
@@ -66,11 +78,11 @@ for (const game of active) {
         assert(!main.searchParams.has('diff'));
         continue;
     }
-    const defaultDifficulty = game.id === 'snake-evolution' ? '3' : 'normal';
+    const defaultDifficulty = game.id === 'snake-evolution' || numericGames.includes(game.id) ? '3' : 'normal';
     assert.equal(main.searchParams.get('diff'), defaultDifficulty);
     const actual = levels.map(level => new URL(level.link, main).searchParams.get('diff'));
     assert.deepEqual(actual, expected, 'Catalog values must match restored presets');
-    const resolve = { 'snake3d-turns': resolveSnake, tictac: resolveTictac, 'tictac-robots': resolveRobosklad, 'snake-evolution': resolveEvolution }[game.id];
+    const resolve = { 'snake3d-turns': resolveSnake, tictac: resolveTictac, 'tictac-robots': resolveRobosklad, 'snake-evolution': resolveEvolution }[game.id] || (search => resolveNumericGame(game.id, search));
     assert.equal(resolve(main.search).selected, defaultDifficulty, 'Default link must select the existing normal preset');
     for (const level of levels) {
         const url = new URL(level.link, 'https://games.example/collection/');

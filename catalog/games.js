@@ -193,6 +193,162 @@ window.GAMES_CATALOG = {
             "available": true,
             "creator": "teacher",
             "directory": "games/interactive-screen-benchmark"
+        },
+        {
+            "id": "zvezdny-kurer",
+            "section": "puzzles-games",
+            "title": "Звёздный курьер",
+            "genre": "Физическая аркада",
+            "description": "Выполни семь доставок на планеты и спутники, выбирая траекторию полёта с учётом притяжения.",
+            "imageUrl": "games/zvezdny-kurer/zvezdny-kurer-small.jpg",
+            "link": "games/zvezdny-kurer/zvezdny-kurer.html?diff=3",
+            "difficulties": {
+                "1": {
+                    "text": "🐣",
+                    "label": "Уровень 1",
+                    "link": "games/zvezdny-kurer/zvezdny-kurer.html?diff=1"
+                },
+                "2": {
+                    "text": "🌱",
+                    "label": "Уровень 2",
+                    "link": "games/zvezdny-kurer/zvezdny-kurer.html?diff=2"
+                },
+                "3": {
+                    "text": "🙂",
+                    "label": "Уровень 3",
+                    "link": "games/zvezdny-kurer/zvezdny-kurer.html?diff=3"
+                },
+                "4": {
+                    "text": "🤔",
+                    "label": "Уровень 4",
+                    "link": "games/zvezdny-kurer/zvezdny-kurer.html?diff=4"
+                },
+                "5": {
+                    "text": "😎",
+                    "label": "Уровень 5",
+                    "link": "games/zvezdny-kurer/zvezdny-kurer.html?diff=5"
+                }
+            },
+            "available": true,
+            "creator": "teacher",
+            "directory": "games/zvezdny-kurer"
+        },
+        {
+            "id": "staya-svetlyachkov",
+            "section": "puzzles-games",
+            "title": "Стая светлячков",
+            "genre": "Аркада",
+            "description": "Проведи стаю из 50 светлячков к Лунному цветку, обходя препятствия и паутины.",
+            "imageUrl": "games/staya-svetlyachkov/staya-svetlyachkov-small.jpg",
+            "link": "games/staya-svetlyachkov/staya-svetlyachkov.html?diff=3",
+            "difficulties": {
+                "1": {
+                    "text": "🐣",
+                    "label": "Уровень 1",
+                    "link": "games/staya-svetlyachkov/staya-svetlyachkov.html?diff=1"
+                },
+                "2": {
+                    "text": "🌱",
+                    "label": "Уровень 2",
+                    "link": "games/staya-svetlyachkov/staya-svetlyachkov.html?diff=2"
+                },
+                "3": {
+                    "text": "🙂",
+                    "label": "Уровень 3",
+                    "link": "games/staya-svetlyachkov/staya-svetlyachkov.html?diff=3"
+                },
+                "4": {
+                    "text": "🤔",
+                    "label": "Уровень 4",
+                    "link": "games/staya-svetlyachkov/staya-svetlyachkov.html?diff=4"
+                },
+                "5": {
+                    "text": "😎",
+                    "label": "Уровень 5",
+                    "link": "games/staya-svetlyachkov/staya-svetlyachkov.html?diff=5"
+                }
+            },
+            "available": true,
+            "creator": "teacher",
+            "directory": "games/staya-svetlyachkov"
+        },
+        {
+            "id": "bashnya-oblakov",
+            "section": "puzzles-games",
+            "title": "Башня облаков",
+            "genre": "Платформер",
+            "description": "Поднимайся по облачным платформам, направляй прыжки героя и собирай звёзды.",
+            "imageUrl": "games/bashnya-oblakov/bashnya-oblakov-small.jpg",
+            "link": "games/bashnya-oblakov/bashnya-oblakov.html?diff=3",
+            "difficulties": {
+                "1": {
+                    "text": "🐣",
+                    "label": "Уровень 1",
+                    "link": "games/bashnya-oblakov/bashnya-oblakov.html?diff=1"
+                },
+                "2": {
+                    "text": "🌱",
+                    "label": "Уровень 2",
+                    "link": "games/bashnya-oblakov/bashnya-oblakov.html?diff=2"
+                },
+                "3": {
+                    "text": "🙂",
+                    "label": "Уровень 3",
+                    "link": "games/bashnya-oblakov/bashnya-oblakov.html?diff=3"
+                },
+                "4": {
+                    "text": "🤔",
+                    "label": "Уровень 4",
+                    "link": "games/bashnya-oblakov/bashnya-oblakov.html?diff=4"
+                },
+                "5": {
+                    "text": "😎",
+                    "label": "Уровень 5",
+                    "link": "games/bashnya-oblakov/bashnya-oblakov.html?diff=5"
+                }
+            },
+            "available": true,
+            "creator": "teacher",
+            "directory": "games/bashnya-oblakov"
+        },
+        {
+            "id": "bashnya-do-oblakov",
+            "section": "puzzles-games",
+            "title": "Башня до облаков",
+            "genre": "Аркада / Строительство",
+            "description": "Лови строительные блоки тележкой и доставляй их к крану, чтобы построить башню.",
+            "imageUrl": "games/bashnya-do-oblakov/bashnya-do-oblakov-small.jpg",
+            "link": "games/bashnya-do-oblakov/bashnya-do-oblakov.html?diff=3",
+            "difficulties": {
+                "1": {
+                    "text": "🐣",
+                    "label": "Уровень 1",
+                    "link": "games/bashnya-do-oblakov/bashnya-do-oblakov.html?diff=1"
+                },
+                "2": {
+                    "text": "🌱",
+                    "label": "Уровень 2",
+                    "link": "games/bashnya-do-oblakov/bashnya-do-oblakov.html?diff=2"
+                },
+                "3": {
+                    "text": "🙂",
+                    "label": "Уровень 3",
+                    "link": "games/bashnya-do-oblakov/bashnya-do-oblakov.html?diff=3"
+                },
+                "4": {
+                    "text": "🤔",
+                    "label": "Уровень 4",
+                    "link": "games/bashnya-do-oblakov/bashnya-do-oblakov.html?diff=4"
+                },
+                "5": {
+                    "text": "😎",
+                    "label": "Уровень 5",
+                    "link": "games/bashnya-do-oblakov/bashnya-do-oblakov.html?diff=5"
+                }
+            },
+            "available": true,
+            "creator": "teacher",
+            "directory": "games/bashnya-do-oblakov"
         }
     ]
 };

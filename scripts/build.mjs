@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import assert from 'node:assert/strict';
-import { projectRoot, loadCatalog, checkProject } from './check.mjs';
+import { projectRoot, loadCatalog, checkProject, excludedGameFiles } from './check.mjs';
 import { findSevenZip, createArchive } from './archive.mjs';
 import { renderDetailsPage } from './descriptions.mjs';
 import { renderLegalPages } from './licenses.mjs';
@@ -30,7 +30,7 @@ function copy(relative, output, destination = relative) {
     fs.mkdirSync(path.dirname(target), { recursive: true });
     fs.cpSync(path.join(projectRoot, relative), target, {
         recursive: true,
-        filter: source => !['local', '.git', 'AGENTS.md', '.gitignore'].includes(path.basename(source))
+        filter: source => !['local', '.git', 'AGENTS.md', '.gitignore'].includes(path.basename(source)) && !excludedGameFiles.has(path.relative(projectRoot, source).split(path.sep).join('/'))
     });
 }
 

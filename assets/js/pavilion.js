@@ -8,8 +8,8 @@ const walkBounds={left:hall.left+1,right:hall.right-1,back:hall.back+1,front:hal
 const hallWidth=hall.right-hall.left,hallDepth=hall.front-hall.back,hallCenterZ=(hall.back+hall.front)/2;
 const hallLights={left:Math.ceil((hall.left+2)/12)*12,right:Math.floor((hall.right-2)/12)*12,back:Math.ceil(hall.back/9)*9+3,front:Math.floor((hall.front-6)/9)*9+3};
 function mapPoint(x,z){return [(x-hall.left)/hallWidth*100,(z-hall.back)/hallDepth*100]}
-const standAnchors=[[-4,0,-3],[4,0,-3],[-4,0,-12],[4,0,-12],[0,0,-18],[-8,0,-24]];
-const standLayout={'snake3d-turns':[-4,0,-3],'tictac':[4,0,-3],'tictac-robots':[-4,0,-12],'8march-shariki':[4,0,-12],'snake-evolution':[0,0,-18],'interactive-screen-benchmark':[-8,0,-24]};
+const standAnchors=[[-4,0,-3],[4,0,-3],[-4,0,-12],[4,0,-12],[0,0,-18],[-8,0,-24],[8,0,-24],[-8,0,-32],[0,0,-32],[8,0,-32]];
+const standLayout={'snake3d-turns':[-4,0,-3],'tictac':[4,0,-3],'tictac-robots':[-4,0,-12],'8march-shariki':[4,0,-12],'snake-evolution':[0,0,-18],'interactive-screen-benchmark':[-8,0,-24],'zvezdny-kurer':[8,0,-24],'staya-svetlyachkov':[-8,0,-32],'bashnya-oblakov':[0,0,-32],'bashnya-do-oblakov':[8,0,-32]};
 const standGroups=games.map((game,i)=>{const anchor=[...standAnchors[i]],position=[...(standLayout[game.id]||anchor)];return {id:game.id,anchor,position,offset:position.map((v,j)=>v-anchor[j]),children:[],obstacles:[],bounds:{left:-3.1,right:3.1,back:-1.75,front:3.75},light:[0,4.7,2]}});
 let activeStandGroup=-1,layoutRevision=0,standMoveHooks=()=>{};
 let benchmarkScene=1,activeBenchmarkVariant=0,refreshBenchmarkControls=()=>{};
@@ -65,7 +65,7 @@ const pointers=new Map();let pinch=null;function beginPinch(){const p=[...pointe
 const gl=canvas.getContext('webgl',{antialias:true,alpha:false});
 if(!gl){document.getElementById('error').hidden=false}else{const renderLimit=Math.min(gl.getParameter(gl.MAX_RENDERBUFFER_SIZE),gl.getParameter(gl.MAX_VIEWPORT_DIMS)[0],gl.getParameter(gl.MAX_VIEWPORT_DIMS)[1]);
 function shader(type,src){const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(s));return s}
-let lighting=true;document.getElementById('lighting').onclick=e=>{lighting=!lighting;e.target.textContent=lighting?'Свет: включён':'Свет: приглушён';e.target.setAttribute('aria-pressed',lighting)};const pr=gl.createProgram();gl.attachShader(pr,shader(gl.VERTEX_SHADER,'attribute vec3 p;attribute vec2 uv;attribute vec3 normal;attribute vec3 tint;varying vec3 shade;uniform mat4 m;uniform mat4 model;varying vec2 t;varying vec3 world;varying vec3 norm;varying float depth;void main(){vec4 wp=model*vec4(p,1.);gl_Position=m*wp;shade=tint;t=uv;world=wp.xyz;norm=mat3(model)*normal;depth=gl_Position.w;}'));gl.attachShader(pr,shader(gl.FRAGMENT_SHADER,'precision mediump float;varying vec3 shade;uniform vec3 lightPositions[6];uniform vec4 hallLightBounds;uniform sampler2D tex;uniform float textured;uniform float power;uniform float emission;varying vec2 t;varying vec3 world;varying vec3 norm;varying float depth;vec3 lamp(vec3 pos,vec3 tint){vec3 d=pos-world;float len=length(d);return tint*max(dot(normalize(norm),normalize(d)),0.)*5.0/(1.+.16*len*len);}void main(){vec4 pixel=vec4(1.);if(textured>.5)pixel=texture2D(tex,t);if(textured>.5&&pixel.a<.1)discard;vec3 c=mix(shade,pixel.rgb,textured);vec3 light=vec3(.36)+vec3(.18)*max(dot(normalize(norm),normalize(vec3(.3,1.,.4))),0.);light+=power*(lamp(lightPositions[0],vec3(.75,1.,.65))+lamp(lightPositions[1],vec3(1.,.72,.38))+lamp(lightPositions[2],vec3(.42,.78,1.))+lamp(lightPositions[3],vec3(1.,.48,.75))+lamp(lightPositions[4],vec3(.65,1.,.86))+lamp(lightPositions[5],vec3(.68,.65,1.)));vec3 hallLamp=vec3(clamp(floor(world.x/12.+.5)*12.,hallLightBounds.x,hallLightBounds.y),4.7,clamp(floor((world.z-3.)/9.+.5)*9.+3.,hallLightBounds.z,hallLightBounds.w));light+=power*.6*lamp(hallLamp,vec3(.60,.80,.92));c*=mix(light,vec3(1.15),max(emission,textured*.78));float fog=clamp((depth-12.)/44.,0.,.6);gl_FragColor=vec4(mix(c,vec3(.045,.08,.12),fog),1.);}'));gl.linkProgram(pr);if(!gl.getProgramParameter(pr,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(pr));gl.useProgram(pr);gl.uniform4fv(gl.getUniformLocation(pr,'hallLightBounds'),new Float32Array([hallLights.left,hallLights.right,hallLights.back,hallLights.front]));canvas.dataset.hallSize=hallWidth+'×'+hallDepth;
+let lighting=true;document.getElementById('lighting').onclick=e=>{lighting=!lighting;e.target.textContent=lighting?'Свет: включён':'Свет: приглушён';e.target.setAttribute('aria-pressed',lighting)};const pr=gl.createProgram();gl.attachShader(pr,shader(gl.VERTEX_SHADER,'attribute vec3 p;attribute vec2 uv;attribute vec3 normal;attribute vec3 tint;varying vec3 shade;uniform mat4 m;uniform mat4 model;varying vec2 t;varying vec3 world;varying vec3 norm;varying float depth;void main(){vec4 wp=model*vec4(p,1.);gl_Position=m*wp;shade=tint;t=uv;world=wp.xyz;norm=mat3(model)*normal;depth=gl_Position.w;}'));gl.attachShader(pr,shader(gl.FRAGMENT_SHADER,'precision mediump float;varying vec3 shade;uniform vec3 lightPositions[10];uniform vec4 hallLightBounds;uniform sampler2D tex;uniform float textured;uniform float power;uniform float emission;varying vec2 t;varying vec3 world;varying vec3 norm;varying float depth;vec3 lamp(vec3 pos,vec3 tint){vec3 d=pos-world;float len=length(d);return tint*max(dot(normalize(norm),normalize(d)),0.)*5.0/(1.+.16*len*len);}void main(){vec4 pixel=vec4(1.);if(textured>.5)pixel=texture2D(tex,t);if(textured>.5&&pixel.a<.1)discard;vec3 c=mix(shade,pixel.rgb,textured);vec3 light=vec3(.36)+vec3(.18)*max(dot(normalize(norm),normalize(vec3(.3,1.,.4))),0.);light+=power*(lamp(lightPositions[0],vec3(.75,1.,.65))+lamp(lightPositions[1],vec3(1.,.72,.38))+lamp(lightPositions[2],vec3(.42,.78,1.))+lamp(lightPositions[3],vec3(1.,.48,.75))+lamp(lightPositions[4],vec3(.65,1.,.86))+lamp(lightPositions[5],vec3(.68,.65,1.))+lamp(lightPositions[6],vec3(.65,.72,1.))+lamp(lightPositions[7],vec3(.75,1.,.48))+lamp(lightPositions[8],vec3(.65,.88,1.))+lamp(lightPositions[9],vec3(1.,.78,.42)));vec3 hallLamp=vec3(clamp(floor(world.x/12.+.5)*12.,hallLightBounds.x,hallLightBounds.y),4.7,clamp(floor((world.z-3.)/9.+.5)*9.+3.,hallLightBounds.z,hallLightBounds.w));light+=power*.6*lamp(hallLamp,vec3(.60,.80,.92));c*=mix(light,vec3(1.15),max(emission,textured*.78));float fog=clamp((depth-12.)/44.,0.,.6);gl_FragColor=vec4(mix(c,vec3(.045,.08,.12),fog),1.);}'));gl.linkProgram(pr);if(!gl.getProgramParameter(pr,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(pr));gl.useProgram(pr);gl.uniform4fv(gl.getUniformLocation(pr,'hallLightBounds'),new Float32Array([hallLights.left,hallLights.right,hallLights.back,hallLights.front]));canvas.dataset.hallSize=hallWidth+'×'+hallDepth;
 const attrP=gl.getAttribLocation(pr,'p'),attrUV=gl.getAttribLocation(pr,'uv'),mat=gl.getUniformLocation(pr,'m'),col=gl.getUniformLocation(pr,'color'),textured=gl.getUniformLocation(pr,'textured');const modelLoc=gl.getUniformLocation(pr,'model');const lightPositionLocation=gl.getUniformLocation(pr,'lightPositions[0]');let lightLayoutRevision=-1;const attrTint=gl.getAttribLocation(pr,'tint');const attrNormal=gl.getAttribLocation(pr,'normal'),power=gl.getUniformLocation(pr,'power'),emit=gl.getUniformLocation(pr,'emission');gl.enable(gl.DEPTH_TEST);gl.clearColor(.035,.075,.105,1);
 function mul(a,b){const r=new Float32Array(16);for(let c=0;c<4;c++)for(let row=0;row<4;row++)for(let k=0;k<4;k++)r[c*4+row]+=a[k*4+row]*b[c*4+k];return r}
 function camera(){const cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch),r=[cy,0,sy],u=[-sy*sp,cp,cy*sp],b=[-sy*cp,-sp,cy*cp],dot=v=>v[0]*eye[0]+v[1]*eye[1]+v[2]*eye[2];const view=[r[0],u[0],b[0],0,r[1],u[1],b[1],0,r[2],u[2],b[2],0,-dot(r),-dot(u),-dot(b),1];const aspect=canvas.width/canvas.height,f=(Math.min(1/Math.tan(Math.PI/6),aspect*1.25)*zoom);return mul([f/aspect,0,0,0,0,f,0,0,0,0,-1.002,-1,0,0,-.2002,0],view)}
@@ -97,7 +97,7 @@ box(hall.left,0,hallCenterZ,.25,6,hallDepth,[.12,.21,.26]);box(hall.right,0,hall
 for(let z=hall.back+2;z<hall.front-2;z+=6){box(hall.left+.5,0,z,.35,5,.35,[.28,.39,.43]);box(hall.right-.5,0,z,.35,5,.35,[.28,.39,.43]);box(0,5,z,hallWidth-1,.12,.16,[.42,.65,.65])}
 box(0,.02,hallCenterZ,.07,.025,hallDepth-2,[.62,.87,.65]);
 label('КОЛЛЕКЦИЯ / ИЛЬЯ БАРИЛО',0,4,hall.back+.3,12,.9);
-const zoneFloorColors=[[.20,.34,.20],[.39,.28,.16],[.14,.28,.37],[.35,.19,.32],[.14,.31,.28],[.22,.20,.38]];
+const zoneFloorColors=[[.20,.34,.20],[.39,.28,.16],[.14,.28,.37],[.35,.19,.32],[.14,.31,.28],[.22,.20,.38],[.16,.20,.38],[.16,.30,.23],[.22,.32,.40],[.36,.27,.18]];
 function screenBezel(x,z,color,bodyColor){
  // A single shell: the bezel owns the sides and back, with no overlapping body box.
  const outer=[[-1.675,.30],[1.675,.30],[1.675,3.44],[-1.675,3.44]],inner=[[-1.5,.38],[1.5,.38],[1.5,3.25],[-1.5,3.25]],p=(v,depth)=>[x+v[0],v[1],z+depth];
@@ -109,7 +109,7 @@ function screenBezel(x,z,color,bodyColor){
  quad(p(outer[1],-.25),p(outer[0],-.25),p(outer[3],-.25),p(outer[2],-.25),bodyColor.map(v=>v*.65));
  quad(p(inner[0],.24),p(inner[1],.24),p(inner[2],.24),p(inner[3],.24),bodyColor);
 }
-standAnchors.forEach(([x,y,z],i)=>withStandGroup(i,()=>{const zone=zoneFloorColors[i];box(x,0,z,3.7,.3,1.7,zone);screenBezel(x,z,zone.map(v=>Math.min(1,v*1.5)),zone);gameSign(games[i].title,['САД ЧЕТЫРЁХ СЕЗОНОВ','ЛОГИКА / РИСК / ХОД','РОБОСКЛАД / СЕКТОР 03','ПРАЗДНИЧНЫЕ ПОЖЕЛАНИЯ','ОТ ТЕРМИНАЛА ДО ФРУКТОВОГО САДА','КАСАНИЯ / МУЛЬТИТАЧ / FPS'][i],x,z);const img=new Image();img.onload=()=>withStandGroup(i,()=>{const c=document.createElement('canvas');c.width=768;c.height=736;const q=c.getContext('2d');q.fillStyle='#10212b';q.fillRect(0,0,768,736);const s=Math.max(768/img.width,736/img.height);q.drawImage(img,(768-img.width*s)/2,(736-img.height*s)/2,img.width*s,img.height*s);quad([x-1.5,.38,z+.27],[x+1.5,.38,z+.27],[x+1.5,3.25,z+.27],[x-1.5,3.25,z+.27],[1,1,1],texture(c))});img.src=games[i].imageUrl}));
+standAnchors.forEach(([x,y,z],i)=>withStandGroup(i,()=>{const zone=zoneFloorColors[i];if(i<6){box(x,0,z,3.7,.3,1.7,zone);screenBezel(x,z,zone.map(v=>Math.min(1,v*1.5)),zone);}else themedScreenHousing(i,x,z,zone);gameSign(games[i].title,['САД ЧЕТЫРЁХ СЕЗОНОВ','ЛОГИКА / РИСК / ХОД','РОБОСКЛАД / СЕКТОР 03','ПРАЗДНИЧНЫЕ ПОЖЕЛАНИЯ','ОТ ТЕРМИНАЛА ДО ФРУКТОВОГО САДА','КАСАНИЯ / МУЛЬТИТАЧ / FPS','КОСМОС / ТРАЕКТОРИЯ / ДОСТАВКА','СВЕТЛЯЧКИ / ЛУННЫЙ ЦВЕТОК','ПРЫЖКИ / ОБЛАКА / ЗВЁЗДЫ','БЛОКИ / ТЕЛЕЖКА / КРАН'][i],x,z);const img=new Image();img.onload=()=>withStandGroup(i,()=>{const c=document.createElement('canvas');c.width=768;c.height=736;const q=c.getContext('2d');q.fillStyle='#10212b';q.fillRect(0,0,768,736);const s=Math.max(768/img.width,736/img.height);q.drawImage(img,(768-img.width*s)/2,(736-img.height*s)/2,img.width*s,img.height*s);quad([x-1.5,.38,z+.27],[x+1.5,.38,z+.27],[x+1.5,3.25,z+.27],[x-1.5,3.25,z+.27],[1,1,1],texture(c))});img.src=games[i].imageUrl}));
 
 // Decorative geometry belongs only to this local showcase prototype.
 const props=[];function prop(x,z,r){const group=activeStandGroup>=0?activeStandGroup:activePlatform,p={x,z,r,group,benchmarkVariant:activeBenchmarkVariant};props.push(p);if(group>=0)standGroups[group].obstacles.push(p)}
@@ -128,18 +128,19 @@ function crate(x,y,z){box(x,y,z,.9,.85,.9,[.26,.40,.50]);raisedFrame(x,y+.10,z+.
 // Ceiling coffers, rail lights, wall ribs and a welcome plinth.
 quad([hall.left,hall.height,hall.back],[hall.right,hall.height,hall.back],[hall.right,hall.height,hall.front],[hall.left,hall.height,hall.front],[.12,.19,.25]);
 for(let z=hall.back+3;z<=hall.front-3;z+=3){box(hall.left+.25,.6,z,.15,3.6,1.6,[.18,.27,.33]);box(hall.right-.25,.6,z,.15,3.6,1.6,[.18,.27,.33])}
-for(const [i,[x,z,tint]] of [[-4,-1,[.75,1,.65]],[4,-1,[1,.72,.38]],[-4,-10,[.42,.78,1]],[4,-10,[1,.48,.75]],[0,-16,[.65,1,.86]],[-8,-22,[.68,.65,1]]].entries())withStandGroup(i,()=>{box(x,4.9,z,3,.15,1.3,[.16,.22,.28]);emissive=1;box(x,4.85,z,2.7,.04,1,[...tint]);emissive=0;box(x-1.5,4.9,z,.06,.6,.06,[.45,.52,.56]);box(x+1.5,4.9,z,.06,.6,.06,[.45,.52,.56]);});
+for(const [i,[x,z,tint]] of [[-4,-1,[.75,1,.65]],[4,-1,[1,.72,.38]],[-4,-10,[.42,.78,1]],[4,-10,[1,.48,.75]],[0,-16,[.65,1,.86]],[-8,-22,[.68,.65,1]],[8,-22,[.65,.72,1]],[-8,-30,[.75,1,.48]],[0,-30,[.65,.88,1]],[8,-30,[1,.78,.42]]].entries())if(i<6)withStandGroup(i,()=>{box(x,4.9,z,3,.15,1.3,[.16,.22,.28]);emissive=1;box(x,4.85,z,2.7,.04,1,[...tint]);emissive=0;box(x-1.5,4.9,z,.06,.6,.06,[.45,.52,.56]);box(x+1.5,4.9,z,.06,.6,.06,[.45,.52,.56]);});
 emissive=1;box(hall.left+.5,.12,hallCenterZ,.07,.05,hallDepth-2,[.35,.62,.68]);box(hall.right-.5,.12,hallCenterZ,.07,.05,hallDepth-2,[.35,.62,.68]);emissive=0;
+standAnchors.slice(6).forEach(([x,y,z],j)=>withStandGroup(j+6,()=>{for(const side of [-1,1]){box(x+side*2.5,5.12,z+.3,.07,.35,.07,[.22,.29,.34]);box(x+side*2.5,5.04,z+.3,.35,.10,.35,[.24,.33,.40]);emissive=1;box(x+side*2.5,5.025,z+.3,.24,.025,.24,[.75,.86,.92]);emissive=0}}));
 // General ceiling lights also illuminate the free areas reserved for future stands.
 for(let x=hallLights.left;x<=hallLights.right;x+=12)for(let z=hallLights.back;z<=hallLights.front;z+=9){
- if(stands.some(s=>Math.hypot(s[0]-x,s[2]+2-z)<2))continue;
+ if(stands.some(s=>Math.hypot(s[0]-x,s[2]+2-z)<2)||standGroups.slice(6).some(g=>Math.abs(g.position[0]-x)<3.1&&z>g.position[2]-1.75&&z<g.position[2]+3.75))continue;
  box(x,4.9,z,2.4,.15,1.0,[.16,.22,.28]);emissive=1;box(x,4.86,z,2.15,.04,.78,[.64,.83,.96]);emissive=0;
  for(const side of [-1,1])box(x+side*1.05,5.05,z,.045,hall.height-5.05,.045,[.38,.52,.58]);
 }
 // The far end is occupied by the evolution stand.
 // Distinct floor materials and perimeter frames. Keep the central aisle clear.
 const colors=zoneFloorColors;
-standAnchors.forEach(([x,y,z],i)=>withStandGroup(i,()=>{box(x,.025,z+1,6.2,.035,5.5,colors[i]);const tint=i===0?[.50,.76,.35]:i===1?[.91,.58,.20]:i===2?[.30,.68,.84]:[.91,.46,.70];emissive=.6;box(x,.08,z+3.70,6.2,.025,.06,tint);emissive=0;}));
+standAnchors.slice(0,6).forEach(([x,y,z],i)=>withStandGroup(i,()=>{box(x,.025,z+1,6.2,.035,5.5,colors[i]);const tint=i===0?[.50,.76,.35]:i===1?[.91,.58,.20]:i===2?[.30,.68,.84]:[.91,.46,.70];emissive=.6;box(x,.08,z+3.70,6.2,.025,.06,tint);emissive=0;}));
 // Snake: garden beds, trees, fruit and a sculpted snake on the side lawn.
 activePlatform=0;tree(-6.4,-1.5,1.45,.70);tree(-1.6,-1.7,1.6,.70);tree(-1.6,-3.7,1.3,.70);for(let k=0;k<5;k++){box(-6.65,.1,-2-k*.45,.8,.22,.34,[.20,.38,.19]);ball(-6.65,.42,-2-k*.45,.15,.15,.15,k%2?[.72,.21,.14]:[.79,.61,.13])}
 function snakePose(t,lag){const a=t*.52-lag;const x=-4.5+1.45*Math.cos(a),z=-.28+.38*Math.sin(a);const angle=Math.atan2(-1.45*Math.sin(a),.38*Math.cos(a));return transform(x,0,z,angle)}
@@ -350,7 +351,123 @@ benchmarkVariant(4,()=>{
  box(-8,.12,-21.65,1.10,.31,.64,[.30,.35,.28]);box(-8,.43,-21.65,1.14,.045,.68,[.41,.44,.33]);label('НАБОР ЩУПОВ',-8,.21,-21.30,.94,.13,'#e3d8b1');prop(-8,-21.65,.72);
  const lead=[];for(let k=0;k<=60;k++){const a=k/60*Math.PI*5;lead.push([-8+Math.cos(a)*.30,.50,-21.65+Math.sin(a)*.20])}benchmarkCable(lead,.016,[.15,.24,.22]);
 });
+// Detailed exhibits for the four new games. All motion uses the pavilion clock.
+function exhibitClamp(v){return Math.max(0,Math.min(1,v))}
+function exhibitEase(v){v=exhibitClamp(v);return v*v*(3-2*v)}
+function exhibitPose(x,y,z,sx=1,sy=sx,sz=sx,angle=0){const m=transform(x,y,z,angle);for(const j of [0,1,2])m[j]*=sx;for(const j of [4,5,6])m[j]*=sy;for(const j of [8,9,10])m[j]*=sz;return m}
+function exhibitBeam(a,b,r,color){benchmarkCable([a,b],r,color)}
+function exhibitRing(x,y,z,rx,rz,color,width=.018,tilt=0){const points=[];for(let k=0;k<=48;k++){const a=k*Math.PI/24;points.push([x+Math.cos(a)*rx,y+Math.sin(a)*rz*Math.sin(tilt),z+Math.sin(a)*rz*Math.cos(tilt)])}benchmarkCable(points,width,color)}
+function exhibitDeck(x,z,rx,rz,height,color,n=12){const vertices=[];for(let k=0;k<n;k++){const a=k*Math.PI*2/n,b=(k+1)*Math.PI*2/n,p=[x+Math.cos(a)*rx,height,z+Math.sin(a)*rz],q=[x+Math.cos(b)*rx,height,z+Math.sin(b)*rz];vertices.push(x,height,z,0,0,...q,0,0,...p,0,0);quad([p[0],.06,p[2]],[q[0],.06,q[2]],q,p,color.map(v=>v*.72))}mesh(vertices,color)}
+function exhibitPlatform(points,height,color){const center=points.reduce((a,p)=>[a[0]+p[0]/points.length,a[1]+p[1]/points.length],[0,0]),v=[];for(let k=0;k<points.length;k++){const a=points[k],b=points[(k+1)%points.length];v.push(center[0],height,center[1],0,0,b[0],height,b[1],0,0,a[0],height,a[1],0,0);quad([a[0],.06,a[1]],[b[0],.06,b[1]],[b[0],height,b[1]],[a[0],height,a[1]],color.map(c=>c*.72))}mesh(v,color)}
+function exhibitLeaf(x,y,z,dx,dy,dz,w,color){const len=Math.hypot(dx,dz)||1,px=-dz/len,pz=dx/len,v=[];function point(u,side){const width=Math.pow(Math.sin(u*Math.PI),.7)*w;return [x+dx*u+px*width*side,y+dy*u+Math.sin(u*Math.PI)*(.10-side*side*.06),z+dz*u+pz*width*side]}for(let k=0;k<7;k++){const a=k/7,b=(k+1)/7;for(const side of [-1,1])for(const tri of [[point(a,0),point(a,side),point(b,side)],[point(a,0),point(b,side),point(b,0)]])for(const p of tri)v.push(...p,0,0)}mesh(v,color);const spine=[];for(let k=0;k<=7;k++)spine.push(point(k/7,0));benchmarkCable(spine,.008,color.map(v=>Math.min(1,v*1.3)))}
+function exhibitStar(x,y,z,r,color){const v=[];for(let k=0;k<10;k++){const a=k*Math.PI/5+Math.PI/2,b=(k+1)*Math.PI/5+Math.PI/2,ra=k%2?r*.45:r,rb=k%2?r:r*.45;v.push(x,y,z+.035,0,0,x+Math.cos(a)*ra,y+Math.sin(a)*ra,z,0,0,x+Math.cos(b)*rb,y+Math.sin(b)*rb,z,0,0)}mesh(v,color)}
+function exhibitCloud(x,y,z,s=1){for(const [dx,dy,dz,r] of [[-.32,0,0,.30],[0,.08,0,.39],[.35,0,0,.27],[-.08,-.035,.16,.32]])ball(x+dx*s,y+dy*s,z+dz*s,r*s,.19*s,r*.75*s,[.82,.91,.98])}
+function themedScreenHousing(i,x,z,zone){
+ // Keep the launch faces fixed, while giving each screen a different structure.
+ const trim=i===6?[.26,.44,.58]:i===7?[.26,.34,.17]:i===8?[.69,.88,.96]:[.47,.40,.27];
+ screenBezel(x,z,trim,zone);
+ if(i===6){
+  for(const side of [-1,1]){exhibitBeam([x+side*1.81,.25,z],[x+side*1.81,3.25,z],.095,[.28,.34,.43]);exhibitBeam([x+side*1.81,3.25,z],[x+side*1.42,3.61,z],.095,[.28,.34,.43]);for(let k=0;k<7;k++){box(x+side*1.74,.48+k*.37,z+.32,.09,.16,.025,[.61,.74,.78]);emissive=.7;box(x+side*1.62,.53+k*.37,z+.307,.025,.055,.018,[.33,.80,1]);emissive=0}}
+  box(x,.09,z,3.8,.19,1.15,[.17,.22,.30]);label('ОРБИТАЛЬНЫЙ ПОЧТАМТ',x,.17,z+.59,2.1,.12,'#8bdfff');
+ }else if(i===7){
+  for(const side of [-1,1]){exhibitBeam([x+side*1.69,.13,z+.16],[x+side*1.76,3.53,z+.13],.09,[.30,.23,.13]);for(let k=0;k<7;k++)exhibitLeaf(x+side*1.73,.38+k*.44,z+.27,-side*.26,.18,.12,.10,[.28,.49,.21]);}
+  for(let k=0;k<7;k++)ball(x-1.53+k*.51,.19,z,.36,.20,.36,[.22,.32,.18]);
+ }else if(i===8){
+  for(let k=0;k<5;k++)exhibitCloud(x-1.4+k*.7,.20,z,.74);
+  for(const side of [-1,1]){exhibitBeam([x+side*1.65,.40,z+.12],[x+side*1.65,3.39,z+.12],.028,[.58,.84,.94]);exhibitCloud(x+side*1.65,3.28,z,.38)}
+ }else{
+  for(const side of [-1,1]){box(x+side*1.76,.12,z,.13,3.35,.27,[.74,.54,.25]);for(let k=0;k<7;k++)box(x+side*1.76,.25+k*.43,z+.15,.17,.065,.04,[.24,.27,.29]);}
+  box(x,.08,z,3.8,.21,1.10,[.33,.37,.38]);for(let k=0;k<12;k++)box(x-1.65+k*.30,.12,z+.57,.15,.11,.028,k%2?[.94,.70,.20]:[.12,.17,.20]);
+ }
+}
+// Courier: launch, curved transfer, autopilot approach, parcel delivery, return.
+function courierSceneState(t){const p=(t%16)/16;let u;if(p<.12)u=0;else if(p<.46)u=exhibitEase((p-.12)/.34);else if(p<.64)u=1;else u=1-exhibitEase((p-.64)/.36);const a=Math.sin(Math.PI*u);return {x:5.72+4.55*u,y:.99+3.52*Math.pow(a,.62),z:-22.65-.72*a,u,returning:p>=.64,parcelY:.80-.34*exhibitEase((p-.46)/.06),parcel:p<.52,delivered:p>=.52&&p<.94}}
+activePlatform=6;
+exhibitDeck(8,-23,3.03,2.48,.13,[.12,.18,.27],8);
+for(let k=0;k<7;k++){box(8,.135,-24.8+k*.65,5.1*Math.sqrt(1-((-1.8+k*.65)/2.48)**2),.012,.016,[.26,.38,.47]);for(const side of [-1,1])box(8+side*2.78,.14,-24.6+k*.60,.08,.02,.16,[.48,.66,.73])}
+for(const side of [-1,1]){const x=8+side*2.28;exhibitDeck(x,-22.65,.66,.61,.43,[.22,.30,.39]);exhibitRing(x,.45,-22.65,.51,.47,[.31,.85,1],.024);for(let k=0;k<4;k++){const a=k*Math.PI/2;box(x+Math.cos(a)*.49,.48,-22.65+Math.sin(a)*.45,.065,.12,.065,[.89,.73,.37])}label(side<0?'01 · ОТПРАВКА':'02 · ДОСТАВКА',x,.23,-22.02,1.0,.12,'#a6e7f8');prop(x,-22.65,.70)}
+ball(10.24,2.5,-24,.59,.59,.59,[.40,.46,.79]);
+for(const r of [.74,.82])exhibitRing(10.24,2.5,-24,r,r*.58,[.73,.65,.84],.035,.48);
+for(let k=0;k<4;k++){const y=2.20+k*.17,r=Math.sqrt(.59*.59-(y-2.5)**2);exhibitRing(10.24,y,-24,r,r,[.56,.54,.83],.015)}
+exhibitBeam([10.24,.16,-24],[10.24,1.88,-24],.035,[.32,.41,.52]);prop(10.24,-24,.76);
+// Antenna and stacked cargo make the departure side a working dock.
+for(let k=0;k<3;k++){box(5.5,.14+k*.23,-24.22,.52,.22,.45,[.39+k*.1,.43+k*.07,.48]);box(5.5,.18+k*.23,-23.985,.06,.15,.015,[.94,.66,.28])}
+exhibitBeam([5.45,.14,-24.75],[5.45,3.0,-24.75],.045,[.38,.48,.58]);exhibitRing(5.45,3.02,-24.75,.37,.37,[.48,.79,.92],.035,Math.PI/2);exhibitBeam([5.45,3.02,-24.75],[5.45,3.13,-24.42],.025,[.65,.77,.82]);
+for(let k=0;k<23;k++){const u=k/22,a=Math.sin(Math.PI*u);emissive=.65;ball(5.72+4.55*u,1.08+3.52*Math.pow(a,.62),-22.65-.72*a,.018,.018,.018,[.38,.73,.95]);emissive=0}
+const courierMotion=t=>{const q=courierSceneState(t);return transform(q.x,q.y,q.z,q.returning?-Math.PI/2:Math.PI/2)};
+motion=courierMotion;
+ball(0,.10,0,.17,.14,.34,[.83,.87,.92]);ball(0,.16,.10,.13,.10,.15,[.20,.63,.82]);box(0,.03,-.08,.60,.035,.22,[.29,.48,.67]);for(const side of [-1,1]){box(side*.23,-.02,-.08,.09,.10,.24,[.55,.64,.71]);emissive=.9;ball(side*.23,.02,-.23,.035,.04,.08,[.34,.84,1]);emissive=0}motion=null;
+motion=t=>{const q=courierSceneState(t);return exhibitPose(q.x,q.u>.999?q.parcelY:q.y-.19,q.z,q.parcel?1:.001)};box(0,0,0,.18,.16,.18,[.95,.61,.20]);box(0,.01,.095,.04,.14,.015,[1,.86,.52]);motion=null;
+motion=t=>exhibitPose(10.27,.46,-22.65,courierSceneState(t).delivered?1:.001);box(0,0,0,.26,.22,.24,[.95,.61,.20]);box(0,.01,.125,.055,.20,.015,[1,.86,.52]);motion=null;
+// Fireflies: a bent tree, a web obstacle and a moonflower receiving the whole swarm.
+activePlatform=7;
+exhibitDeck(-8,-31,3.04,2.47,.12,[.13,.23,.17],15);
+for(const [x,z,s] of [[-10.25,-31.6,.9],[-5.7,-30.6,1],[-9.9,-29.7,.72]]){exhibitDeck(x,z,.67*s,.57*s,.23,[.22,.34,.20],9);prop(x,z,.60*s)}
+const trunk=[[-10.45,.13,-32.1],[-10.56,1.1,-32.15],[-10.34,2.05,-32.05],[-10.45,3.12,-32.2],[-9.98,4.15,-32.25]];
+benchmarkCable(trunk,.17,[.25,.20,.13]);benchmarkCable(trunk.map(p=>[p[0]+.045,p[1],p[2]+.14]),.024,[.43,.34,.20]);
+for(const [dx,dz] of [[-.35,.5],[.45,.4],[.18,-.6]])benchmarkCable([trunk[1],[-10.45+dx*.6,.28,-32.1+dz*.6],[-10.45+dx,.15,-32.1+dz]],.09,[.25,.20,.13]);
+const crown=[[-9.98,4.15,-32.25],[-8.9,4.48,-32.22],[-7.8,4.52,-32.13],[-6.7,4.15,-32.10]];benchmarkCable(crown,.08,[.31,.25,.15]);
+for(let k=0;k<12;k++){const u=k/11;exhibitLeaf(-10+3.35*u,4.1+Math.sin(u*Math.PI)*.36,-32.15,(k%2?.32:-.22),.22,(k%2?-.44:.40),.16,[.22,.42+k%3*.035,.22])}
+// Silk spokes are a real obstacle around which the swarm climbs.
+const webX=-10.15,webY=2.45,webZ=-30.9;
+for(let k=0;k<8;k++){const a=k*Math.PI/4;exhibitBeam([webX,webY,webZ],[webX+Math.cos(a)*.52,webY+Math.sin(a)*.68,webZ],.006,[.57,.68,.65])}
+for(const r of [.23,.46,.70,1]){const ps=[];for(let k=0;k<=8;k++){const a=k*Math.PI/4;ps.push([webX+Math.cos(a)*.52*r,webY+Math.sin(a)*.68*r,webZ])}benchmarkCable(ps,.006,[.57,.68,.65])}
+ball(webX+.18,webY+.12,webZ+.03,.065,.08,.045,[.20,.15,.24]);for(const side of [-1,1])for(let k=0;k<3;k++)benchmarkCable([[webX+.18,webY+.12,webZ+.02],[webX+.18+side*.13,webY+.18-k*.05,webZ+.04],[webX+.18+side*.19,webY+.10-k*.06,webZ]],.009,[.24,.19,.26]);
+exhibitDeck(-5.8,-30.7,.82,.68,.30,[.12,.28,.29],16);exhibitRing(-5.8,.31,-30.7,.66,.52,[.34,.59,.48],.012);
+benchmarkCable([[-5.8,.31,-30.7],[-5.97,.74,-30.7],[-5.75,1.26,-30.7],[-5.82,1.62,-30.7]],.045,[.28,.49,.22]);
+for(let k=0;k<8;k++){const a=k*Math.PI/4;ball(-5.82+Math.cos(a)*.31,1.70+Math.sin(a)*.31,-30.7,.24,.24,.09,[.78,.85,.98])}
+emissive=.7;ball(-5.82,1.70,-30.57,.17,.17,.10,[1,.95,.56]);emissive=0;
+exhibitLeaf(-5.9,.75,-30.7,-.42,.23,.26,.19,[.28,.49,.22]);exhibitLeaf(-5.9,.95,-30.7,.45,.22,-.22,.19,[.31,.55,.23]);
+for(const [x,z] of [[-10.35,-29.8],[-6,-32.6],[-7,-29.4]])for(let k=0;k<7;k++){const a=k*Math.PI*2/7;exhibitLeaf(x,.13,z,Math.cos(a)*.43,.24,Math.sin(a)*.40,.085,[.23,.41,.21])}
+for(let k=0;k<8;k++){const x=-10.45+(k%3)*.20,z=-29.6-Math.floor(k/3)*.20;box(x,.13,z,.035,.14,.035,[.70,.67,.46]);ball(x,.30,z,.10,.065,.10,k%2?[.69,.40,.25]:[.77,.65,.38])}
+function fireflyScenePose(t,k){const cycle=t%16,forward=exhibitClamp((cycle-1-k*.025)/7),u=cycle<11?forward:1-exhibitEase((cycle-11)/5),route=[[-10.13,1.10,-30.7],[-10.80,2.1,-30.3],[-10.50,3.35,-30.3],[-9.8,4.15,-31.4],[-7.9,4.45,-31.5],[-5.85,4.15,-31.3],[-5.40,2.5,-30.6],[-5.82,1.70,-30.47]],part=Math.min(6,Math.floor(u*7)),f=exhibitEase(u*7-part),a=route[part],b=route[part+1],gather=cycle>=8&&cycle<11?exhibitEase((cycle-8)/1.4):0,spread=.12*(1-gather)+.035;return [a[0]+(b[0]-a[0])*f+Math.sin(k*2.4+t*2)*spread,a[1]+(b[1]-a[1])*f+Math.cos(k*1.7+t*1.3)*spread,a[2]+(b[2]-a[2])*f+Math.sin(k*1.3+t)*spread]}
+for(let k=0;k<24;k++){motion=t=>{const p=fireflyScenePose(t,k);return transform(...p)};ball(0,0,0,.017,.025,.025,[.25,.32,.14]);emissive=.9;ball(0,-.025,0,.043,.042,.043,[.85,1,.34]);emissive=0;exhibitLeaf(0,0,0,-.05,.014,.02,.015,[.64,.78,.58]);exhibitLeaf(0,0,0,.05,.014,.02,.015,[.64,.78,.58]);motion=null}
+motion=t=>{const s=1+.18*Math.sin(t*2);return exhibitPose(-5.82,1.69,-30.7,s,1,s)};emissive=.6;exhibitRing(0,0,0,.28,.28,[1,.87,.39],.012,Math.PI/2);emissive=0;motion=null;
+// Cloud tower: connected jumping route, a compressing spring and collected stars.
+activePlatform=8;
+exhibitDeck(0,-31,2.97,2.42,.10,[.26,.43,.53],11);
+for(const [x,z,s] of [[-2.25,-30.4,1.05],[1.95,-31.7,1.3],[.1,-32.5,1.3]])exhibitCloud(x,.24,z,s);
+const cloudRoute=[[-2.25,.65,-30.2],[-2.35,1.6,-30.7],[-2.20,2.65,-31],[-2.1,3.65,-31.5],[0,4.37,-32],[2.15,3.65,-31.5],[2.28,2.55,-31],[2.2,1.55,-30.6],[2.18,.65,-30.1],[0,.28,-29.45]];
+for(const [k,p] of cloudRoute.entries()){if(k===1||k===9)continue;exhibitCloud(...p,k===4?.82:k===9?.60:.74)}
+function cloudSceneState(t){const phase=(t%12)/1.2,k=Math.floor(phase),u=phase-k,a=cloudRoute[k],b=cloudRoute[(k+1)%cloudRoute.length],q=exhibitEase(u),compression=k===0&&u>.80?1-(u-.80)*2.1:k===1&&u<.22?.58+u/.22*.42:1;if(k>=8){const r=(k-8+u)/2,v=exhibitEase(r);return {k,u,x:2.18-4.43*v,y:.97-.70*Math.sin(Math.PI*r),z:-30.1-.1*v+.65*Math.sin(Math.PI*r)}}return {k,u,x:a[0]+(b[0]-a[0])*q,y:a[1]+(b[1]-a[1])*q+.32+Math.sin(Math.PI*u)*(k===3||k===4?.35:.40)-.285*(1-compression),z:a[2]+(b[2]-a[2])*q}}
+function cloudSpringCompression(t){const q=cloudSceneState(t);return q.k===0&&q.u>.80?1-(q.u-.80)*2.1:q.k===1&&q.u<.22?.58+q.u/.22*.42:1}
+exhibitCloud(-2.35,1.43,-30.7,.74);
+motion=t=>exhibitPose(-2.35,1.49,-30.7,1,cloudSpringCompression(t),1);const coil=[];for(let k=0;k<=48;k++){const a=k/48*Math.PI*8;coil.push([Math.cos(a)*.12,k/48*.24,Math.sin(a)*.12])}benchmarkCable(coil,.017,[.91,.62,.28]);box(0,.24,0,.38,.045,.34,[.91,.64,.28]);motion=null;
+for(const k of [2,4,6]){const p=cloudRoute[k];motion=t=>{const q=cloudSceneState(t),visible=q.k<k||q.k===9;const s=visible?1:.001;return exhibitPose(p[0],p[1]+.48,p[2],s,s,s,Math.sin(t)*.3)};emissive=.6;exhibitStar(0,0,0,.13,[1,.81,.27]);emissive=0;motion=null}
+const cloudHeroMotion=t=>{const q=cloudSceneState(t);return transform(q.x,q.y,q.z)};
+motion=cloudHeroMotion;box(0,0,0,.17,.19,.12,[.22,.52,.76]);ball(0,.28,0,.105,.11,.095,[.95,.73,.48]);ball(0,.355,-.015,.11,.055,.09,[.29,.20,.13]);for(const side of [-1,1]){box(side*.055,-.11,0,.065,.12,.07,[.21,.28,.38]);box(side*.06,-.13,.025,.085,.045,.12,[.86,.47,.22]);exhibitBeam([side*.08,.15,0],[side*.15,.24,0],.026,[.95,.73,.48])}box(0,.23,.094,.10,.032,.01,[.23,.25,.29]);motion=null;
+motion=t=>{const q=cloudSceneState(t);return mul(transform(q.x,q.y+.17,q.z-.06),pivotZ(0,0,0,Math.sin(t*5)*.16))};exhibitLeaf(0,0,0,-.22,-.13,-.16,.13,[.87,.29,.23]);motion=null;
+for(const [x,z] of [[-2.55,-32.6],[2.55,-32.6]]){const ps=[];for(let k=0;k<=32;k++){const u=k/32;ps.push([x+Math.sin(u*Math.PI*3)*.19,.35+u*3.4,z+Math.cos(u*Math.PI*3)*.20])}benchmarkCable(ps,.015,[.62,.83,.91]);prop(x,z,.36)}
+// Construction: one coherent cycle shared by the cart, hoist, load and growing tower.
+function constructionSceneState(t){const cycle=t%56,layer=Math.floor(cycle/14),p=cycle%14,from=7.0,pickup=9.85,tower=5.72,deck=.50+layer*.26;let cart=from;if(p<3)cart=from+(pickup-from)*exhibitEase(p/3);else if(p<5)cart=pickup;else cart=pickup+(from-pickup)*exhibitEase((p-5)/3);let hx=pickup,hy=.53;if(p>=3&&p<5.5)hy=.53+(4.0-.53)*exhibitEase((p-3)/2.5);else if(p>=5.5&&p<8){hy=4.0;hx=pickup+(tower-pickup)*exhibitEase((p-5.5)/2.5)}else if(p>=8&&p<10.5){hx=tower;hy=4.0+(deck-4.0)*exhibitEase((p-8)/2.5)}else if(p>=10.5&&p<12){hx=tower;hy=deck+(4.0-deck)*exhibitEase((p-10.5)/1.5)}else if(p>=12){hx=tower+(pickup-tower)*exhibitEase(p-12);hy=4.0+(.53-4.0)*exhibitEase(p-13)}const load=p<3?[cart,.53,-29.8]:p<10.5?[hx,hy,-29.8]:[tower,deck,-29.8];return {layer,p,cart,hx,hy,load,placed:layer+(p>=10.5?1:0)}}
+activePlatform=9;
+exhibitPlatform([[5.35,-33.43],[10.65,-33.43],[11.04,-33.04],[11.04,-28.98],[10.65,-28.55],[5.35,-28.55],[4.96,-28.98],[4.96,-33.04]],.14,[.30,.31,.29]);
+// Road has curbs, sleepers and dashed lane markings, with an open viewing edge.
+box(8,.15,-29.8,4.55,.055,.83,[.15,.20,.23]);for(let k=0;k<12;k++)box(5.94+k*.37,.211,-29.4,.19,.012,.04,[.82,.70,.39]);
+for(const x of [5.5,10.65]){box(x,.15,-31.5,.65,.20,1.3,[.37,.39,.37]);prop(x,-31.5,.63)}
+// Steel lattice mast and long triangulated jib.
+for(const x of [10.35,10.75])for(const z of [-31.45,-31.05])exhibitBeam([x,.34,z],[x,4.6,z],.045,[.90,.60,.20]);
+for(let k=0;k<10;k++){const y=.35+k*.42;for(const z of [-31.45,-31.05])exhibitBeam([10.35,y,z],[10.75,y+.42,z],.025,[.84,.50,.16]);exhibitBeam([10.35,y,-31.45],[10.35,y+.42,-31.05],.025,[.84,.50,.16])}
+for(const y of [4.55,4.92])for(const z of [-30.0,-29.6])exhibitBeam([5.45,y,z],[10.78,y,z],.045,[.93,.66,.24]);
+for(let k=0;k<12;k++){const x=5.45+k*.44;for(const z of [-30.0,-29.6])exhibitBeam([x,4.55,z],[x+.44,4.92,z],.024,[.84,.53,.18]);}
+exhibitBeam([10.55,4.6,-31.25],[10.55,4.7,-29.8],.08,[.90,.60,.20]);box(10.55,3.50,-30.7,.66,.52,.62,[.88,.66,.28]);box(10.55,3.61,-30.378,.51,.30,.025,[.20,.43,.53]);prop(10.55,-30.65,.65);
+for(let k=0;k<5;k++){const x=5.6+k*.12;box(x,.15,-32.5,.08,.30,.46,[.49,.47,.38]);}for(let k=0;k<3;k++)box(9.8,.15+k*.13,-32.6,.55,.12,.41,[.61,.57,.44]);
+for(const x of [5.6,10.5]){box(x,.16,-28.95,.055,.48,.055,[.64,.67,.64]);box(x,.44,-28.95,.72,.13,.055,[.94,.70,.27]);for(let k=0;k<4;k++)box(x-.27+k*.18,.445,-28.915,.08,.12,.015,[.19,.23,.24]);prop(x,-28.95,.42)}
+label('ПРИЁМ БЛОКОВ',9.83,.25,-29.30,.91,.13,'#ffd991');label('СБОРКА БАШНИ',5.72,.25,-29.30,.91,.13,'#ffd991');
+exhibitDeck(5.72,-29.8,.62,.57,.48,[.45,.47,.43],4);prop(5.72,-29.8,.67);
+const cartMotion=t=>transform(constructionSceneState(t).cart,.30,-29.8);
+motion=cartMotion;box(0,0,0,.62,.13,.45,[.92,.62,.22]);box(0,.13,0,.72,.075,.53,[.56,.62,.62]);for(const side of [-1,1])box(side*.29,.12,0,.035,.20,.47,[.92,.62,.22]);motion=null;
+for(const side of [-1,1])for(const z of [-.25,.25]){motion=t=>{const q=constructionSceneState(t);return mul(transform(q.cart+side*.21,.27,-29.8+z),pivotZ(0,0,0,-q.cart/.10))};ball(0,0,0,.10,.10,.055,[.11,.15,.18]);box(0,-.06,.06,.022,.12,.015,[.56,.61,.59]);motion=null}
+motion=t=>{const q=constructionSceneState(t);return transform(q.hx,4.55,-29.8)};box(0,0,0,.40,.16,.48,[.31,.37,.39]);for(const x of [-.15,.15])ball(x,.13,0,.08,.08,.09,[.17,.22,.25]);motion=null;
+motion=t=>{const q=constructionSceneState(t);return exhibitPose(q.hx,q.hy+.38,-29.8,1,Math.max(.02,4.55-q.hy-.38),1)};box(0,0,0,.018,1,.018,[.49,.54,.56]);motion=null;
+motion=t=>{const q=constructionSceneState(t);return transform(q.hx,q.hy+.28,-29.8)};benchmarkCable([[0,.10,0],[0,0,0],[.08,-.04,0],[.13,.025,0]],.022,[.35,.40,.42]);motion=null;
+for(let k=0;k<4;k++){motion=t=>{const q=constructionSceneState(t);return exhibitPose(5.72,.50+k*.26,-29.8,k<q.placed?1:.001)};box(0,0,0,.62,.24,.55,k%2?[.72,.39,.24]:[.83,.62,.33]);box(0,.10,.282,.47,.025,.012,[.95,.80,.55]);motion=null}
+motion=t=>{const q=constructionSceneState(t);return exhibitPose(...q.load,q.p<10.5?1:.001)};box(0,0,0,.62,.24,.55,[.83,.62,.33]);box(0,.10,.282,.47,.025,.012,[.95,.80,.55]);motion=null;
+// A shared motion footprint keeps the side delivery lane clear while visitors walk.
+prop(8.4,-29.8,1.12);
 activePlatform=-1;
+// End detailed exhibits.
+
 function blocked(x,z){const robot=robotDrive(animTime),delta=standOffset(2);return Math.hypot(x-robot.x-delta[0],z-robot.z-delta[2])<.97||props.some(p=>{if(!benchmarkVisible(p))return false;const d=standOffset(p.group);return Math.hypot(x-p.x-d[0],z-p.z-d[2])<p.r+.25})||stands.some(s=>Math.abs(x-s[0])<2.1&&z-s[2]>-1.2&&z-s[2]<3.15)}
 
 // Intersect the camera ray with the floor plane. Walking follows a collision-free grid route.

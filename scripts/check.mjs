@@ -6,6 +6,14 @@ import { fileURLToPath } from 'node:url';
 import { renderDetailsPage } from './descriptions.mjs';
 import { renderLegalPages } from './licenses.mjs';
 
+// Internal development notes stay in the source checkout only. License files are unaffected.
+export const excludedGameFiles = new Set([
+    "games/zvezdny-kurer/zvezdny-kurer.md",
+    "games/staya-svetlyachkov/staya-svetlyachkov.md",
+    "games/bashnya-oblakov/bashnya-oblakov-development-notes.md",
+    "games/bashnya-do-oblakov/bashnya-do-oblakov-development-notes.md"
+]);
+
 export const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 export function loadCatalog(root) {

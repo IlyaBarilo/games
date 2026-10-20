@@ -20,3 +20,5 @@
 @media(max-height:650px) and (min-width:651px){.minimap{width:155px}.map-floor{height:210px}.map-floor button[data-zone]:not(.entrance){width:28px;height:24px}.map-floor button span{display:none}}
 
 .benchmark{border-color:#ad9fe8}
+
+.courier{border-color:#879de8}.fireflies{border-color:#b9dc7c}.clouds{border-color:#9fd8f5}.construction{border-color:#efbd6d}

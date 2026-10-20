@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { projectRoot, checkProject, loadCatalog } from './check.mjs';
+import { projectRoot, checkProject, loadCatalog, excludedGameFiles } from './check.mjs';
 import { parseReleaseTag } from './version.mjs';
 
 const release = process.env.RELEASE_TAG ? parseReleaseTag(process.env.RELEASE_TAG) : null;
@@ -32,6 +32,7 @@ for (const mode of ['web', 'gamespace']) {
     });
     walk(output, (file, entry) => {
         assert(!privateNames.has(entry.name), 'Private material: ' + file);
+        assert(!excludedGameFiles.has(path.relative(output, file).split(path.sep).join('/')), 'Internal game notes: ' + file);
         if (!entry.isFile() || !entry.name.endsWith('.html') || path.relative(output, file).split(path.sep)[0] === 'games') return;
         const html = fs.readFileSync(file, 'utf8');
         assert(!html.includes('__VERSION__'), 'Unresolved version marker');
@@ -43,7 +44,7 @@ for (const mode of ['web', 'gamespace']) {
     for (const directory of directories) {
         const source = path.join(projectRoot, directory);
         walk(source, (file, entry) => {
-            if (entry.isFile()) assert.equal(hash(path.join(output, directory, path.relative(source, file))), hash(file), 'Game file changed: ' + file);
+            if (entry.isFile() && !excludedGameFiles.has(path.relative(projectRoot, file).split(path.sep).join('/'))) assert.equal(hash(path.join(output, directory, path.relative(source, file))), hash(file), 'Game file changed: ' + file);
         });
         walk(path.join(output, directory), (file, entry) => {
             if (entry.isFile()) assert(fs.existsSync(path.join(source, path.relative(path.join(output, directory), file))), 'Unexpected game file: ' + file);
