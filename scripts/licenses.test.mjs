@@ -23,7 +23,7 @@ try {
     assert.throws(() => checkSupplementalLicenses(temporary), /ENOENT/);
     fs.copyFileSync(path.join(root, 'licenses', files[0]), path.join(temporary, 'licenses', files[0]));
     fs.copyFileSync(path.join(root, 'LICENSE.md'), path.join(temporary, 'LICENSE.md'));
-    for (const id of ['snake3d-turns', 'tictac', 'tictac-robots', '8march-shariki']) {
+    for (const id of ['snake3d-turns', 'tictac', 'tictac-robots', '8march-shariki', 'snake-evolution']) {
         const folder = path.join(temporary, 'games', id);
         fs.mkdirSync(folder, { recursive: true });
         fs.copyFileSync(path.join(root, 'games', id, id + '.html'), path.join(folder, id + '.html'));

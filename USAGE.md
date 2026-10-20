@@ -21,13 +21,15 @@ A/D и стрелки влево/вправо поворачивают. На с�
 
 ## Скачать одну игру
 
-Каждая из четырёх игр работает из одного HTML-файла. Обложки из репозитория
+Каждая игра коллекции работает из одного HTML-файла. Обложки из репозитория
 для запуска игры скачивать не требуется.
 
 | Игра | Файл в репозитории |
 |---|---|
 | Змейка 3D | [snake3d-turns.html](https://github.com/IlyaBarilo/games/blob/main/games/snake3d-turns/snake3d-turns.html) |
 | Крестики-нолики с сапёром | [tictac.html](https://github.com/IlyaBarilo/games/blob/main/games/tictac/tictac.html) |
+| Змейка: эволюция видеоигр | [snake-evolution.html](https://github.com/IlyaBarilo/games/blob/main/games/snake-evolution/snake-evolution.html) |
+| Диагностика интерактивного экрана | [interactive-screen-benchmark.html](https://github.com/IlyaBarilo/games/blob/main/games/interactive-screen-benchmark/interactive-screen-benchmark.html) |
 | Робосклад | [tictac-robots.html](https://github.com/IlyaBarilo/games/blob/main/games/tictac-robots/tictac-robots.html) |
 | Шарики с поздравлениями к 8 Марта | [8march-shariki.html](https://github.com/IlyaBarilo/games/blob/main/games/8march-shariki/8march-shariki.html) |
 
@@ -42,6 +44,8 @@ A/D и стрелки влево/вправо поворачивают. На с�
 JavaScript; для «Змейки 3D» также нужен WebGL. Способ открытия локального HTML
 на телефоне зависит от системы и браузера; для коллекции на телефоне можно использовать GameSpace.
 Полные условия автора и сторонние уведомления уже находятся внутри файлов игр.
+Исключение — текущий HTML диагностического теста: полный текст условий автора
+в него пока не встроен; для него также действуют [условия коллекции](LICENSE.md).
 
 ## Скачать готовую коллекцию
 

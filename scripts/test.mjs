@@ -11,6 +11,7 @@ const read = file => fs.readFileSync(path.join(projectRoot, file), 'utf8').repla
 const snake = read('games/snake3d-turns/snake3d-turns.html');
 const tictac = read('games/tictac/tictac.html');
 const robosklad = read('games/tictac-robots/tictac-robots.html');
+const evolution = read('games/snake-evolution/snake-evolution.html');
 function between(source, start, end) {
     const first = source.indexOf(start);
     const last = source.indexOf(end, first);
@@ -41,10 +42,17 @@ function resolveRobosklad(search, saved = {}) {
     const context = { location: { search }, URLSearchParams, localStorage: { getItem: () => JSON.stringify(saved) } };
     return JSON.parse(vm.runInNewContext(rules + '\nconst R = globalThis.RoboRules;\n' + selection + '\nconst config = initialConfig(); JSON.stringify({ selected: config.difficulty, config, presets: Object.keys(R.DIFFICULTIES) });', context));
 }
+function resolveEvolution(search, saved = 5) {
+    const progressCode = between(evolution, 'const EvolutionProgress = (() => {', '})();') + '})();';
+    const selection = between(evolution, 'const query = new URLSearchParams(location.search);', "  if (query.has('cells'))");
+    const context = { location: { search }, URLSearchParams, progress: { difficulty: saved } };
+    return JSON.parse(vm.runInNewContext(progressCode + '\n' + selection + '\nJSON.stringify({selected:String(progress.difficulty),config:{difficulty:progress.difficulty},presets:["1","2","3","4","5"]});', context));
+}
 const contracts = {
     'snake3d-turns': ['easy', 'normal', 'hard'],
     'tictac': ['simple', 'normal', 'hard', 'expert'],
-    'tictac-robots': ['simple', 'normal', 'hard', 'expert']
+    'tictac-robots': ['simple', 'normal', 'hard', 'expert'],
+    'snake-evolution': ['1', '2', '3', '4', '5']
 };
 const catalog = loadCatalog(projectRoot);
 const active = catalog.games.filter(game => game.available);
@@ -53,16 +61,17 @@ for (const game of active) {
     const levels = Object.values(game.difficulties || {});
     const expected = contracts[game.id];
     if (!expected) {
-        assert.equal(game.id, '8march-shariki');
+        assert(['8march-shariki', 'interactive-screen-benchmark'].includes(game.id), 'New game needs an explicit launch contract');
         assert.equal(levels.length, 0);
         assert(!main.searchParams.has('diff'));
         continue;
     }
-    assert.equal(main.searchParams.get('diff'), 'normal');
+    const defaultDifficulty = game.id === 'snake-evolution' ? '3' : 'normal';
+    assert.equal(main.searchParams.get('diff'), defaultDifficulty);
     const actual = levels.map(level => new URL(level.link, main).searchParams.get('diff'));
     assert.deepEqual(actual, expected, 'Catalog values must match restored presets');
-    const resolve = { 'snake3d-turns': resolveSnake, tictac: resolveTictac, 'tictac-robots': resolveRobosklad }[game.id];
-    assert.equal(resolve(main.search).selected, 'normal', 'Default link must select normal');
+    const resolve = { 'snake3d-turns': resolveSnake, tictac: resolveTictac, 'tictac-robots': resolveRobosklad, 'snake-evolution': resolveEvolution }[game.id];
+    assert.equal(resolve(main.search).selected, defaultDifficulty, 'Default link must select the existing normal preset');
     for (const level of levels) {
         const url = new URL(level.link, 'https://games.example/collection/');
         const value = url.searchParams.get('diff');
@@ -79,6 +88,9 @@ assert.equal(resolveSnake('?diff=normal', 'hard').selected, 'normal', 'URL must 
 assert.equal(resolveSnake('?diff=hard', 'easy').selected, 'hard', 'URL must override saved difficulty');
 
 assert.equal(resolveRobosklad('?diff=normal', { difficulty: 'expert', cols: 8, rows: 8 }).selected, 'normal', 'URL must override saved difficulty');
+assert.equal(resolveEvolution('?diff=1', 5).selected, '1', 'Evolution URL must override saved difficulty');
+assert.equal(resolveEvolution('?diff=5', 1).selected, '5', 'Evolution URL must override saved difficulty');
+assert.equal(resolveEvolution('?diff=invalid').selected, '3');
 
 // The website and detail pages create their difficulty anchors through this helper.
 function element(tagName) {

@@ -63,6 +63,7 @@ h3 { font-size: 1.3rem; margin: 0 0 12px; }
 .article-body > h2 { margin-top: 40px; }
 .article-body > h3 { margin-top: 28px; }
 .article-body { overflow-wrap: anywhere; }
+.article-body img { height: auto; border: 1px solid var(--line); border-radius: 14px; }
 .article-body pre { overflow-x: auto; padding: 16px; background: var(--panel); }
 .article-body blockquote { margin-inline: 0; padding-left: 20px; border-left: 3px solid var(--line); }
 .skip-link { position: absolute; left: 24px; top: -100px; background: var(--panel); padding: 10px; z-index: 2; }

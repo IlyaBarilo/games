@@ -52,7 +52,9 @@ for (const [relative, base] of [
     ['../../games/snake3d-turns/snake3d-turns.html?diff=normal', 'https://ilyabarilo.github.io/games/content/games/snake3d-turns.html'],
     ['../../games/tictac/tictac.html?diff=normal', 'https://ilyabarilo.github.io/games/content/games/tictac.html'],
     ['games/tictac-robots/tictac-robots.html?diff=normal', 'https://ilyabarilo.github.io/games/game-info.html'],
-    ['../../games/8march-shariki/8march-shariki.html', 'https://ilyabarilo.github.io/games/content/games/8march-shariki.html']
+    ['../../games/8march-shariki/8march-shariki.html', 'https://ilyabarilo.github.io/games/content/games/8march-shariki.html'],
+    ['games/snake-evolution/snake-evolution.html?diff=3', 'https://ilyabarilo.github.io/games/game-info.html'],
+    ['games/interactive-screen-benchmark/interactive-screen-benchmark.html', 'https://ilyabarilo.github.io/games/game-info.html']
 ]) {
     const url = api.resolveLink(relative, base);
     assert(url.startsWith('https://ilyabarilo.github.io/games/games/'));

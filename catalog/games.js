@@ -14,6 +14,12 @@ window.GAMES_CATALOG = {
             "header": "Праздничные игры",
             "description": "Игры на темы праздников.",
             "creator": "teacher"
+        },
+        {
+            "id": "testing",
+            "header": "Тестирование",
+            "description": "Интерактивные тесты экрана и производительности.",
+            "creator": "teacher"
         }
     ],
     "games": [
@@ -135,6 +141,58 @@ window.GAMES_CATALOG = {
             "directory": "games/8march-shariki",
             "detailsUrl": "content/games/8march-shariki.html",
             "detailsSource": "content/games/8march-shariki.md"
+        },
+        {
+            "id": "snake-evolution",
+            "section": "puzzles-games",
+            "title": "Змейка: эволюция видеоигр",
+            "genre": "Аркада / История видеоигр",
+            "description": "Пройди 11 эпох змейки: от терминала 1980 года до трёхмерного фруктового сада.",
+            "imageUrl": "games/snake-evolution/preview.jpg",
+            "imageUrlMobile": "games/snake-evolution/preview-mobile.jpg",
+            "link": "games/snake-evolution/snake-evolution.html?diff=3",
+            "difficulties": {
+                "1": {
+                    "text": "🐣",
+                    "label": "Легко",
+                    "link": "games/snake-evolution/snake-evolution.html?diff=1"
+                },
+                "2": {
+                    "text": "🌱",
+                    "label": "Спокойно",
+                    "link": "games/snake-evolution/snake-evolution.html?diff=2"
+                },
+                "3": {
+                    "text": "🙂",
+                    "label": "Обычно",
+                    "link": "games/snake-evolution/snake-evolution.html?diff=3"
+                },
+                "4": {
+                    "text": "🤔",
+                    "label": "Сложно",
+                    "link": "games/snake-evolution/snake-evolution.html?diff=4"
+                },
+                "5": {
+                    "text": "😎",
+                    "label": "Эксперт",
+                    "link": "games/snake-evolution/snake-evolution.html?diff=5"
+                }
+            },
+            "available": true,
+            "creator": "teacher",
+            "directory": "games/snake-evolution"
+        },
+        {
+            "id": "interactive-screen-benchmark",
+            "section": "testing",
+            "title": "Диагностика интерактивного экрана",
+            "genre": "Тестирование / Экран",
+            "description": "Проверь касания, мультитач, точность ввода и FPS в девяти этапах диагностики.",
+            "imageUrl": "games/interactive-screen-benchmark/interactive-screen-benchmark-small.jpg",
+            "link": "games/interactive-screen-benchmark/interactive-screen-benchmark.html",
+            "available": true,
+            "creator": "teacher",
+            "directory": "games/interactive-screen-benchmark"
         }
     ]
 };

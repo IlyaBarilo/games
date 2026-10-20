@@ -26,7 +26,7 @@ export function checkSupplementalLicenses(root) {
 export function checkEmbeddedLicenses(root) {
     const read = file => fs.readFileSync(path.join(root, file), 'utf8').replace(/\r\n/g, '\n');
     const author = read('LICENSE.md').trim();
-    for (const id of ['snake3d-turns', 'tictac', 'tictac-robots', '8march-shariki']) {
+    for (const id of ['snake3d-turns', 'tictac', 'tictac-robots', '8march-shariki', 'snake-evolution']) {
         const html = read(`games/${id}/${id}.html`);
         const block = html.match(/<!-- COLLECTION_AUTHOR_LICENSE\n([\s\S]*?)\nEND_COLLECTION_AUTHOR_LICENSE -->/);
         assert(block?.[1].includes(author), 'Missing complete author terms inside HTML: ' + id);
