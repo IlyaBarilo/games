@@ -17,9 +17,7 @@
   <a href="https://github.com/IlyaBarilo/games/actions/workflows/release.yml"><img src="https://img.shields.io/github/actions/workflow/status/IlyaBarilo/games/release.yml?event=release&amp;style=for-the-badge&amp;label=%D1%81%D0%B1%D0%BE%D1%80%D0%BA%D0%B0%20%D1%80%D0%B5%D0%BB%D0%B8%D0%B7%D0%B0" alt="Состояние сборки релиза"></a>
 </p>
 
-[Открыть 3D-витрину](https://ilyabarilo.github.io/games/) · [Скачать GameSpace](https://github.com/IlyaBarilo/games/releases/latest/download/games-gamespace-latest.7z) · [Как скачать и играть](USAGE.md) · [Все выпуски](https://github.com/IlyaBarilo/games/releases)
-
-[Витрины](#витрины) · [Разработка игр](#разработка-игр) · [Условия использования](LICENSE.md)
+[Все выпуски](https://github.com/IlyaBarilo/games/releases)
 
 ## Игры
 
@@ -59,18 +57,12 @@
 
 Эти описания доступны по ссылкам в таблице игр и на страницах сайта.
 
-## Документация
-
-- [Скачивание отдельных игр, запуск коллекции и использование в GameSpace](USAGE.md).
-- [Условия использования авторских материалов](LICENSE.md).
-- [Сторонние компоненты и лицензии](NOTICE.md).
-
 ## Автор и условия использования
 
 Автор — [Илья Барило](https://barilo.ru/).
 
 Авторские игры, код, тексты, фотографии и другие материалы распространяются
-на [собственных условиях использования](LICENSE.md). Разрешены личное
+на собственных условиях использования. Разрешены личное
 некоммерческое использование, изучение кода и обычные занятия со своей
 группой обучающихся или воспитанников в образовательных организациях
 и кружках, включая дополнительное образование.
