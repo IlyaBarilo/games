@@ -64,6 +64,8 @@ assert.throws(() => api.encode('x'.repeat(10000)));
 assert.throws(() => api.resolveLink('javascript:alert(1)', 'https://example.test/'), /HTTP/);
 assert.equal(api.resolveLink('../game.html?diff=hard#start', 'https://example.test/nested/page.html'), 'https://example.test/game.html?diff=hard#start');
 const license = fs.readFileSync(path.join(root, 'licenses/qrcodegen-MIT.txt'), 'utf8').replace(/\r\n/g, '\n').trim();
-const header = vendor.slice(2, vendor.indexOf('*/')).split('\n').map(line => line.replace(/^ \* ?/, '')).join('\n').trim();
-assert.equal(license, header, 'QR vendor notice must be preserved in full');
+for (const source of [vendor.replace(/\r\n/g, '\n'), vendor.replace(/\r?\n/g, '\r\n')]) {
+    const header = source.slice(2, source.indexOf('*/')).split(/\r?\n/).map(line => line.replace(/^ \* ?/, '')).join('\n').trim();
+    assert.equal(license, header, 'QR vendor notice must be preserved in full');
+}
 console.log('Passed: independent QR decoding of all game URLs, Unicode, multiline and long text, SVG quiet zones and complete vendor notice.');
