@@ -388,6 +388,41 @@ window.GAMES_CATALOG = {
             "available": true,
             "creator": "teacher",
             "directory": "games/podvodnaya-ekspeditsiya"
+        },
+        {
+            "id": "tictac-sea",
+            "section": "puzzles-games",
+            "title": "Лагуна",
+            "genre": "Головоломка / 3D",
+            "description": "Крестики-нолики в море. Обойди кракена по цифрам.",
+            "imageUrl": "games/tictac-sea/preview.jpg",
+            "imageUrlMobile": "games/tictac-sea/preview-mobile.jpg",
+            "link": "games/tictac-sea/tictac-sea.html?diff=normal",
+            "difficulties": {
+                "2": {
+                    "text": "🐣",
+                    "label": "Тихая бухта",
+                    "link": "games/tictac-sea/tictac-sea.html?diff=easy"
+                },
+                "3": {
+                    "text": "🙂",
+                    "label": "Приключение",
+                    "link": "games/tictac-sea/tictac-sea.html?diff=normal"
+                },
+                "4": {
+                    "text": "🤔",
+                    "label": "Опасные воды",
+                    "link": "games/tictac-sea/tictac-sea.html?diff=hard"
+                },
+                "5": {
+                    "text": "😎",
+                    "label": "Штормовой маршрут",
+                    "link": "games/tictac-sea/tictac-sea.html?diff=expert"
+                }
+            },
+            "available": true,
+            "creator": "teacher",
+            "directory": "games/tictac-sea"
         }
     ]
 };

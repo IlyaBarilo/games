@@ -8,13 +8,15 @@
 в HTML игр и в сопровождающей папке `licenses/`, как указано ниже. HTML-файлы игр
 содержат полные условия автора и применимые сторонние уведомления внутри файла;
 скачивание одного HTML сохраняет эти тексты без обращения к внешнему сайту.
-Общий перечень не дублирует полный состав встроенных зависимостей «Робосклада».
+Полные сведения о встроенных зависимостях автономных игр сохраняются в их HTML.
 
 ## Компоненты готовых игр
 
 | Компонент | Файлы и применение | Лицензия и полный текст |
 |---|---|---|
 | three.js r128 | `games/snake3d-turns/snake3d-turns.html`; встроенная three.js, трёхмерная графика «Змейки» | [MIT](licenses/three.js-MIT.txt) |
+| three.js r186 | `games/tictac-sea/tictac-sea.html`; встроенная трёхмерная графика «Лагуны» | [MIT](licenses/three.js-r186-MIT.txt) |
+| Earcut 3.0.2 | Триангуляция в составе three.js r186 в «Лагуне» | [ISC](licenses/earcut-3.0.2-ISC.txt) |
 | Earcut 2.2.2 | Триангуляция в составе three.js r128 в «Змейке» | [ISC](licenses/earcut-2.2.2-ISC.txt) |
 | Roboto 3.015; 2026 | `games/tictac/tictac.html`; встроенные Roboto Regular, Medium и Bold «Крестиков-ноликов с сапёром» | [SIL Open Font License 1.1](licenses/Roboto-OFL.txt) |
 | Phaser 3.90.0 и включённые в него компоненты | `games/tictac-robots/tictac-robots.html`; движок «Робосклада» | MIT и другие разрешительные лицензии внутри HTML; отдельная копия BSD — [полный текст](licenses/phaser-adaptations-BSD-2-Clause.txt) |
@@ -34,6 +36,15 @@ Copyright © 2010–2021 three.js authors.
 [Earcut 2.2.2](https://github.com/mrdoob/three.js/blob/r128/src/extras/Earcut.js).
 Copyright (c) 2016, Mapbox. Полный текст ISC встроен в HTML «Змейки»;
 отдельная копия находится в `licenses/earcut-2.2.2-ISC.txt`.
+
+### «Лагуна»
+
+В `games/tictac-sea/tictac-sea.html` встроены three.js r186 и Earcut 3.0.2.
+Copyright © 2010–2026 three.js authors; Copyright (c) 2024, Mapbox.
+Полные тексты MIT и ISC сохранены в HTML и в папке `licenses/`.
+Источники: [three.js r186 / LICENSE](https://github.com/mrdoob/three.js/blob/r186/LICENSE),
+[Earcut в three.js r186](https://github.com/mrdoob/three.js/blob/r186/src/extras/lib/earcut.js),
+[Earcut 3.0.2 / LICENSE](https://github.com/mapbox/earcut/blob/v3.0.2/LICENSE).
 
 ### Roboto
 
@@ -107,7 +118,7 @@ Interactive Screen Benchmark поставляется одним автоном�
 устройства, сами шрифты с этой игрой не распространяются.
 
 На авторские материалы действуют [условия коллекции](LICENSE.md).
-В текущем HTML диагностического теста полный текст этих условий пока не встроен.
+Полный текст этих условий встроен в HTML диагностического теста.
 
 ## QR-коды витрины
 
@@ -153,7 +164,7 @@ Node.js, npm и установленная отдельно программа 7
 поддерживаются в соответствующих HTML-файлах.
 
 При скачивании одной игры условия автора и необходимые сторонние тексты уже
-сохранены в её HTML, кроме отмеченного выше диагностического теста.
+сохранены в её HTML.
 Комментарии с лицензиями нельзя удалять при последующем
 копировании или обработке файла. Самостоятельное распространение авторских
 материалов определяется [условиями автора](LICENSE.md); встраивание уведомлений

@@ -3,6 +3,7 @@ import path from 'node:path';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import MarkdownIt from 'markdown-it';
+import vm from 'node:vm';
 
 const markdown = new MarkdownIt({ html: false, linkify: false, typographer: false });
 const documents = [
@@ -14,6 +15,8 @@ const documents = [
 // Pin complete supplemental texts, including notices lost by upstream minification.
 export function checkSupplementalLicenses(root) {
     const required = new Map([
+        ['licenses/earcut-3.0.2-ISC.txt', '324139c19d87af03fda38afea1590e00ca354c4159bdb2ae9e9cec070cfa46a8'],
+        ['licenses/three.js-r186-MIT.txt', '8b378ebe60e2fe500158cb0ac71cb5e8b7d92953c2abcc63a0eb90499653b5bc'],
         ['licenses/earcut-2.2.2-ISC.txt', 'cd661c432ea8243974e6fde6fc433ebee3e96525ca8b66321b9d9971674ede60'],
         ['licenses/phaser-adaptations-BSD-2-Clause.txt', '72349c5916cfba89a97f7330c202d021d2a83c4d0e6e51ee4fb4275706d1d5b2']
     ]);
@@ -26,7 +29,10 @@ export function checkSupplementalLicenses(root) {
 export function checkEmbeddedLicenses(root) {
     const read = file => fs.readFileSync(path.join(root, file), 'utf8').replace(/\r\n/g, '\n');
     const author = read('LICENSE.md').trim();
-    for (const id of ['snake3d-turns', 'tictac', 'tictac-robots', '8march-shariki', 'snake-evolution']) {
+    const context = { window: {} };
+    vm.runInNewContext(read('catalog/games.js'), context);
+    const games = context.window.GAMES_CATALOG.games.filter(game => game.available && game.directory);
+    for (const { id } of games) {
         const html = read(`games/${id}/${id}.html`);
         const block = html.match(/<!-- COLLECTION_AUTHOR_LICENSE\n([\s\S]*?)\nEND_COLLECTION_AUTHOR_LICENSE -->/);
         assert(block?.[1].includes(author), 'Missing complete author terms inside HTML: ' + id);
@@ -34,7 +40,9 @@ export function checkEmbeddedLicenses(root) {
     }
     for (const [id, license] of [
         ['snake3d-turns', 'earcut-2.2.2-ISC.txt'],
-        ['tictac-robots', 'phaser-adaptations-BSD-2-Clause.txt']
+        ['tictac-robots', 'phaser-adaptations-BSD-2-Clause.txt'],
+        ['tictac-sea', 'earcut-3.0.2-ISC.txt'],
+        ['tictac-sea', 'three.js-r186-MIT.txt']
     ]) {
         const html = read(`games/${id}/${id}.html`);
         assert(html.includes(read('licenses/' + license).trim()), 'Missing complete embedded third-party license: ' + id);

@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import './licenses.test.mjs';
 import './qr.test.mjs';
+import './pavilion.test.mjs';
 import path from 'node:path';
 import vm from 'node:vm';
 import assert from 'node:assert/strict';
@@ -59,7 +60,14 @@ function resolveNumericGame(id, search) {
 for (const id of numericGames) for (const search of ['', '?diff=invalid', '?diff=0', '?diff=6', '?diff=2.5']) {
     assert.equal(resolveNumericGame(id, search).selected, '3', id + ' must retain its default difficulty');
 }
+function resolveLagoon(search) {
+    const source = read('games/tictac-sea/tictac-sea.html');
+    const rules = between(source, 'var Qa=', 'function Np(');
+    return JSON.parse(vm.runInNewContext(rules + '\nconst selected=Up(' + JSON.stringify(search) + '); JSON.stringify({selected:selected.difficulty,config:Qa[selected.difficulty],presets:Object.keys(Qa)});', { URLSearchParams }));
+}
+for (const query of ['', '?diff=invalid']) assert.equal(resolveLagoon(query).selected, 'normal');
 const contracts = {
+    'tictac-sea': ['easy', 'normal', 'hard', 'expert'],
     ...Object.fromEntries(numericGames.map(id => [id, ["1", "2", "3", "4", "5"]])),
     'snake3d-turns': ['easy', 'normal', 'hard'],
     'tictac': ['simple', 'normal', 'hard', 'expert'],
@@ -82,7 +90,7 @@ for (const game of active) {
     assert.equal(main.searchParams.get('diff'), defaultDifficulty);
     const actual = levels.map(level => new URL(level.link, main).searchParams.get('diff'));
     assert.deepEqual(actual, expected, 'Catalog values must match restored presets');
-    const resolve = { 'snake3d-turns': resolveSnake, tictac: resolveTictac, 'tictac-robots': resolveRobosklad, 'snake-evolution': resolveEvolution }[game.id] || (search => resolveNumericGame(game.id, search));
+    const resolve = { 'snake3d-turns': resolveSnake, tictac: resolveTictac, 'tictac-robots': resolveRobosklad, 'snake-evolution': resolveEvolution, 'tictac-sea': resolveLagoon }[game.id] || (search => resolveNumericGame(game.id, search));
     assert.equal(resolve(main.search).selected, defaultDifficulty, 'Default link must select the existing normal preset');
     for (const level of levels) {
         const url = new URL(level.link, 'https://games.example/collection/');
