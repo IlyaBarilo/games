@@ -92,9 +92,18 @@ Copyright 2011 The Roboto Project Authors
 поздравлениями» отдельные сторонние библиотеки, шрифты и наборы изображений
 в комплекте не поставляются.
 
-## Зависимости сборщика
+## QR-коды витрины
 
-Эти пакеты используются Node.js при преобразовании Markdown. Их программный
+Для создания QR-кодов в браузере используется [QR Code generator library v1.8.0](https://github.com/nayuki/QR-Code-generator/releases/tag/v1.8.0)
+Project Nayuki, лицензия MIT. Официальная JavaScript-сборка сохранена в
+`assets/vendor/qrcodegen-v1.8.0.js` вместе с полным исходным лицензионным заголовком.
+Отдельная копия условий — [qrcodegen-MIT.txt](licenses/qrcodegen-MIT.txt).
+Библиотека включена только в веб-витрину; QR-коды формируются локально,
+без передачи текста внешнему сервису. В файлы самих игр библиотека не добавляется.
+
+## Зависимости сборщика и проверок
+
+Эти пакеты используются Node.js при преобразовании Markdown и проверках. Их программный
 код не включается в готовый сайт и комплект GameSpace. Точные зависимости
 и контрольные суммы npm-пакетов зафиксированы в `package-lock.json`.
 Полные лицензионные тексты сохранены также в комплекте уведомлений:
@@ -108,6 +117,10 @@ Copyright 2011 The Roboto Project Authors
 | mdurl | 2.1.0 | [MIT](licenses/build/mdurl.txt) | [mdurl](https://github.com/markdown-it/mdurl) |
 | punycode.js | 2.3.1 | [MIT](licenses/build/punycode.js.txt) | [punycode.js](https://github.com/mathiasbynens/punycode.js) |
 | uc.micro | 2.1.0 | [MIT](licenses/build/uc.micro.txt) | [uc.micro](https://github.com/markdown-it/uc.micro) |
+| jsqr | 1.4.0 | [Apache-2.0](licenses/build/jsqr.txt) | [jsQR](https://github.com/cozmo/jsQR) |
+
+jsQR используется только в автоматических тестах для независимой проверки чтения
+созданных QR-кодов. Декодер не включается в JavaScript сайта или игр.
 
 Node.js, npm и установленная отдельно программа 7-Zip не поставляются
 в составе коллекции и сохраняют собственные условия использования.

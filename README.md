@@ -5,9 +5,19 @@
 игра, как развивался её замысел, какие решения я выбирал и какую роль
 в создании играл ИИ.
 
-**[Открыть 3D-витрину →](https://ilyabarilo.github.io/games/)**
+<p align="center">
+  <a href="https://ilyabarilo.github.io/games/"><img src="https://img.shields.io/badge/%D0%B2%D0%B8%D1%82%D1%80%D0%B8%D0%BD%D0%B0-%D0%B8%D0%B3%D1%80%D0%B0%D1%82%D1%8C-2ea44f?style=for-the-badge" alt="Открыть 3D-витрину и играть"></a>
+  <a href="https://github.com/IlyaBarilo/games/releases/latest/download/games-gamespace-latest.7z"><img src="https://img.shields.io/badge/GameSpace-%D1%81%D0%BA%D0%B0%D1%87%D0%B0%D1%82%D1%8C-7c3aed?style=for-the-badge" alt="Скачать последнюю коллекцию для GameSpace"></a>
+  <a href="USAGE.md"><img src="https://img.shields.io/badge/%D0%B8%D0%BD%D1%81%D1%82%D1%80%D1%83%D0%BA%D1%86%D0%B8%D1%8F-%D0%BA%D0%B0%D0%BA%20%D0%B8%D0%B3%D1%80%D0%B0%D1%82%D1%8C-0969da?style=for-the-badge" alt="Как скачать и играть"></a>
+</p>
 
-[Скачать готовую коллекцию](https://github.com/IlyaBarilo/games/releases/latest) · [Как скачать и играть](USAGE.md) · [Репозиторий](https://github.com/IlyaBarilo/games)
+<p align="center">
+  <a href="https://github.com/IlyaBarilo/games/releases/latest"><img src="https://img.shields.io/github/v/release/IlyaBarilo/games?display_name=tag&amp;label=%D1%80%D0%B5%D0%BB%D0%B8%D0%B7&amp;color=blue&amp;style=for-the-badge" alt="Последний стабильный релиз"></a>
+  <a href="LICENSE.md"><img src="https://img.shields.io/badge/%D0%BB%D0%B8%D1%86%D0%B5%D0%BD%D0%B7%D0%B8%D1%8F-%D0%B0%D0%B2%D1%82%D0%BE%D1%80%D1%81%D0%BA%D0%B8%D0%B5%20%D1%83%D1%81%D0%BB%D0%BE%D0%B2%D0%B8%D1%8F-0969da?style=for-the-badge" alt="Условия использования авторских материалов"></a>
+  <a href="https://github.com/IlyaBarilo/games/actions/workflows/release.yml"><img src="https://img.shields.io/github/actions/workflow/status/IlyaBarilo/games/release.yml?event=release&amp;style=for-the-badge&amp;label=%D1%81%D0%B1%D0%BE%D1%80%D0%BA%D0%B0%20%D1%80%D0%B5%D0%BB%D0%B8%D0%B7%D0%B0" alt="Состояние сборки релиза"></a>
+</p>
+
+[Открыть 3D-витрину](https://ilyabarilo.github.io/games/) · [Скачать GameSpace](https://github.com/IlyaBarilo/games/releases/latest/download/games-gamespace-latest.7z) · [Как скачать и играть](USAGE.md) · [Все выпуски](https://github.com/IlyaBarilo/games/releases)
 
 [Витрины](#витрины) · [Разработка игр](#разработка-игр) · [Условия использования](LICENSE.md)
 

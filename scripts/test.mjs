@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import './licenses.test.mjs';
+import './qr.test.mjs';
 import path from 'node:path';
 import vm from 'node:vm';
 import assert from 'node:assert/strict';
@@ -150,7 +151,11 @@ assert(page.includes('Сам код я не редактировал.'));
 for (const heading of read(described.detailsSource).matchAll(/^## (.+)$/gm)) {
     assert(page.includes(`<h2>${heading[1]}</h2>`), 'Missing author section: ' + heading[1]);
 }
-assert(!page.includes('<script'), 'Author text and launch links should work without scripts');
+const pageScripts = [...page.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)];
+assert.deepEqual(pageScripts.map(match => match[1].match(/src="([^"]+)"/)?.[1]), [
+    '../../assets/vendor/qrcodegen-v1.8.0.js', '../../assets/js/qr-code.js'
+]);
+assert(pageScripts.every(match => /\bdefer\b/.test(match[1]) && !match[2].trim()), 'Only deferred QR files may run; author text and launch links remain static');
 assert(!page.includes('{{'));
 for (const level of [described, ...Object.values(described.difficulties)]) {
     const url = new URL('../../' + level.link, 'https://games.example/collection/' + described.detailsUrl);

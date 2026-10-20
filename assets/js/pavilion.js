@@ -87,17 +87,18 @@ quad([-10,0,10],[10,0,10],[10,0,-21],[-10,0,-21],[.10,.17,.20]);for(let z=-20;z<
 for(let z=-19;z<8;z+=6){box(-9.5,0,z,.35,5,.35,[.28,.39,.43]);box(9.5,0,z,.35,5,.35,[.28,.39,.43]);box(0,5,z,19,.12,.16,[.42,.65,.65])}box(0,.02,-5,.07,.025,25,[.62,.87,.65]);
 label('КОЛЛЕКЦИЯ / ИЛЬЯ БАРИЛО',0,4,-20.7,12,.9);
 const zoneFloorColors=[[.20,.34,.20],[.39,.28,.16],[.14,.28,.37],[.35,.19,.32]];
-function screenBezel(x,z,color){
- // One closed ring: adjacent strips share the same corners, without overlapping rails.
+function screenBezel(x,z,color,bodyColor){
+ // A single shell: the bezel owns the sides and back, with no overlapping body box.
  const outer=[[-1.675,.30],[1.675,.30],[1.675,3.44],[-1.675,3.44]],inner=[[-1.5,.38],[1.5,.38],[1.5,3.25],[-1.5,3.25]],p=(v,depth)=>[x+v[0],v[1],z+depth];
  for(let k=0;k<4;k++){const j=(k+1)%4,a=outer[k],b=outer[j],c=inner[j],d=inner[k];
   quad(p(a,.285),p(b,.285),p(c,.285),p(d,.285),color);
-  quad(p(b,-.25),p(a,-.25),p(d,-.25),p(c,-.25),color.map(v=>v*.6));
-  quad(p(a,-.25),p(b,-.25),p(b,.285),p(a,.285),color.map(v=>v*.8));
+  quad(p(a,-.25),p(b,-.25),p(b,.285),p(a,.285),bodyColor.map(v=>v*.8));
   quad(p(d,.24),p(d,.285),p(c,.285),p(c,.24),color.map(v=>v*.65));
  }
+ quad(p(outer[1],-.25),p(outer[0],-.25),p(outer[3],-.25),p(outer[2],-.25),bodyColor.map(v=>v*.65));
+ quad(p(inner[0],.24),p(inner[1],.24),p(inner[2],.24),p(inner[3],.24),bodyColor);
 }
-standAnchors.forEach(([x,y,z],i)=>withStandGroup(i,()=>{const zone=zoneFloorColors[i];box(x,0,z,3.7,.3,1.7,zone);box(x,.30,z,3.35,3.14,.50,zone);screenBezel(x,z,zone.map(v=>Math.min(1,v*1.5)));gameSign(games[i].title,['САД ЧЕТЫРЁХ СЕЗОНОВ','ЛОГИКА / РИСК / ХОД','РОБОСКЛАД / СЕКТОР 03','ПРАЗДНИЧНЫЕ ПОЖЕЛАНИЯ'][i],x,z);const img=new Image();img.onload=()=>withStandGroup(i,()=>{const c=document.createElement('canvas');c.width=768;c.height=736;const q=c.getContext('2d');q.fillStyle='#10212b';q.fillRect(0,0,768,736);const s=Math.max(768/img.width,736/img.height);q.drawImage(img,(768-img.width*s)/2,(736-img.height*s)/2,img.width*s,img.height*s);quad([x-1.5,.38,z+.27],[x+1.5,.38,z+.27],[x+1.5,3.25,z+.27],[x-1.5,3.25,z+.27],[1,1,1],texture(c))});img.src=games[i].imageUrl}));
+standAnchors.forEach(([x,y,z],i)=>withStandGroup(i,()=>{const zone=zoneFloorColors[i];box(x,0,z,3.7,.3,1.7,zone);screenBezel(x,z,zone.map(v=>Math.min(1,v*1.5)),zone);gameSign(games[i].title,['САД ЧЕТЫРЁХ СЕЗОНОВ','ЛОГИКА / РИСК / ХОД','РОБОСКЛАД / СЕКТОР 03','ПРАЗДНИЧНЫЕ ПОЖЕЛАНИЯ'][i],x,z);const img=new Image();img.onload=()=>withStandGroup(i,()=>{const c=document.createElement('canvas');c.width=768;c.height=736;const q=c.getContext('2d');q.fillStyle='#10212b';q.fillRect(0,0,768,736);const s=Math.max(768/img.width,736/img.height);q.drawImage(img,(768-img.width*s)/2,(736-img.height*s)/2,img.width*s,img.height*s);quad([x-1.5,.38,z+.27],[x+1.5,.38,z+.27],[x+1.5,3.25,z+.27],[x-1.5,3.25,z+.27],[1,1,1],texture(c))});img.src=games[i].imageUrl}));
 
 // Decorative geometry belongs only to this local showcase prototype.
 const props=[];function prop(x,z,r){const group=activeStandGroup>=0?activeStandGroup:activePlatform,p={x,z,r,group};props.push(p);if(group>=0)standGroups[group].obstacles.push(p)}

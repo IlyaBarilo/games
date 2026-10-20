@@ -8,6 +8,9 @@
     <meta name="author" content="Илья Барило">
     <link rel="icon" type="image/png" href="../../assets/favicon.png">
     <link rel="stylesheet" href="../../assets/css/site.css">
+    <link rel="stylesheet" href="../../assets/css/qr-code.css">
+    <script defer src="../../assets/vendor/qrcodegen-v1.8.0.js"></script>
+    <script defer src="../../assets/js/qr-code.js"></script>
 </head>
 <body>
     <header class="site-header shell">
@@ -21,7 +24,9 @@
                 <p class="genre">{{genre}}</p>
                 <h1>{{title}}</h1>
                 <p class="lead">{{description}}</p>
-                <div><a class="button" href="{{play}}">Играть</a>{{difficulties}}</div>
+                <div class="detail-actions"><a class="button" href="{{play}}">Играть</a><a class="button button-secondary" href="{{download}}" download="{{filename}}">Скачать игру</a></div>
+                {{difficulties}}
+                <div data-qr-link="{{play}}" data-qr-label="Запустить игру «{{title}}»" data-qr-caption="Открыть на телефоне. Нажмите, чтобы увеличить" hidden></div>
             </div>
             <img class="detail-image" src="{{image}}" alt="{{title}}">
         </div>

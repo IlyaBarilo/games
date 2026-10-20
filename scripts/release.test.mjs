@@ -4,10 +4,12 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { parseReleaseTag, stampBuild } from './version.mjs';
 import { assetNames } from './release.mjs';
 import { siteBaseUrl, applyMetadata } from './metadata.mjs';
+import { findSevenZip, createArchive } from './archive.mjs';
 
 test('Release validation runs before npm install in a clean checkout and retains Git checks', () => {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), 'games-clean-release-'));
@@ -87,10 +89,53 @@ test('Site metadata uses the page content and preserves the hosting subdirectory
 test('Release tags preserve one to four numeric parts and artifact names', () => {
     for (const tag of ['v1', 'v0.1', 'v0.1.1', 'v0.1.2', 'v0.1.0', 'v0.1.2.3']) {
         assert.deepEqual(parseReleaseTag(tag), { tag, version: tag.slice(1) });
-        assert.deepEqual(assetNames(tag), [`games-web-${tag}.7z`, `games-gamespace-${tag}.7z`, `SHA256SUMS-${tag}.txt`]);
+        assert.deepEqual(assetNames(tag), [`games-web-${tag}.7z`, `games-gamespace-${tag}.7z`, `SHA256SUMS-${tag}.txt`, 'games-gamespace-latest.7z']);
     }
     for (const tag of [undefined, '', '1', 'v', 'v1.2.3.4.5', 'v1-beta', 'v1\n', ' v1', 'v1 & echo unsafe', 'v1/../../']) {
         assert.throws(() => parseReleaseTag(tag));
+    }
+});
+
+test('Release packaging creates an identical permanent GameSpace asset and covers it with checksums', () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'games-release-alias-'));
+    const tag = 'v0.1.2.3', release = parseReleaseTag(tag);
+    const digest = file => createHash('sha256').update(fs.readFileSync(file)).digest('hex');
+    try {
+        fs.cpSync(fileURLToPath(new URL('.', import.meta.url)), path.join(root, 'scripts'), { recursive: true });
+        for (const mode of ['web', 'gamespace']) {
+            const folder = path.join(root, 'dist', mode);
+            fs.mkdirSync(folder, { recursive: true });
+            fs.writeFileSync(path.join(folder, 'release.json'), JSON.stringify(release));
+            fs.writeFileSync(path.join(folder, 'index.html'), '<!doctype html><title>' + mode + '</title>');
+        }
+        const source = path.join(root, 'dist/games-gamespace.7z');
+        createArchive(findSevenZip(), path.join(root, 'dist/gamespace'), source);
+        const pack = () => spawnSync(process.execPath, [path.join(root, 'scripts/release.mjs'), 'package'], {
+            cwd: root, env: { ...process.env, RELEASE_TAG: tag }, encoding: 'utf8', windowsHide: true
+        });
+        const result = pack();
+        assert.equal(result.status, 0, result.stderr);
+        const output = path.join(root, 'dist/release');
+        assert.deepEqual(fs.readdirSync(output).sort(), assetNames(tag).sort());
+        const latest = path.join(output, 'games-gamespace-latest.7z');
+        const versioned = path.join(output, `games-gamespace-${tag}.7z`);
+        assert.deepEqual(fs.readFileSync(latest), fs.readFileSync(source));
+        assert.deepEqual(fs.readFileSync(versioned), fs.readFileSync(source));
+        const sums = fs.readFileSync(path.join(output, `SHA256SUMS-${tag}.txt`), 'utf8').trim().split('\n');
+        assert.equal(sums.length, 3);
+        for (const name of [`games-web-${tag}.7z`, `games-gamespace-${tag}.7z`, 'games-gamespace-latest.7z']) {
+            assert(sums.includes(`${digest(path.join(output, name))}  ${name}`), 'Missing or wrong checksum: ' + name);
+        }
+        const previous = digest(latest);
+        fs.writeFileSync(path.join(root, 'dist/gamespace/release.json'), JSON.stringify(parseReleaseTag('v1')));
+        const mismatch = pack();
+        assert.notEqual(mismatch.status, 0);
+        assert.match(mismatch.stderr, /Build must use the same release tag/);
+        assert.equal(digest(latest), previous, 'A mismatched build must preserve the previous asset');
+    } finally {
+        assert(path.resolve(root).startsWith(path.resolve(os.tmpdir()) + path.sep));
+        assert(path.basename(root).startsWith('games-release-alias-'));
+        fs.rmSync(root, { recursive: true, force: true });
     }
 });
 

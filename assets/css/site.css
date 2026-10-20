@@ -44,6 +44,9 @@ h3 { font-size: 1.3rem; margin: 0 0 12px; }
 .card-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 20px; margin-top: auto; padding-top: 6px; }
 .button { display: inline-flex; justify-content: center; align-items: center; min-height: 44px; padding: 9px 20px; border: 1px solid #b4e2ff; border-radius: 8px; background: #b4e2ff; color: #07172b; font-weight: 700; text-decoration: none; }
 .button:hover { background: #d8efff; color: #07172b; }
+.button-secondary { background: transparent; color: var(--accent); }
+.button-secondary:hover { background: var(--panel); color: var(--text); }
+.detail-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
 .difficulty-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
 .difficulty-link { padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; font-size: .8rem; text-decoration: none; }
 .about-author { padding: 40px 0; border-top: 1px solid var(--line); max-width: 800px; }

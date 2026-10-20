@@ -12,7 +12,7 @@ const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '
 
 export function assetNames(tag) {
     parseReleaseTag(tag);
-    return [`games-web-${tag}.7z`, `games-gamespace-${tag}.7z`, `SHA256SUMS-${tag}.txt`];
+    return [`games-web-${tag}.7z`, `games-gamespace-${tag}.7z`, `SHA256SUMS-${tag}.txt`, 'games-gamespace-latest.7z'];
 }
 
 function run(binary, args) {
@@ -35,14 +35,15 @@ function packageRelease(tag) {
     for (const mode of ['web', 'gamespace']) {
         assert.deepEqual(JSON.parse(fs.readFileSync(path.join(dist, mode, 'release.json'), 'utf8')), release, 'Build must use the same release tag');
     }
-    const [web, gamespace, sums] = assetNames(tag);
+    const [web, gamespace, sums, gamespaceLatest] = assetNames(tag);
     const output = path.join(dist, 'release');
     assert(!fs.existsSync(output) || !fs.lstatSync(output).isSymbolicLink(), 'Release directory must not be a symlink');
     fs.mkdirSync(output, { recursive: true });
     createArchive(findSevenZip(), path.join(dist, 'web'), path.join(dist, web));
     fs.copyFileSync(path.join(dist, web), path.join(output, web));
     fs.copyFileSync(path.join(dist, 'games-gamespace.7z'), path.join(output, gamespace));
-    const lines = [web, gamespace].map(name => `${digest(path.join(output, name))}  ${name}`);
+    fs.copyFileSync(path.join(output, gamespace), path.join(output, gamespaceLatest));
+    const lines = [web, gamespace, gamespaceLatest].map(name => `${digest(path.join(output, name))}  ${name}`);
     fs.writeFileSync(path.join(output, sums), lines.join('\n') + '\n');
     console.log('Ready: ' + assetNames(tag).join(', '));
 }

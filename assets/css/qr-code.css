@@ -1,0 +1,23 @@
+.qr-code { display: flex; align-items: center; gap: 12px; margin-block: 22px 0; }
+.qr-trigger { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; padding: 7px; border: 1px solid #9bb4c7; border-radius: 10px; background: #fff; cursor: zoom-in; }
+.qr-trigger svg { display: block; width: 104px; height: 104px; }
+.qr-trigger:hover { border-color: #c4ec97; box-shadow: 0 0 0 3px #c4ec9733; }
+.qr-trigger:focus-visible, .qr-close:focus-visible { outline: 3px solid #c4ec97; outline-offset: 4px; }
+.qr-caption { max-width: 180px; color: #b4c7d6; font: 14px/1.5 'Segoe UI', sans-serif; }
+.qr-modal { --qr-size: min(80vw, 80svh); box-sizing: border-box; width: calc(var(--qr-size) + 26px); max-width: calc(100vw - 12px); max-height: calc(100svh - 12px); margin: auto; padding: 12px; overflow: auto; border: 1px solid #729288; border-radius: 16px; background: #102632; color: #eef9f5; }
+.qr-modal::backdrop { background: #020b15cc; }
+.qr-modal-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.qr-modal h2 { margin: 0; font: 700 20px/1.3 'Segoe UI', sans-serif; letter-spacing: normal; }
+.qr-close { padding: 8px 12px; border: 1px solid #729288; border-radius: 7px; background: #18343c; color: #eef9f5; font: 14px 'Segoe UI', sans-serif; cursor: pointer; }
+.qr-close:hover { background: #294b54; }
+.qr-modal-graphic { width: var(--qr-size); max-width: 100%; margin-inline: auto; }
+.qr-modal-graphic svg { display: block; width: 100%; height: auto; background: #fff; }
+.qr-payload { margin: 8px 0 0; overflow-wrap: anywhere; color: #b4c7d6; font: 13px/1.5 'Segoe UI', sans-serif; }
+.qr-code[hidden] { display: none; }
+@media (max-height: 480px) {
+    .qr-modal { width: calc(var(--qr-size) + 14px); padding: 6px; }
+    .qr-modal-header { gap: 8px; margin-bottom: 4px; }
+    .qr-modal h2 { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 14px; }
+    .qr-close { padding: 3px 8px; font-size: 12px; line-height: 1.2; }
+    .qr-payload { margin-top: 4px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 10px; line-height: 1.2; }
+}

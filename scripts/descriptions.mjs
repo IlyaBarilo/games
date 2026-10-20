@@ -29,7 +29,8 @@ export function renderDetailsPage(root, game) {
     const values = {
         title: escapeHtml(game.title), genre: escapeHtml(game.genre),
         description: escapeHtml(game.description), image: relativeUrl(game.imageUrl),
-        play: relativeUrl(game.link), difficulties: levels, body
+        play: relativeUrl(game.link), download: relativeUrl(game.link.split(/[?#]/)[0]),
+        filename: escapeHtml(game.id + '.html'), difficulties: levels, body
     };
     const template = fs.readFileSync(path.join(root, 'templates/game-details.html'), 'utf8');
     return template.replace(/\{\{([a-z]+)\}\}/g, (_, key) => {
