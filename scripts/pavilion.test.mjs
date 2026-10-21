@@ -330,17 +330,40 @@ assert.equal(renderContext.objectMatrix({group:1,motion},3,new Map())[12],10,'Ea
 let pointers=0,bindings=0;
 const attributes={gl:{ARRAY_BUFFER:1,FLOAT:2,bindBuffer(){},enableVertexAttribArray(){},disableVertexAttribArray(){},vertexAttribPointer(){pointers++}},attrP:0,attrUV:1,attrNormal:2,attrTint:3,vertexArrays:{createVertexArrayOES:()=>({}),bindVertexArrayOES(){bindings++}}};
 vm.createContext(attributes);vm.runInContext(declaration('bindRenderGeometry'),attributes);
-const geometry={buffer:{},batched:true};attributes.bindRenderGeometry(geometry);attributes.bindRenderGeometry(geometry);assert.equal(pointers,4);assert.equal(bindings,2);
-attributes.vertexArrays=null;pointers=0;attributes.bindRenderGeometry({buffer:{}});attributes.bindRenderGeometry({buffer:{}});assert.equal(pointers,6,'Browsers without the optional extension retain ordinary WebGL attributes');
+const elementBindings=[];attributes.gl.ELEMENT_ARRAY_BUFFER=4;attributes.gl.bindBuffer=(target,buffer)=>{if(target===4)elementBindings.push(buffer)};
+const geometry={buffer:{},indexBuffer:{},batched:true};attributes.bindRenderGeometry(geometry);attributes.bindRenderGeometry(geometry);assert.equal(pointers,4);assert.equal(bindings,2);assert.deepEqual(elementBindings,[geometry.indexBuffer],'The index buffer is captured once by the VAO');
+attributes.vertexArrays=null;pointers=0;attributes.bindRenderGeometry({buffer:{}});attributes.bindRenderGeometry({buffer:{}});assert.equal(pointers,6,'Browsers without the optional extension retain ordinary WebGL attributes');attributes.bindRenderGeometry(geometry);attributes.bindRenderGeometry(geometry);assert.equal(elementBindings.length,3,'Without VAOs, each indexed draw rebinds its own element buffer');
 
 let uploads=0,deletions=0;const batchUploads=[];
-const batching={objects:[],renderItems:[],batchedObjectCount:-1,motionIds:new WeakMap(),nextMotionId:1,canvas:{dataset:{}},vertexArrays:null,combinedBounds:renderContext.combinedBounds,gl:{ARRAY_BUFFER:1,STATIC_DRAW:2,createBuffer:()=>({}),bindBuffer(){},bufferData(target,data){uploads++;batchUploads.push(Array.from(data))},deleteBuffer(){deletions++}}};
-vm.createContext(batching);vm.runInContext(['writeRenderVertices','rebuildRenderBatches'].map(declaration).join('\n'),batching);
+const batching={objects:[],renderItems:[],batchedObjectCount:-1,motionIds:new WeakMap(),nextMotionId:1,canvas:{dataset:{}},vertexArrays:null,uintIndices:false,combinedBounds:renderContext.combinedBounds,gl:{ARRAY_BUFFER:1,STATIC_DRAW:2,createBuffer:()=>({}),bindBuffer(){},bufferData(target,data){uploads++;batchUploads.push(Array.from(data))},deleteBuffer(){deletions++}}};
+vm.createContext(batching);vm.runInContext(['writeRenderVertices','indexRenderVertices','rebuildRenderBatches'].map(declaration).join('\n'),batching);
 const part={group:0,n:3,vertices:[0,0,0,0,0,1,0,0,1,0,0,1,0,0,1],color:[1,1,1],bounds:boxBounds,emission:0};batching.objects.push(part);batching.rebuildRenderBatches();const originalBatch=batching.renderItems[0];assert.equal(uploads,1);
 batching.objects.push({...part,texture:{}});batching.rebuildRenderBatches();assert.equal(uploads,1);assert.strictEqual(batching.renderItems[0],originalBatch);assert.equal(batching.renderItems.length,2,'New previews append without replacing unchanged geometry');
-batching.objects.push({...part});batching.rebuildRenderBatches();assert.equal(uploads,2);assert.equal(deletions,1,'A genuine geometry change still rebuilds the batch');
-assert.deepEqual(batchUploads[1],[...batchUploads[0],...batchUploads[0]],'A full rebuild regenerates identical upload bytes from retained source triangles');
+batching.objects.push({...part});batching.rebuildRenderBatches();assert.equal(uploads,2);assert.equal(deletions,1,'A genuine small geometry change replaces only the vertex buffer');
+assert.deepEqual(batchUploads[1],[...batchUploads[0],...batchUploads[0]],'Small batches retain exact ordinary drawing');
+const manyTriangles=Array.from({length:200},()=>part.vertices).flat();batching.objects=[{...part,n:600,vertices:manyTriangles}];batching.batchedObjectCount=-1;batching.rebuildRenderBatches();assert.equal(uploads,4);assert.equal(deletions,2);assert(batching.renderItems[0].indexBuffer,'Large repeated geometry receives an index buffer');
+assert.deepEqual(batchUploads[2],batchUploads[0]);assert.deepEqual(batchUploads[3],Array.from({length:600},(_,i)=>i%3));
+batching.batchedObjectCount=-1;batching.rebuildRenderBatches();assert.equal(uploads,6);assert.equal(deletions,4,'A full repack releases both old vertex and index buffers');
+assert.deepEqual(batchUploads.slice(4),batchUploads.slice(2,4),'Repeated indexed packing is deterministic');
 console.log('Passed: conservative view culling, shared model transforms, optional vertex arrays and incremental preview uploads.');
+
+// Indexing must preserve all Float32 bits, seams, winding and triangle order.
+const indexing={};vm.createContext(indexing);vm.runInContext(declaration('indexRenderVertices'),indexing);
+const attributes11=[1,2,3,.25,.75,0,1,0,.2,.4,.6],variants=[attributes11];
+for(const attribute of Array.from({length:11},(_,i)=>i)){const different=attributes11.slice();different[attribute]+=.125;variants.push(different)}
+const signed=attributes11.slice();signed[5]=-0;variants.push(signed);
+const ordered=[...variants,...variants.slice().reverse(),...variants],data11=new Float32Array(ordered.flat()),originalBits=new Uint32Array(data11.buffer).slice();
+const indexed=indexing.indexRenderVertices(data11,false);assert.equal(indexed.vertices.length,variants.length*11);assert.equal(indexed.indices.BYTES_PER_ELEMENT,2);
+const compactBits=new Uint32Array(indexed.vertices.buffer),restoredBits=new Uint32Array(data11.length);
+indexed.indices.forEach((id,i)=>restoredBits.set(compactBits.subarray(id*11,(id+1)*11),i*11));assert.deepEqual(restoredBits,originalBits);assert.deepEqual(new Uint32Array(data11.buffer),originalBits,'Packing does not mutate its input');
+const uniqueData=new Float32Array(variants.flat());assert.strictEqual(indexing.indexRenderVertices(uniqueData,true).vertices,uniqueData,'Unhelpful indexing retains ordinary drawing');
+assert.equal(indexing.indexRenderVertices(new Float32Array(),false).vertices.length,0);assert.strictEqual(indexing.indexRenderVertices(data11,false,300).vertices,data11,'Small batches can skip indexing and its allocation cost');
+function repeatedVertices(unique){const data=new Float32Array(unique*22);for(let i=0;i<unique*2;i++)data[i*11]=i%unique;return data}
+const edge16=indexing.indexRenderVertices(repeatedVertices(65536),false);assert.equal(edge16.indices.BYTES_PER_ELEMENT,2);assert.equal(edge16.indices[65535],65535);assert.equal(edge16.indices[65536],0);
+const needs32=repeatedVertices(65537),fallback32=indexing.indexRenderVertices(needs32,false);assert.strictEqual(fallback32.vertices,needs32);assert.equal(fallback32.indices,undefined,'WebGL1 without uint extension never receives a 32-bit index');
+const edge32=indexing.indexRenderVertices(needs32,true);assert.equal(edge32.indices.BYTES_PER_ELEMENT,4);assert.equal(edge32.indices[65536],65536);assert.equal(edge32.indices[65537],0);
+for(let i=0;i<edge32.indices.length;i++)assert.equal(edge32.vertices[edge32.indices[i]*11],needs32[i*11],'Hash collisions cannot merge distinct vertices');
+console.log('Passed: lossless indexed triangles, UV/normal/color seams, signed zero, hash collisions, 16/32-bit limits and extension fallback.');
 
 // Exact-time shared poses must advance, rewind and keep distinct articulated parts separate.
 const memoScope={};vm.createContext(memoScope);vm.runInContext(declaration('cacheAnimationState'),memoScope);

@@ -1020,6 +1020,32 @@ function pickWorldControl(clientX,clientY,activate=true){
 
 // Retain original objects for precise picking; batch only their render geometry.
 const vertexArrays=gl.getExtension('OES_vertex_array_object');
+const uintIndices=!!gl.getExtension('OES_element_index_uint');
+// Share only bit-identical render attributes. Original triangles still drive exact picking.
+function indexRenderVertices(data,allowUint32,minCount=0){
+ if(data.length<minCount*11)return {vertices:data};
+ const stride=11,count=data.length/stride,words=new Uint32Array(data.buffer,data.byteOffset,data.length),indices=new Uint32Array(count);
+ let size=1;while(size<count*2)size*=2;
+ const slots=new Uint32Array(size),mask=size-1;let unique=0;
+ for(let i=0;i<count;i++){
+  const offset=i*stride;let hash=2166136261;
+  for(let j=0;j<stride;j++)hash=Math.imul(hash^words[offset+j],16777619);
+  // Mix high Float32 bits down before choosing a power-of-two table slot.
+  hash=Math.imul(hash^(hash>>>16),0x7feb352d);hash=Math.imul(hash^(hash>>>15),0x846ca68b);hash^=hash>>>16;
+  let slot=hash&mask;
+  while(slots[slot]){const first=slots[slot]-1,base=first*stride;let same=true;
+   for(let j=0;j<stride;j++)if(words[base+j]!==words[offset+j]){same=false;break}
+   if(same)break;slot=(slot+1)&mask;
+  }
+  if(!slots[slot]){slots[slot]=i+1;indices[i]=unique++}else indices[i]=indices[slots[slot]-1];
+ }
+ const indexBytes=unique<=65536?2:4;
+ // Keep ordinary drawing when indexing has no memory benefit or needs an unavailable extension.
+ if((indexBytes===4&&!allowUint32)||unique*stride*4+count*indexBytes>=data.byteLength)return {vertices:data};
+ const vertices=new Float32Array(unique*stride),packed=new Uint32Array(vertices.buffer);let next=0;
+ for(let i=0;i<count;i++)if(indices[i]===next){for(let j=0;j<stride;j++)packed[next*stride+j]=words[i*stride+j];next++}
+ return {vertices,indices:indexBytes===2?new Uint16Array(indices):indices};
+}
 let renderItems=[],batchedObjectCount=-1;const motionIds=new WeakMap();let nextMotionId=1;
 function rebuildRenderBatches(){
  // Preview images arrive after the geometry. Appending their individual quads
@@ -1027,7 +1053,8 @@ function rebuildRenderBatches(){
  if(batchedObjectCount>=0&&objects.slice(batchedObjectCount).every(o=>o.controlHit||o.standIndex!==undefined||o.texture)){
   renderItems.push(...objects.slice(batchedObjectCount));batchedObjectCount=objects.length;canvas.dataset.sourceDraws=objects.length;canvas.dataset.renderDraws=renderItems.length;return;
  }
- for(const o of renderItems)if(o.batched){gl.deleteBuffer(o.buffer);if(o.vertexArray)vertexArrays.deleteVertexArrayOES(o.vertexArray)}
+ if(vertexArrays)vertexArrays.bindVertexArrayOES(null);
+ for(const o of renderItems)if(o.batched){gl.deleteBuffer(o.buffer);if(o.indexBuffer)gl.deleteBuffer(o.indexBuffer);if(o.vertexArray)vertexArrays.deleteVertexArrayOES(o.vertexArray)}
  const groups=new Map(),individual=[];
  for(const o of objects){
   // Selectable faces and difficulty bodies can change material at runtime.
@@ -1039,8 +1066,10 @@ function rebuildRenderBatches(){
  const batches=[];for(const group of groups.values()){
   const data=new Float32Array(group.parts.reduce((n,o)=>n+o.n*11,0));let offset=0;
   for(const o of group.parts)offset=writeRenderVertices(o.vertices,data,offset,o.color);
-  const buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,data,gl.STATIC_DRAW);
-  batches.push({...group,bounds:combinedBounds(group.parts),parts:undefined,buffer,n:data.length/11,batched:true,texture:null});
+  // Tiny batches keep one buffer; their index allocation would save very little.
+  const geometry=indexRenderVertices(data,uintIndices,300),buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,geometry.vertices,gl.STATIC_DRAW);
+  let indexBuffer=null,indexType=null;if(geometry.indices){indexBuffer=gl.createBuffer();gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,indexBuffer);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,geometry.indices,gl.STATIC_DRAW);indexType=geometry.indices.BYTES_PER_ELEMENT===2?gl.UNSIGNED_SHORT:gl.UNSIGNED_INT}
+  batches.push({...group,bounds:combinedBounds(group.parts),parts:undefined,buffer,indexBuffer,indexType,n:data.length/11,batched:true,texture:null});
  }
  renderItems=[...batches,...individual];batchedObjectCount=objects.length;
  canvas.dataset.sourceDraws=objects.length;canvas.dataset.renderDraws=renderItems.length;
@@ -1050,7 +1079,7 @@ function bindRenderGeometry(object){
  if(!object.buffer){const data=new Float32Array(object.n*8);writeRenderVertices(object.vertices,data);object.buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,object.buffer);gl.bufferData(gl.ARRAY_BUFFER,data,gl.STATIC_DRAW)}
  if(vertexArrays&&object.vertexArray){vertexArrays.bindVertexArrayOES(object.vertexArray);return}
  if(vertexArrays){object.vertexArray=vertexArrays.createVertexArrayOES();vertexArrays.bindVertexArrayOES(object.vertexArray)}
- gl.bindBuffer(gl.ARRAY_BUFFER,object.buffer);const stride=object.batched?44:32;
+ gl.bindBuffer(gl.ARRAY_BUFFER,object.buffer);if(object.indexBuffer)gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,object.indexBuffer);const stride=object.batched?44:32;
  if(vertexArrays){gl.enableVertexAttribArray(attrP);gl.enableVertexAttribArray(attrUV);gl.enableVertexAttribArray(attrNormal)}
  gl.vertexAttribPointer(attrP,3,gl.FLOAT,false,stride,0);gl.vertexAttribPointer(attrUV,2,gl.FLOAT,false,stride,12);gl.vertexAttribPointer(attrNormal,3,gl.FLOAT,false,stride,20);
  if(object.batched){gl.enableVertexAttribArray(attrTint);gl.vertexAttribPointer(attrTint,3,gl.FLOAT,false,44,32)}else gl.disableVertexAttribArray(attrTint);
@@ -1072,7 +1101,7 @@ function renderScene(){
   const textured=!!o.texture;if(previousTextured!==textured){gl.uniform1f(windowTexturedLocation,textured?1:0);previousTextured=textured}
   if(textured&&previousTexture!==o.texture){gl.bindTexture(gl.TEXTURE_2D,o.texture);previousTexture=o.texture}
   const cull=!!o.oneSided;if(previousCull!==cull){if(cull){gl.enable(gl.CULL_FACE);gl.cullFace(gl.BACK)}else gl.disable(gl.CULL_FACE);previousCull=cull}
-  gl.drawArrays(gl.TRIANGLES,0,o.n);
+  if(o.indexBuffer)gl.drawElements(gl.TRIANGLES,o.n,o.indexType,0);else gl.drawArrays(gl.TRIANGLES,0,o.n);
  }
  if(vertexArrays)vertexArrays.bindVertexArrayOES(null);
 }
