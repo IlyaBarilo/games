@@ -680,7 +680,7 @@ function lagoonFigurePose(t,k){const q=lagoonFloatState(t,k),x=-12.45+(k%2)*.72,
 activePlatform=11;
 softPlatform(standFootprint(ovalPlatformContour(-12,-9,3.02,2.45),activePlatform),.13,[.10,.38,.39]);
 softPlatform(standFootprint(ovalPlatformContour(-9.8,-10.62,.85,.74,64),activePlatform),.23,[.63,.57,.37],.025,.025);
-for(let k=0;k<18;k++){const a=k*Math.PI/9;ball(-12+Math.cos(a)*2.86,.16,-9+Math.sin(a)*2.28,.14,.025,.09,[.65,.84,.73]);}
+for(let k=0;k<18;k++){const a=k*Math.PI/9+(k===4?-Math.PI/18:k===5?Math.PI/18:0);ball(-12+Math.cos(a)*2.72,.16,-9+Math.sin(a)*2.16,.14,.025,.09,[.65,.84,.73]);}
 for(const side of [-1,1]){const x=-12+side*1.79;box(x,.15,-10,.15,3.21,.22,[.41,.28,.17]);for(let k=0;k<6;k++){const points=[];for(let j=0;j<=24;j++){const a=j*Math.PI/6;points.push([x+Math.cos(a)*.09,.46+k*.48+j*.002,-10+Math.sin(a)*.14])}benchmarkCable(points,.012,[.74,.64,.40]);}}
 // Eight curled arms, heavy eye sockets, a narrow beak and mottled green mantle.
 waterline=.135;motion=lagoonKrakenPose;

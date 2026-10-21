@@ -58,10 +58,15 @@ for (const mode of ['web', 'gamespace']) {
     fs.writeFileSync(path.join(output, 'catalog/games.js'), 'window.GAMES_CATALOG = ' + JSON.stringify(catalog, null, 4) + ';\n');
 
     copy(mode === 'web' ? 'index.html' : 'gamespace.html', output, 'index.html');
+    if (mode === 'gamespace') {
+        const entry = path.join(output, 'index.html');
+        const html = fs.readFileSync(entry, 'utf8').replace(/<(script|a)\b(?=[^>]*\bdata-web-only\b)[^>]*>[\s\S]*?<\/\1>\s*/g, '');
+        fs.writeFileSync(entry, html);
+    }
     for (const resource of ['LICENSE.md', 'NOTICE.md', 'USAGE.md', 'licenses']) copy(resource, output);
     for (const [relative, html] of legalPages) fs.writeFileSync(path.join(output, relative), html);
     const resources = ['assets/favicon.png', 'assets/js/catalog.js', 'assets/js/gamespace.js', 'assets/css/gamespace.css', 'assets/icons/role/teacher-cap-minimal.svg'];
-    if (mode === 'web') resources.push('gamespace.html', 'assets/css/site.css', 'assets/js/pavilion-loading.js', 'assets/js/pavilion.js', 'assets/js/pavilion-developer.js', 'assets/css/pavilion.css', 'game-info.html', 'assets/js/details.js', 'assets/social-preview.jpg', 'assets/js/qr-code.js', 'assets/css/qr-code.css', 'assets/vendor/qrcodegen-v1.8.0.js');
+    if (mode === 'web') resources.push('assets/js/view-mode.js', 'gamespace.html', 'assets/css/site.css', 'assets/js/pavilion-loading.js', 'assets/js/pavilion.js', 'assets/js/pavilion-developer.js', 'assets/css/pavilion.css', 'game-info.html', 'assets/js/details.js', 'assets/social-preview.jpg', 'assets/js/qr-code.js', 'assets/css/qr-code.css', 'assets/vendor/qrcodegen-v1.8.0.js');
     for (const resource of resources) copy(resource, output);
     for (const directory of new Set(games.map(game => game.directory).filter(Boolean))) copy(directory, output);
     if (mode === 'web') {

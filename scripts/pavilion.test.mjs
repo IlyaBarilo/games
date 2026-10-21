@@ -269,13 +269,14 @@ assert.deepEqual(Array.from(mapPrevious),[4,0]);
 
 // The loader must wait for actual preview settlement and a rendered frame.
 const loadingSource=fs.readFileSync(path.join(root,'assets/js/pavilion-loading.js'),'utf8');
-function loadingFixture(){
+function loadingFixture(random=Math.random){
  const elements=new Map(),frames=[],timers=[],listeners=[];
- for(const id of ['pavilion-loading','loading-stage','loading-caption','games','loading-title','loading-progress'])elements.set(id,{hidden:false,textContent:'',attributes:{},classList:{values:new Set(),add(value){this.values.add(value)}},setAttribute(name,value){this.attributes[name]=value}});
- const scope={document:{getElementById:id=>elements.get(id)},window:{addEventListener(...args){listeners.push(args)}},requestAnimationFrame:fn=>frames.push(fn),setTimeout:fn=>timers.push(fn),setInterval:()=>0,clearInterval(){}};
+ for(const id of ['pavilion-loading','loading-stage','loading-caption','loading-mascot','loading-fallback','games','loading-title','loading-progress'])elements.set(id,{hidden:id==='loading-fallback',textContent:'',dataset:{},attributes:{},classList:{values:new Set(),add(value){this.values.add(value)}},setAttribute(name,value){this.attributes[name]=value}});
+ const scope={Math:{floor:Math.floor,random},document:{getElementById:id=>elements.get(id)},window:{addEventListener(...args){listeners.push(args)}},requestAnimationFrame:fn=>frames.push(fn),setTimeout:fn=>timers.push(fn),setInterval:()=>0,clearInterval(){}};
  vm.runInNewContext(loadingSource,scope);return {api:scope.window.PAVILION_LOADING,elements,frames,timers,listeners};
 }
 const loading=loadingFixture();assert(loading.elements.get('games').inert);
+assert(loading.elements.get('loading-fallback').hidden,'Normal loading must not offer a shortcut out of the pavilion');
 loading.frames.shift()();assert.equal(loading.frames.length,1);loading.frames.shift()();await loading.api.painted;
 loading.api.start(2);loading.api.frameRendered();assert(!loading.elements.get('pavilion-loading').classList.values.has('is-ready'));
 loading.api.previewDone();loading.api.sceneInitialized();assert.equal(await loading.api.initialized,true);
@@ -286,4 +287,14 @@ loading.timers.shift()();assert(loading.elements.get('pavilion-loading').hidden)
 const failedLoading=loadingFixture();failedLoading.listeners[0][1]({target:{tagName:'SCRIPT',src:'https://example.test/assets/js/pavilion.js'}});
 assert.equal(await failedLoading.api.initialized,false);failedLoading.api.sceneInitialized();failedLoading.api.frameRendered();
 assert(failedLoading.elements.get('pavilion-loading').classList.values.has('has-error'));assert(!failedLoading.elements.get('pavilion-loading').hidden);assert(failedLoading.elements.get('loading-progress').hidden);
+assert(!failedLoading.elements.get('loading-fallback').hidden,'GameSpace remains available when the pavilion cannot open');
 console.log('Passed: map travel follows safe paths; loading waits for previews and a rendered frame and handles script failures.');
+for(const [i,name]of ['robot','kraken','firefly','rocket'].entries()){
+ const fixture=loadingFixture(()=>i/4+.01),caption=fixture.elements.get('loading-caption');
+ assert.equal(fixture.elements.get('loading-mascot').dataset.character,name);
+ assert.equal(/кракен/i.test(caption.textContent),name==='kraken','Kraken captions must belong only to the kraken');
+ fixture.api.start(12);fixture.api.sceneInitialized();fixture.api.previewDone();
+ assert(caption.textContent.includes('1 из 12'),'Every mascot must retain the live preview count');
+ assert.equal(/кракен/i.test(caption.textContent),name==='kraken');
+}
+console.log('Passed: loading captions match all four mascots and preserve the live preview count.');

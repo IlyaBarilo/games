@@ -20,6 +20,14 @@ function walk(folder, visit) {
 for (const mode of ['web', 'gamespace']) {
     const output = path.join(projectRoot, 'dist', mode);
     checkProject(output, mode);
+    const entryHtml = fs.readFileSync(path.join(output, 'index.html'), 'utf8');
+    if (mode === 'gamespace') {
+        assert(!entryHtml.includes('data-web-only'), 'Web-only navigation leaked into offline kit');
+        assert(!entryHtml.includes('view-mode.js'), 'Offline kit must not remember or redirect site mode');
+    } else {
+        assert(entryHtml.includes('assets/js/view-mode.js'), 'Missing site mode preference');
+        assert(fs.readFileSync(path.join(output, 'gamespace.html'), 'utf8').includes('index.html?view=3d'), 'Missing return to pavilion');
+    }
     // The kit must accompany unchanged game HTML in every distribution.
     for (const document of ['LICENSE.md', 'NOTICE.md', 'USAGE.md']) {
         assert.equal(hash(path.join(output, document)), hash(path.join(projectRoot, document)), 'Document changed: ' + document);
