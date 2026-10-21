@@ -12,7 +12,7 @@
   try{if(current.source.hasPointerCapture(current.pointerId))current.source.releasePointerCapture(current.pointerId)}catch{}
  }
  function cancelDrag(){if(drag?.moved)status.textContent='Перетаскивание отменено.';clearDrag()}
- function setOpen(open){cancelDrag();panel.hidden=!open;toggle.setAttribute('aria-pressed',String(open));map.classList.toggle('map-editing',open);mapTitle.textContent=open?'Карта · перетащите стенд на другой':normalMapTitle;if(open)document.getElementById('developer-close').focus({preventScroll:true});else toggle.focus({preventScroll:true})}
+ function setOpen(open){cancelDrag();panel.hidden=!open;toggle.setAttribute('aria-pressed',String(open));map.classList.toggle('map-editing',open);mapTitle.textContent=open?'Карта · перетащите стенд на другой':normalMapTitle;if(open){layout.audit();document.getElementById('developer-close').focus({preventScroll:true})}else toggle.focus({preventScroll:true})}
  function exchange(source,target){
   try{const a=gameFor(source),b=gameFor(target);layout.swapStands(a.id,b.id);const saved=layout.save();status.textContent='Сцены '+String(Number(source.dataset.zone)+1).padStart(2,'0')+' «'+a.title+'» и «'+b.title+'» поменялись местами. '+(saved?'Сохранено в этом браузере.':'Сохранение недоступно: расстановка действует до закрытия страницы.')}
   catch(error){status.textContent=error.message}
@@ -47,6 +47,7 @@
  map.addEventListener('click',event=>{if(suppressClick&&event.detail!==0&&suppressClick.includes(marker(event.target))){suppressClick=null;event.preventDefault();event.stopImmediatePropagation()}},true);
  map.addEventListener('dragstart',event=>{if(!panel.hidden)event.preventDefault()});
  document.addEventListener('keydown',event=>{if(event.key==='Escape'&&drag){event.preventDefault();event.stopImmediatePropagation();cancelDrag()}},true);
+ document.getElementById('map-toggle').addEventListener('click',cancelDrag);
  window.addEventListener('blur',cancelDrag);window.addEventListener('resize',cancelDrag);document.addEventListener('visibilitychange',()=>{if(document.hidden)cancelDrag()});
  document.getElementById('developer-reset').onclick=()=>{cancelDrag();const saved=layout.reset();status.textContent='Исходная расстановка восстановлена.'+(saved?'':' Браузер не разрешил очистить сохранённую расстановку.')};
 })();

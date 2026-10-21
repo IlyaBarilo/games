@@ -21,7 +21,8 @@ function declaration(name) {
 const context = {};
 vm.createContext(context);
 vm.runInContext(['transform', 'pivotZ', 'mul', 'exhibitClamp', 'exhibitEase', 'lagoonShotTime', 'lagoonActionState',
-    'lagoonKrakenPose', 'lagoonCurvePoint', 'lagoonArmPoint', 'lagoonFloatState', 'lagoonFigurePose'].map(declaration).join('\n'), context);
+    'cacheAnimationState', 'lagoonKrakenPose', 'lagoonCurvePoint', 'lagoonArmCurve', 'lagoonArmPoint', 'lagoonFloatState', 'lagoonFigurePose'].map(declaration).join('\n'), context);
+vm.runInContext('const lagoonArmCurves=cacheAnimationState(lagoonArmCurve);',context);
 for (let time = 0; time < 24; time += .1) {
     const model = context.lagoonKrakenPose(time);
     for (let column = 0; column < 3; column++) {
@@ -199,6 +200,7 @@ for(let k=0;k<7;k++){
 console.log('Passed: cloud jumps clear both signs, courier heading is smooth, stripes and edge lights fit the octagon.');
 
 vm.runInContext(['moonflowerPose','moonflowerHead','moonflowerStemPoint','moonflowerStemVertices','fireflyScenePose'].map(declaration).join('\n'), context);
+vm.runInContext('const moonflowerHeads=cacheAnimationState(moonflowerHead);',context);
 const stemVertices=context.moonflowerStemVertices(),stemEdges=new Map();
 for(let offset=0;offset<stemVertices.length;offset+=15){const points=[0,5,10].map(i=>Array.from(stemVertices.slice(offset+i,offset+i+3)).map(v=>v.toFixed(7)).join(','));for(let edge=0;edge<3;edge++){const key=[points[edge],points[(edge+1)%3]].sort().join('|');stemEdges.set(key,(stemEdges.get(key)||0)+1)}}
 assert([...stemEdges.values()].every(count=>count===2),'Flower stem must have shared rings and closed ends');
@@ -298,3 +300,115 @@ for(const [i,name]of ['robot','kraken','firefly','rocket'].entries()){
  assert.equal(/кракен/i.test(caption.textContent),name==='kraken');
 }
 console.log('Passed: loading captions match all four mascots and preserve the live preview count.');
+
+// Visibility rejects only fully outside boxes, including moved and animated models.
+const renderContext={Float32Array,Map,identity:new Float32Array([1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]),standOffset:group=>group===1?[7,0,-3]:[0,0,0]};
+vm.createContext(renderContext);
+vm.runInContext(['combinedBounds','viewFrustum','boundsInView','objectMatrix','transform'].map(declaration).join('\n'),renderContext);
+const clip=renderContext.viewFrustum(renderContext.identity),boxBounds={center:[0,0,0],extent:[.2,.3,.4]};
+assert(renderContext.boundsInView(boxBounds,renderContext.identity,clip));
+for(const [x,y,z] of [[2,0,0],[-2,0,0],[0,2,0],[0,-2,0],[0,0,2],[0,0,-2]])assert(!renderContext.boundsInView(boxBounds,renderContext.transform(x,y,z),clip));
+assert(renderContext.boundsInView(boxBounds,renderContext.transform(1.1,0,0),clip),'Boxes crossing the screen edge must stay visible');
+assert(renderContext.boundsInView({center:[0,0,0],extent:[20,20,20]},renderContext.identity,clip),'A box enclosing the viewer must stay visible');
+let rejected=0;
+for(let i=0;i<400;i++){
+ const m=renderContext.transform(Math.sin(i*.83)*3,Math.cos(i*.27)*2,Math.sin(i*.31)*3,i*.17);
+ for(const col of [0,4,8])for(let row=0;row<3;row++)m[col+row]*=.2+(i%7)*.3;
+ const corners=[];for(const a of [-1,1])for(const b of [-1,1])for(const c of [-1,1]){const p=[a*.2,b*.3,c*.4];corners.push([0,1,2].map(j=>m[j]*p[0]+m[j+4]*p[1]+m[j+8]*p[2]+m[j+12]));}
+ if(!renderContext.boundsInView(boxBounds,m,clip)){rejected++;assert([0,1,2].some(axis=>corners.every(p=>p[axis]<-1)||corners.every(p=>p[axis]>1)),'Culling must not reject any potentially visible corner');}
+}
+assert(rejected>100);
+const combined=renderContext.combinedBounds([{bounds:boxBounds},{bounds:{center:[3,2,-1],extent:[1,.5,.2]}}]);
+for(const [i,value] of [1.9,1.1,-.4].entries())assert(Math.abs(combined.center[i]-value)<1e-12);
+for(const [i,value] of [2.1,1.4,.8].entries())assert(Math.abs(combined.extent[i]-value)<1e-12);
+let poseCalls=0;const motion=t=>{poseCalls++;return renderContext.transform(t,0,0)},modelCache=new Map();
+const first=renderContext.objectMatrix({group:0,motion},2,modelCache);
+assert.strictEqual(first,renderContext.objectMatrix({group:0,motion},2,modelCache));
+const moved=renderContext.objectMatrix({group:1,motion},2,modelCache);assert.equal(moved[12],9);assert.equal(moved[14],-3);assert.equal(first[12],2);assert.equal(poseCalls,2);
+assert.equal(renderContext.objectMatrix({group:1,motion},3,new Map())[12],10,'Each new frame recomputes animation and layout transforms');
+
+let pointers=0,bindings=0;
+const attributes={gl:{ARRAY_BUFFER:1,FLOAT:2,bindBuffer(){},enableVertexAttribArray(){},disableVertexAttribArray(){},vertexAttribPointer(){pointers++}},attrP:0,attrUV:1,attrNormal:2,attrTint:3,vertexArrays:{createVertexArrayOES:()=>({}),bindVertexArrayOES(){bindings++}}};
+vm.createContext(attributes);vm.runInContext(declaration('bindRenderGeometry'),attributes);
+const geometry={buffer:{},batched:true};attributes.bindRenderGeometry(geometry);attributes.bindRenderGeometry(geometry);assert.equal(pointers,4);assert.equal(bindings,2);
+attributes.vertexArrays=null;pointers=0;attributes.bindRenderGeometry({buffer:{}});attributes.bindRenderGeometry({buffer:{}});assert.equal(pointers,6,'Browsers without the optional extension retain ordinary WebGL attributes');
+
+let uploads=0,deletions=0;
+const batching={objects:[],renderItems:[],batchedObjectCount:-1,motionIds:new WeakMap(),nextMotionId:1,canvas:{dataset:{}},vertexArrays:null,combinedBounds:renderContext.combinedBounds,gl:{ARRAY_BUFFER:1,STATIC_DRAW:2,createBuffer:()=>({}),bindBuffer(){},bufferData(){uploads++},deleteBuffer(){deletions++}}};
+vm.createContext(batching);vm.runInContext(declaration('rebuildRenderBatches'),batching);
+const part={group:0,n:3,expanded:Array(24).fill(0),color:[1,1,1],bounds:boxBounds,emission:0};batching.objects.push(part);batching.rebuildRenderBatches();const originalBatch=batching.renderItems[0];assert.equal(uploads,1);
+batching.objects.push({...part,texture:{}});batching.rebuildRenderBatches();assert.equal(uploads,1);assert.strictEqual(batching.renderItems[0],originalBatch);assert.equal(batching.renderItems.length,2,'New previews append without replacing unchanged geometry');
+batching.objects.push({...part});batching.rebuildRenderBatches();assert.equal(uploads,2);assert.equal(deletions,1,'A genuine geometry change still rebuilds the batch');
+console.log('Passed: conservative view culling, shared model transforms, optional vertex arrays and incremental preview uploads.');
+
+// Exact-time shared poses must advance, rewind and keep distinct articulated parts separate.
+const memoScope={};vm.createContext(memoScope);vm.runInContext(declaration('cacheAnimationState'),memoScope);
+let calculations=0;const pose=memoScope.cacheAnimationState((time,part)=>{calculations++;return [time,part]});
+const same=pose(8.25,3);assert.strictEqual(pose(8.25,3),same);assert.notStrictEqual(pose(8.25,4),same);assert.equal(calculations,2);
+assert.deepEqual(pose(8.26,3),[8.26,3]);assert.notStrictEqual(pose(8.25,3),same,'Rewinding must discard the previous frame cache');assert.equal(calculations,4);
+let zeroCalls=0;const zero=memoScope.cacheAnimationState(()=>{zeroCalls++;return 0});zero(0);zero(0);assert.equal(zeroCalls,1);
+
+// A model can be built and picked without a GPU allocation. Only visible individual geometry uploads.
+let createdBuffers=0,individualUploads=0;const uploaded=[];
+const lazy={objects:[],activeStandGroup:-1,activePlatform:-1,activeBenchmarkVariant:0,emissive:0,motion:null,waterline:null,
+ gl:{ARRAY_BUFFER:1,STATIC_DRAW:2,FLOAT:3,createBuffer(){createdBuffers++;return {}},bindBuffer(){},bufferData(target,data){individualUploads++;uploaded.push(Array.from(data))},enableVertexAttribArray(){},disableVertexAttribArray(){},vertexAttribPointer(){}},
+ vertexArrays:null,attrP:0,attrUV:1,attrNormal:2,attrTint:3};
+vm.createContext(lazy);vm.runInContext(['geometryBounds','mesh','bindRenderGeometry'].map(declaration).join('\n'),lazy);
+const triangle=[0,0,0,0,0,1,0,0,1,0,0,1,0,0,1];lazy.mesh(triangle,[1,.5,0]);lazy.mesh(triangle,[0,.5,1]);
+assert.equal(createdBuffers,0);assert.equal(individualUploads,0);assert.strictEqual(lazy.objects[0].vertices,triangle,'Precise picking retains its source triangles');
+lazy.bindRenderGeometry(lazy.objects[0]);lazy.bindRenderGeometry(lazy.objects[0]);assert.equal(createdBuffers,1);assert.equal(individualUploads,1);
+assert.deepEqual(uploaded[0],Array.from(new Float32Array(lazy.objects[0].expanded)));assert.equal(lazy.objects[1].buffer,null,'Unseen individual geometry stays off the GPU');
+
+// All faces settle before the one initial refresh, including failed images.
+const pendingFaces=[],readyScope={difficultyArt:{a:1,b:1,c:1,d:1,e:1},difficultyFaceImages:{},difficultyFaceSource:kind=>kind,
+ Image:class {constructor(){pendingFaces.push(this)}}};vm.createContext(readyScope);
+const readyLine=source.split('\n').find(line=>line.startsWith('const difficultyFacesReady='));
+vm.runInContext(readyLine+'\nthis.ready=difficultyFacesReady;',readyScope);let readyCount=0;const ready=readyScope.ready.then(()=>readyCount++);
+for(const image of pendingFaces.slice(0,4))image.onload();await Promise.resolve();assert.equal(readyCount,0);
+pendingFaces[4].onerror();await ready;assert.equal(readyCount,1);pendingFaces[4].onload();await Promise.resolve();assert.equal(readyCount,1);
+console.log('Passed: exact-time animation caches, lazy GPU allocation with retained picking data and one-shot face readiness.');
+
+// The first complete icon draw must match all later redraws (Canvas state must not leak between calls).
+let strokes=[],controlUploads=0;const paint={lineCap:'butt',lineJoin:'miter',clearRect(){strokes=[]},beginPath(){},arc(){},fill(){},drawImage(){},moveTo(){},lineTo(){},stroke(){strokes.push([this.lineCap,this.lineJoin,this.lineWidth,this.strokeStyle])}};
+const controls={games:[{difficulties:{2:{link:'easy'},3:{link:'normal'}}}],difficultyLinks:['normal'],difficultyKind:link=>link,
+ difficultyFaceImages:{easy:{complete:true,naturalWidth:68},normal:{complete:true,naturalWidth:68}},
+ gl:{bindTexture(){},pixelStorei(){},texImage2D(){controlUploads++}}};vm.createContext(controls);vm.runInContext(declaration('drawControlTexture'),controls);
+const entry={canvas:{width:600,height:130,getContext:()=>paint},i:0,kind:'difficulty',texture:{}};
+controls.drawControlTexture(entry);const firstStrokes=JSON.stringify(strokes);controls.drawControlTexture(entry);assert.equal(JSON.stringify(strokes),firstStrokes,'Single initial draw must keep the established stroke appearance');
+const refreshed=[];controls.controlTextures=[entry,{i:0,kind:'actions'},{i:1,kind:'difficulty'}];controls.objects=[];controls.drawControlTexture=e=>refreshed.push(e);vm.runInContext(source.split('\n').find(line=>line.startsWith('refreshStandControls=i=>')),controls);controls.refreshStandControls(0);assert.deepEqual(refreshed,[entry],'Changing difficulty must not upload action labels or another stand');
+console.log('Passed: first-pass control strokes match redraws and difficulty changes update only their own texture.');
+
+// Stand and motion packets must retain static overhangs, global props and original depth ties.
+const spatialScope={Float32Array,Map,Set,objects:[],standGroups:[{anchor:[0,0,0],offset:[0,0,0]},{anchor:[20,0,0],offset:[0,0,0]}],layoutRevision:0,sceneIndex:null,eye:[0,0,5],yaw:0,pitch:0,zoom:1,animTime:2,benchmarkScene:1,
+ identity:renderContext.identity,canvas:{width:600,height:600,getBoundingClientRect:()=>({left:0,top:0,width:600,height:600})},standSourcePoint:(group,p)=>p};
+spatialScope.standOffset=i=>spatialScope.standGroups[i]?.offset||[0,0,0];vm.createContext(spatialScope);
+vm.runInContext(['buildSceneIndex','getSceneIndex','rayStandGroups','pickObjectCandidates','pickWorldControl','geometryBounds','combinedBounds','objectMatrix','rayObjectBounds','camera','mul','benchmarkVisible'].map(declaration).join('\n'),spatialScope);
+function pickPlane(x,z,controlHit=null,motion=null,group=0){const vertices=[x-1,-1,z,0,0,x+1,-1,z,1,0,x+1,1,z,1,1,x-1,-1,z,0,0,x+1,1,z,1,1,x-1,1,z,0,1];return {vertices,bounds:spatialScope.geometryBounds(vertices),group,motion,controlHit}}
+let picked='';const back=pickPlane(0,0,()=>()=>picked='back'),front=pickPlane(0,1),far=pickPlane(20,0,null,()=>spatialScope.identity,1);
+spatialScope.objects=[back,far,front];let index=spatialScope.getSceneIndex();assert.strictEqual(spatialScope.getSceneIndex(),index,'Index is reused between frames');
+let groups=spatialScope.rayStandGroups(index,[0,0,-1]);assert(groups.has(0));assert(!groups.has(1));assert.equal(spatialScope.pickWorldControl(300,300),false,'A non-clickable prop must occlude the button');
+front.controlHit=()=>null;spatialScope.sceneIndex=null;assert.equal(spatialScope.pickWorldControl(300,300),true,'Transparent control corners must let the rear button receive the ray');assert.equal(picked,'back');
+front.controlHit=()=>()=>picked='front';spatialScope.sceneIndex=null;assert.equal(spatialScope.pickWorldControl(300,300,false),true);assert.equal(picked,'back','Hover cannot execute an action');spatialScope.pickWorldControl(300,300);assert.equal(picked,'front');
+spatialScope.objects=[back,far,pickPlane(0,0,()=>()=>picked='tie',()=>spatialScope.identity)];spatialScope.sceneIndex=null;spatialScope.pickWorldControl(300,300);assert.equal(picked,'back','Coplanar controls retain source order across motion packets');
+index=spatialScope.getSceneIndex();spatialScope.standGroups[0].offset=[10,0,0];spatialScope.layoutRevision++;assert.strictEqual(spatialScope.getSceneIndex(),index);assert.equal(index.buckets.get(0).worldBounds.center[0],10);assert.equal(spatialScope.pickWorldControl(300,300),false,'Layout changes must immediately update ray broad phase');
+spatialScope.standGroups[0].offset=[0,0,0];spatialScope.layoutRevision++;
+const overhang=pickPlane(-7,0);spatialScope.objects.push(overhang);const extended=spatialScope.getSceneIndex();assert.notStrictEqual(extended,index,'Late preview geometry refreshes the index');const bound=extended.buckets.get(0).bounds;assert(bound.center[0]-bound.extent[0]<=-8,'Static props outside the animated envelope stay included');
+const globalProp=pickPlane(0,0,null,()=>spatialScope.identity,-1);spatialScope.objects.push(globalProp);index=spatialScope.getSceneIndex();assert(spatialScope.rayStandGroups(index,[1,0,0]).has(-1),'Global objects cannot use a stand envelope');
+const alternate=pickPlane(0,0,null,()=>spatialScope.identity);alternate.benchmarkVariant=2;spatialScope.objects.push(alternate);index=spatialScope.getSceneIndex();groups=spatialScope.rayStandGroups(index,[0,0,-1]);const candidates=spatialScope.pickObjectCandidates(index,groups,[0,0,-1],new Map());assert(!candidates.includes(alternate));assert(candidates.includes(back)&&candidates.includes(globalProp));
+assert.deepEqual(Array.from(candidates,o=>spatialScope.objects.indexOf(o)),Array.from(candidates,o=>spatialScope.objects.indexOf(o)).sort((a,b)=>a-b));
+console.log('Passed: indexed picking preserves occlusion, transparent corners, depth ties, late geometry, moved stands and benchmark variants.');
+
+// An idle scene does not rewrite HUD values or read layout dimensions every frame.
+let hudWrites=0,sizeReads=0,viewports=0;const tracked=values=>new Proxy(values,{set(target,key,value){hudWrites++;target[key]=value;return true}});
+const hud={visitorMarker:{style:tracked({})},visitorView:{},locationView:{},mapContent:{hidden:false},eye:[0,1.7,5],yaw:0,layoutRevision:0,stands:[[0,0,0]],mapPoint:(x,z)=>[x+50,z+50],loc:tracked({textContent:''}),renderSize:{dirty:true},devicePixelRatio:1,renderScale:100,renderLimit:2048,resolutionLabel:tracked({textContent:''}),limitLabel:tracked({hidden:false,textContent:''})};
+let cssWidth=800,cssHeight=600;hud.canvas={width:0,height:0,get clientWidth(){sizeReads++;return cssWidth},get clientHeight(){sizeReads++;return cssHeight}};hud.gl={get drawingBufferWidth(){return hud.canvas.width},get drawingBufferHeight(){return hud.canvas.height},viewport(){viewports++}};
+vm.createContext(hud);vm.runInContext(['updateVisitorMarker','updateLocationLabel','actualRenderStatus','updateRenderSize','invalidateRenderSize'].map(declaration).join('\n'),hud);
+hud.updateVisitorMarker();hud.updateLocationLabel();hud.updateRenderSize();assert.equal(sizeReads,2);let writes=hudWrites;
+for(let i=0;i<120;i++){hud.updateVisitorMarker();hud.updateLocationLabel();hud.updateRenderSize()}assert.equal(hudWrites,writes);assert.equal(sizeReads,2);assert.equal(viewports,1);
+hud.eye[0]=.001;hud.updateLocationLabel();assert.equal(hudWrites,writes,'Subpixel movement keeps the same formatted location text');
+hud.mapContent.hidden=true;hud.eye[0]=2;hud.yaw=1;hud.updateVisitorMarker();assert.equal(hudWrites,writes);hud.mapContent.hidden=false;hud.updateVisitorMarker();assert.equal(hud.visitorMarker.style.left,'52%');assert(hud.visitorMarker.style.transform.includes('rotate(-57.'));
+hud.updateLocationLabel();const beforeMove=hud.loc.textContent;hud.stands[0]=[20,0,0];hud.layoutRevision++;hud.updateLocationLabel();assert.notEqual(hud.loc.textContent,beforeMove,'Nearest stand is refreshed after a layout change');
+hud.devicePixelRatio=2;hud.updateRenderSize();assert.equal(hud.canvas.width,1200);assert.equal(sizeReads,2,'DPR changes reuse measured CSS dimensions');
+for(const scale of [100,75,50,25,10,1000,500,400,200]){hud.renderScale=scale;hud.updateRenderSize();const ratio=1.5*scale/100,limit=Math.min(1,2048/Math.max(cssWidth*ratio,cssHeight*ratio));assert.equal(hud.canvas.width,Math.max(1,Math.round(cssWidth*ratio*limit)));assert.equal(hud.canvas.height,Math.max(1,Math.round(cssHeight*ratio*limit)));}
+cssWidth=360;cssHeight=640;hud.renderScale=100;hud.invalidateRenderSize();hud.updateRenderSize();assert.equal(sizeReads,4);assert.equal(hud.canvas.width,540);assert.equal(hud.canvas.height,960);assert.equal(hud.limitLabel.hidden,true);
+console.log('Passed: idle HUD writes and layout reads are eliminated; map reopen, layout changes, DPR, all quality levels and portrait resize stay correct.');
