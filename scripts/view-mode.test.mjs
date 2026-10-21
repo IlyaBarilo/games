@@ -4,9 +4,9 @@ import assert from 'node:assert/strict';
 const source = fs.readFileSync(new URL('../assets/js/view-mode.js', import.meta.url), 'utf8');
 const storage = new Map();
 function visit(pageMode, href, unavailable = false) {
-    const result = { redirect: null, canonical: null, onShow: null };
+    const result = { redirect: null, canonical: null, onShow: null, view: {} };
     const context = {
-        document: { currentScript: { dataset: { view: pageMode } } }, URL,
+        document: { documentElement: { dataset: result.view }, currentScript: { dataset: { view: pageMode } } }, URL,
         location: { href, replace: value => { result.redirect = value; } },
         history: { state: { scroll: 20 }, replaceState: (state, title, value) => { result.canonical = value; assert.equal(state.scroll, 20); } },
         window: { addEventListener: (event, listener) => { assert.equal(event, 'pageshow'); result.onShow = listener; } }
@@ -21,6 +21,9 @@ function visit(pageMode, href, unavailable = false) {
 const root = 'https://example.test/collection/';
 assert.equal(visit('3d', root).redirect, null, 'First visit opens 3D');
 assert.equal(storage.get('games-view-mode'), '3d');
+assert.equal(visit('3d', root).view.viewMode, '3d');
+assert.equal(visit('3d', root + 'index.html?view=2d').view.viewMode, '2d');
+storage.clear();
 visit('2d', root + 'gamespace.html');
 assert.equal(visit('3d', root + 'index.html?app=1#games').redirect, root + 'gamespace.html?app=1#games');
 const explicit = visit('3d', root + 'index.html?view=3d&app=1#games');

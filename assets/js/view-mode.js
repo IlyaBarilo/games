@@ -8,6 +8,8 @@
     let saved;
     try { saved = localStorage.getItem(storageKey); } catch {}
     const mode = explicit ? requested : pageMode === '2d' ? '2d' : saved === '2d' ? '2d' : '3d';
+    // Build-time image hints run only for the selected view.
+    document.documentElement.dataset.viewMode = mode;
     const remember = () => { try { localStorage.setItem(storageKey, mode); } catch {} };
     remember();
     if (explicit) url.searchParams.delete('view');

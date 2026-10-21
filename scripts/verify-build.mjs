@@ -4,7 +4,10 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { projectRoot, checkProject, loadCatalog, excludedGameFiles } from './check.mjs';
 import { parseReleaseTag } from './version.mjs';
+import { renderPavilionPreloads } from './pavilion-preload.mjs';
+import { prepareShowcaseScripts } from './showcase-scripts.mjs';
 
+const preparedScripts = await prepareShowcaseScripts(projectRoot);
 const release = process.env.RELEASE_TAG ? parseReleaseTag(process.env.RELEASE_TAG) : null;
 const hash = file => createHash('sha256').update(fs.readFileSync(file)).digest('hex');
 const privateNames = new Set(['local', '.git', 'AGENTS.md', '.gitignore', 'node_modules']);
@@ -24,11 +27,15 @@ for (const mode of ['web', 'gamespace']) {
     assert(entryHtml.includes('id="scene"'), 'Missing 3D pavilion: ' + mode);
     assert(entryHtml.includes('assets/js/view-mode.js'), 'Missing mode preference: ' + mode);
     assert(entryHtml.includes('data-view="3d"'), 'Initial entry must be 3D: ' + mode);
+    const preload = renderPavilionPreloads('<!-- pavilion-preview-preloads -->', loadCatalog(output).games);
+    assert(entryHtml.includes(preload), 'Preview hints must match the built catalog: ' + mode);
     const catalogHtml = fs.readFileSync(path.join(output, 'gamespace.html'), 'utf8');
+    assert(!catalogHtml.includes('data-pavilion-preloads'), '2D must not preload 3D artwork');
     assert(catalogHtml.includes('index.html?view=3d'), 'Missing return to pavilion: ' + mode);
     assert(catalogHtml.includes('data-view="2d"'), 'Missing 2D catalog mode: ' + mode);
     for (const resource of ['assets/js/pavilion.js', 'assets/js/pavilion-loading.js', 'assets/js/pavilion-developer.js', 'assets/js/view-mode.js', 'assets/css/pavilion.css', 'assets/js/gamespace.js', 'assets/css/gamespace.css']) {
-        assert.equal(hash(path.join(output, resource)), hash(path.join(projectRoot, resource)), 'Missing or changed showcase resource: ' + mode + '/' + resource);
+        const expectedHash = preparedScripts.has(resource) ? createHash('sha256').update(preparedScripts.get(resource)).digest('hex') : hash(path.join(projectRoot, resource));
+        assert.equal(hash(path.join(output, resource)), expectedHash, 'Missing or changed showcase resource: ' + mode + '/' + resource);
     }
     // The kit must accompany unchanged game HTML in every distribution.
     for (const document of ['LICENSE.md', 'NOTICE.md', 'USAGE.md']) {

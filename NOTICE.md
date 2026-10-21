@@ -131,7 +131,8 @@ Project Nayuki, лицензия MIT. Официальная JavaScript-сбор
 
 ## Зависимости сборщика и проверок
 
-Эти пакеты используются Node.js при преобразовании Markdown и проверках. Их программный
+Эти пакеты используются Node.js при преобразовании Markdown, подготовке скрипта
+павильона и проверках. Их программный
 код не включается в готовый сайт и комплект GameSpace. Точные зависимости
 и контрольные суммы npm-пакетов зафиксированы в `package-lock.json`.
 Полные лицензионные тексты сохранены также в комплекте уведомлений:
@@ -146,9 +147,24 @@ Project Nayuki, лицензия MIT. Официальная JavaScript-сбор
 | punycode.js | 2.3.1 | [MIT](licenses/build/punycode.js.txt) | [punycode.js](https://github.com/mathiasbynens/punycode.js) |
 | uc.micro | 2.1.0 | [MIT](licenses/build/uc.micro.txt) | [uc.micro](https://github.com/markdown-it/uc.micro) |
 | jsqr | 1.4.0 | [Apache-2.0](licenses/build/jsqr.txt) | [jsQR](https://github.com/cozmo/jsQR) |
+| @jridgewell/gen-mapping | 0.3.13 | [MIT](licenses/build/@jridgewell/gen-mapping.txt) | [@jridgewell/gen-mapping](https://github.com/jridgewell/sourcemaps) |
+| @jridgewell/resolve-uri | 3.1.2 | [MIT](licenses/build/@jridgewell/resolve-uri.txt) | [@jridgewell/resolve-uri](https://github.com/jridgewell/resolve-uri) |
+| @jridgewell/source-map | 0.3.11 | [MIT](licenses/build/@jridgewell/source-map.txt) | [@jridgewell/source-map](https://github.com/jridgewell/sourcemaps) |
+| @jridgewell/sourcemap-codec | 1.6.0 | [MIT](licenses/build/@jridgewell/sourcemap-codec.txt) | [@jridgewell/sourcemap-codec](https://github.com/jridgewell/sourcemaps) |
+| @jridgewell/trace-mapping | 0.3.31 | [MIT](licenses/build/@jridgewell/trace-mapping.txt) | [@jridgewell/trace-mapping](https://github.com/jridgewell/sourcemaps) |
+| acorn | 8.19.0 | [MIT](licenses/build/acorn.txt) | [acorn](https://github.com/acornjs/acorn) |
+| buffer-from | 1.1.2 | [MIT](licenses/build/buffer-from.txt) | [buffer-from](https://github.com/LinusU/buffer-from) |
+| commander | 2.20.3 | [MIT](licenses/build/commander.txt) | [commander](https://github.com/tj/commander.js) |
+| source-map | 0.6.1 | [BSD-3-Clause](licenses/build/source-map.txt) | [source-map](https://github.com/mozilla/source-map) |
+| source-map-support | 0.5.21 | [MIT](licenses/build/source-map-support.txt) | [source-map-support](https://github.com/evanw/node-source-map-support) |
+| terser | 5.51.2 | [BSD-2-Clause](licenses/build/terser.txt) | [terser](https://github.com/terser/terser) |
 
 jsQR используется только в автоматических тестах для независимой проверки чтения
 созданных QR-кодов. Декодер не включается в JavaScript сайта или игр.
+
+Terser используется только сборщиком для уменьшения собственного скрипта 3D-павильона.
+Вычисления не преобразуются, все комментарии сохраняются. Исходники витрины и файлы
+игр остаются без такой обработки; код минификатора в браузер не передаётся.
 
 Node.js, npm и установленная отдельно программа 7-Zip не поставляются
 в составе коллекции и сохраняют собственные условия использования.

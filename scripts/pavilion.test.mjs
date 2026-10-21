@@ -479,6 +479,13 @@ for(const style of [2,3])for(const r of [0,.125,.78]){primitives.evolutionBall(r
 const template=primitives.sphereTemplate(8,12),oldTrig=trigCalls;assert.strictEqual(primitives.sphereTemplate(8,12),template);primitives.ball(7,3,1,.1,.2,.3,[1,1,1]);assert.equal(trigCalls,oldTrig,'A repeated sphere uses no trigonometry');assert.equal(primitives.sphereTemplates.size,3);assert.equal(template.order.length,8*12*6);
 function cableReference(points,r){const vertices=[];for(let k=1;k<points.length;k++){const a=points[k-1],b=points[k],d=b.map((v,j)=>v-a[j]),len=Math.hypot(...d);if(len<1e-5)continue;const n=d.map(v=>v/len),helper=Math.abs(n[1])>.9?[1,0,0]:[0,1,0],u=[n[1]*helper[2]-n[2]*helper[1],n[2]*helper[0]-n[0]*helper[2],n[0]*helper[1]-n[1]*helper[0]],ul=Math.hypot(...u);for(let j=0;j<3;j++)u[j]/=ul;const v=[n[1]*u[2]-n[2]*u[1],n[2]*u[0]-n[0]*u[2],n[0]*u[1]-n[1]*u[0]],point=(base,angle)=>[...base.map((x,j)=>x+r*(Math.cos(angle)*u[j]+Math.sin(angle)*v[j])),0,0];for(let j=0;j<8;j++){const s=j*Math.PI/4,t=(j+1)*Math.PI/4;vertices.push(...point(a,s),...point(b,s),...point(b,t),...point(a,s),...point(b,t),...point(a,t))}}return vertices}
 for(const points of [[],[[0,0,0]],[[0,0,0],[0,0,0],[0,1,0],[1,.3,-2]],[[1,0,0],[2,0,0],[2,0,1]],[[1,2,3],[1,2.000001,3],[1,3,3]]]){primitives.benchmarkCable(points,.027,[1,1,1]);sameDoubles(primitives.meshes.at(-1).vertices,cableReference(points,.027))}
+// Reused tube scratch must not leak old segments, alter signed zero or alias prior meshes.
+for(const radius of [0,-0,.027,-.31])for(const points of [
+ [[-0,0,-0],[0,0,0],[0,2,0],[0,2,0],[3,2,-4]],
+ [[0,0,0],[1e-7,1e-7,0],[1,2,3],[1,2,3]],
+ [[-7,.2,31],[2,11,-4],[6,-3,1]],
+ [[1e6,.2,-1e6],[1e6+1,3,-1e6-.4]]
+]){primitives.benchmarkCable(points,radius,[1,.5,.2]);const tube=primitives.meshes.at(-1).vertices,copy=Array.from(tube);sameDoubles(tube,cableReference(points,radius));primitives.benchmarkCable([[0,0,0],[0,1,0]],.15,[1,1,1]);sameDoubles(tube,copy)}
 const cableTrig=trigCalls;primitives.benchmarkCable([[0,0,0],[1,2,3]],.5,[1,1,1]);assert.equal(trigCalls,cableTrig,'Changing a tube radius reuses its angle table');
 const ringReference=[];for(let k=0;k<36;k++){const a=k*Math.PI/18,b=(k+1)*Math.PI/18,p=(angle,r)=>[1.2+Math.cos(angle)*r,-.3+Math.sin(angle)*r,2.7,0,0];ringReference.push(...p(a,.8),...p(b,.8),...p(b,.775),...p(a,.8),...p(b,.775),...p(a,.775))}primitives.benchmarkRing(1.2,-.3,2.7,.8,[1,1,1]);sameDoubles(primitives.meshes.at(-1).vertices,ringReference);
 const exhibitPoints=[];for(let k=0;k<=48;k++){const a=k*Math.PI/24;exhibitPoints.push([1+Math.cos(a)*.8,.3+Math.sin(a)*.4*Math.sin(.27),2+Math.sin(a)*.4*Math.cos(.27)])}primitives.exhibitRing(1,.3,2,.8,.4,[1,1,1],.018,.27);sameDoubles(primitives.meshes.at(-1).vertices,cableReference(exhibitPoints,.018));
@@ -498,3 +505,38 @@ const compileFailure=shaderWaitFixture({extension:false,linked:false,badShader:t
 const lostProgram=shaderWaitFixture({lost:true});await assert.rejects(lostProgram.wait(),/WebGL/);assert.equal(lostProgram.frames.length,0,'Context loss must report an error instead of polling forever');
 const lostWhileWaiting=shaderWaitFixture(),lostPromise=lostWhileWaiting.wait();lostWhileWaiting.state.lost=true;lostWhileWaiting.frames.shift()();await assert.rejects(lostPromise,/WebGL/);
 console.log('Passed: concurrent preview requests, failed-image settlement, deferred shader validation, nonblocking completion, fallback linking and context-loss errors.');
+
+// Fixed-offset writes preserve triangle normals, signed zero and optional tint at every offset.
+for(const triangle of [[-0,0,-0,-0,0, 0,0,0,1,0, 0,0,0,0,1], [1e-140,0,0,0,0, 0,2e-140,0,1,0, 0,0,3e-140,0,1], [1e140,0,0,0,0, 0,2e140,0,1,0, 0,0,3e140,0,1], [-7,.2,31,.3,.1, 2,11,-4,.5,.7, 6,-3,1,.9,1]]){
+ const u=[triangle[5]-triangle[0],triangle[6]-triangle[1],triangle[7]-triangle[2]],v=[triangle[10]-triangle[0],triangle[11]-triangle[1],triangle[12]-triangle[2]],normal=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]],length=Math.hypot(...normal)||1;
+ for(const tint of [null,[-0,.36,1]])for(const offset of [0,1,17]){
+  const reference=[];for(let k=0;k<3;k++)reference.push(...triangle.slice(k*5,k*5+5),...normal.map(n=>n/length),...(tint||[]));
+  const actual=new Float32Array(offset+reference.length+1).fill(99);assert.equal(uploadScope.writeRenderVertices(new Float64Array(triangle),actual,offset,tint),offset+reference.length);
+  assert.deepEqual(new Uint32Array(actual.buffer,offset*4,reference.length),new Uint32Array(new Float32Array(reference).buffer));assert(actual.slice(0,offset).every(n=>n===99));assert.equal(actual.at(-1),99);
+ }
+}
+const boundsScope={};vm.createContext(boundsScope);vm.runInContext(declaration('geometryBounds'),boundsScope);
+for(const positions of [[],[-0,0,-0,0,-0,0],[-23,4,7,11,-17,3,0,25,-31],...Array.from({length:40},(_,k)=>Array.from({length:(k+1)*3},(_,j)=>Math.sin(k*7+j*3)*1e5))]){
+ const vertices=positions.flatMap((n,j)=>j%3===2?[n,100,-100]:[n]),bounds=boundsScope.geometryBounds(new Float64Array(vertices));
+ for(let axis=0;axis<3;axis++){const values=positions.filter((_,j)=>j%3===axis),low=Math.min(...values),high=Math.max(...values);assert(Object.is(bounds.center[axis],(low+high)/2));assert(Object.is(bounds.extent[axis],(high-low)/2))}
+}
+console.log('Passed: fixed-offset GPU attributes preserve float bits, extreme coordinates, degenerate normals and tint; scalar bounds match all axes and signed zero.');
+
+// Adversarial lane collisions must retain every bit and avoid quadratic lookup work.
+const collisionUnique=2048,collisionCount=collisionUnique*2,collisionStorage=new ArrayBuffer((collisionCount*11+10)*4),collisionData=new Float32Array(collisionStorage,12,collisionCount*11),collisionWords=new Uint32Array(collisionStorage,12,collisionData.length);
+let inversePrime=1;for(let i=0;i<5;i++)inversePrime=Math.imul(inversePrime,2-Math.imul(16777619,inversePrime));assert.equal(Math.imul(inversePrime,16777619),1);
+const rotate=(word,bits)=>(word<<bits)|(word>>>(32-bits));
+for(let i=0;i<collisionCount;i++){
+ const offset=i*11;collisionWords[offset]=0x3f000000+i%collisionUnique;
+ let a=2166136261,b=0x7feb352d,c=0x846ca68b;
+ for(let j=0;j<4;j++){a=Math.imul(a^collisionWords[offset+j],16777619);b=Math.imul(b,16777619)}
+ c=Math.imul(Math.imul(c,16777619),16777619);
+ const desired=rotate(a^rotate(b,11),10);collisionWords[offset+10]=c^Math.imul(desired,inversePrime);
+}
+const collisionOriginal=collisionWords.slice();let collisionReads=0;
+const collisionScope={Uint32Array:class {constructor(...args){const array=new Uint32Array(...args);return args[0]===collisionStorage?new Proxy(array,{get(target,key){if(typeof key==='string'&&/^\d+$/.test(key))collisionReads++;return Reflect.get(target,key,target)}}):array}}};vm.createContext(collisionScope);vm.runInContext(declaration('indexRenderVertices'),collisionScope);
+const collisionResult=collisionScope.indexRenderVertices(collisionData,false),collisionPacked=new Uint32Array(collisionResult.vertices.buffer),collisionRestored=new Uint32Array(collisionData.length);
+assert(collisionResult.indices,'Repeated adversarial geometry must still be indexed');collisionResult.indices.forEach((id,i)=>collisionRestored.set(collisionPacked.subarray(id*11,(id+1)*11),i*11));
+assert.deepEqual(collisionRestored,collisionOriginal);assert.deepEqual(collisionWords,collisionOriginal,'Nonzero-offset input remains unchanged');
+assert(collisionReads<collisionCount*200,'Clustered keys must switch hash before lookup becomes quadratic: '+collisionReads+' reads');
+console.log('Passed: adversarial hash collisions retain all float bits and index order with bounded lookup work and nonzero input offsets.');

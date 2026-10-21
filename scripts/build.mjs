@@ -7,6 +7,8 @@ import { renderDetailsPage } from './descriptions.mjs';
 import { renderLegalPages } from './licenses.mjs';
 import { parseReleaseTag, stampBuild } from './version.mjs';
 import { siteBaseUrl, applyMetadata } from './metadata.mjs';
+import { renderPavilionPreloads } from './pavilion-preload.mjs';
+import { prepareShowcaseScripts } from './showcase-scripts.mjs';
 
 const release = process.env.RELEASE_TAG ? parseReleaseTag(process.env.RELEASE_TAG) : null;
 const siteConfig = JSON.parse(fs.readFileSync(path.join(projectRoot, 'catalog/site.json'), 'utf8'));
@@ -20,6 +22,10 @@ const sourceCatalog = loadCatalog(projectRoot);
 const descriptions = new Map(sourceCatalog.games.filter(game => game.available && game.detailsSource)
     .map(game => [game.id, renderDetailsPage(projectRoot, game)]));
 const legalPages = renderLegalPages(projectRoot);
+const preparedScripts = await prepareShowcaseScripts(projectRoot);
+const pavilionTemplate = fs.readFileSync(path.join(projectRoot, 'index.html'), 'utf8');
+const pavilionPages = new Map(['web', 'gamespace'].map(mode => [mode,
+    renderPavilionPreloads(pavilionTemplate, sourceCatalog.games.filter(game => mode === 'web' || game.directory))]));
 const dist = path.resolve(projectRoot, 'dist');
 assert(!fs.existsSync(dist) || !fs.lstatSync(dist).isSymbolicLink(), 'dist must not be a symlink');
 fs.mkdirSync(dist, { recursive: true });
@@ -54,14 +60,20 @@ for (const mode of ['web', 'gamespace']) {
     const usedSections = new Set(games.map(game => game.section));
     const catalog = { ...sourceCatalog, sections: sourceCatalog.sections.filter(section => usedSections.has(section.id)), games };
     fs.mkdirSync(path.join(output, 'catalog'), { recursive: true });
-    fs.writeFileSync(path.join(output, 'catalog/games.js'), 'window.GAMES_CATALOG = ' + JSON.stringify(catalog, null, 4) + ';\n');
+    fs.writeFileSync(path.join(output, 'catalog/games.js'), 'window.GAMES_CATALOG = ' + JSON.stringify(catalog) + ';\n');
 
-    copy('index.html', output);
+    fs.writeFileSync(path.join(output, 'index.html'), pavilionPages.get(mode));
     for (const resource of ['LICENSE.md', 'NOTICE.md', 'USAGE.md', 'licenses']) copy(resource, output);
     for (const [relative, html] of legalPages) fs.writeFileSync(path.join(output, relative), html);
     // Both distributions include the pavilion, 2D catalog and local information pages.
     const resources = ['gamespace.html', 'assets/favicon.png', 'assets/js/catalog.js', 'assets/js/gamespace.js', 'assets/css/gamespace.css', 'assets/icons/role/teacher-cap-minimal.svg', 'assets/js/view-mode.js', 'assets/css/site.css', 'assets/js/pavilion-loading.js', 'assets/js/pavilion.js', 'assets/js/pavilion-developer.js', 'assets/css/pavilion.css', 'game-info.html', 'assets/js/details.js', 'assets/social-preview.jpg', 'assets/js/qr-code.js', 'assets/css/qr-code.css', 'assets/vendor/qrcodegen-v1.8.0.js'];
-    for (const resource of resources) copy(resource, output);
+    for (const resource of resources) {
+        if (preparedScripts.has(resource)) {
+            const target = path.join(output, resource);
+            fs.mkdirSync(path.dirname(target), { recursive: true });
+            fs.writeFileSync(target, preparedScripts.get(resource));
+        } else copy(resource, output);
+    }
     for (const directory of new Set(games.map(game => game.directory).filter(Boolean))) copy(directory, output);
     for (const game of games) {
         if (!game.detailsUrl) continue;

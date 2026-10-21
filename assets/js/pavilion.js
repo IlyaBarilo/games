@@ -184,7 +184,11 @@ function boundsInView(bounds,model,planes){
  for(let k=0;k<24;k+=4)if(planes[k]*x+planes[k+1]*y+planes[k+2]*z+planes[k+3]+Math.abs(planes[k])*rx+Math.abs(planes[k+1])*ry+Math.abs(planes[k+2])*rz<-.001)return false;
  return true;
 }
-function geometryBounds(v){const lo=[Infinity,Infinity,Infinity],hi=[-Infinity,-Infinity,-Infinity];for(let k=0;k<v.length;k+=5)for(let j=0;j<3;j++){lo[j]=Math.min(lo[j],v[k+j]);hi[j]=Math.max(hi[j],v[k+j])}return {center:lo.map((n,j)=>(n+hi[j])/2),extent:lo.map((n,j)=>(hi[j]-n)/2)}}
+function geometryBounds(v){
+ let minX=Infinity,minY=Infinity,minZ=Infinity,maxX=-Infinity,maxY=-Infinity,maxZ=-Infinity;
+ for(let k=0;k<v.length;k+=5){const x=v[k],y=v[k+1],z=v[k+2];minX=Math.min(minX,x);minY=Math.min(minY,y);minZ=Math.min(minZ,z);maxX=Math.max(maxX,x);maxY=Math.max(maxY,y);maxZ=Math.max(maxZ,z)}
+ return {center:[(minX+maxX)/2,(minY+maxY)/2,(minZ+maxZ)/2],extent:[(maxX-minX)/2,(maxY-minY)/2,(maxZ-minZ)/2]};
+}
 // Write upload data directly; keep only original coordinates for exact picking and later rebuilds.
 // Small immutable angle/topology tables are shared by all decorative models.
 const angularTemplates=new Map(),sphereTemplates=new Map();
@@ -210,10 +214,16 @@ function sphereVertices(x,y,z,rx,ry,rz,lat,lon,translateXZ=true){
  return vertices;
 }
 function writeRenderVertices(vertices,data,offset=0,color=null){
+ const stride=color?11:8,r=color?.[0],g=color?.[1],b=color?.[2];
  for(let i=0;i<vertices.length;i+=15){
   const ux=vertices[i+5]-vertices[i],uy=vertices[i+6]-vertices[i+1],uz=vertices[i+7]-vertices[i+2],vx=vertices[i+10]-vertices[i],vy=vertices[i+11]-vertices[i+1],vz=vertices[i+12]-vertices[i+2];
-  const nx=uy*vz-uz*vy,ny=uz*vx-ux*vz,nz=ux*vy-uy*vx,len=Math.hypot(nx,ny,nz)||1;
-  for(let k=0;k<3;k++){for(let j=0;j<5;j++)data[offset++]=vertices[i+k*5+j];data[offset++]=nx/len;data[offset++]=ny/len;data[offset++]=nz/len;if(color)for(let j=0;j<3;j++)data[offset++]=color[j]}
+  const nx=uy*vz-uz*vy,ny=uz*vx-ux*vz,nz=ux*vy-uy*vx,len=Math.hypot(nx,ny,nz)||1,x=nx/len,y=ny/len,z=nz/len;
+  // Each triangle shares its normal and tint. Write fixed attribute offsets directly.
+  for(let k=i;k<i+15;k+=5){
+   data[offset]=vertices[k];data[offset+1]=vertices[k+1];data[offset+2]=vertices[k+2];data[offset+3]=vertices[k+3];data[offset+4]=vertices[k+4];
+   data[offset+5]=x;data[offset+6]=y;data[offset+7]=z;
+   if(color){data[offset+8]=r;data[offset+9]=g;data[offset+10]=b}offset+=stride;
+  }
  }
  return offset;
 }
@@ -419,15 +429,16 @@ function benchmarkRing(x,y,z,r,color,width=.025){
  mesh(vertices,color);
 }
 function benchmarkCable(points,r,color){
- const angles=circleTemplate(8,4),vertices=new Array(Math.max(0,points.length-1)*8*30);let offset=0;
+ // Share radial offsets between both ends; reuse scratch and retain exact double coordinates.
+ const ends=new Float64Array(2*9*3),angles=circleTemplate(8,4),vertices=new Float64Array(Math.max(0,points.length-1)*8*30);let offset=0;
  for(let k=1;k<points.length;k++){
   const a=points[k-1],b=points[k],d=b.map((v,j)=>v-a[j]),len=Math.hypot(...d);if(len<1e-5)continue;
   const n=d.map(v=>v/len),helper=Math.abs(n[1])>.9?[1,0,0]:[0,1,0],u=[n[1]*helper[2]-n[2]*helper[1],n[2]*helper[0]-n[0]*helper[2],n[0]*helper[1]-n[1]*helper[0]],ul=Math.hypot(...u);for(let j=0;j<3;j++)u[j]/=ul;
-  const v=[n[1]*u[2]-n[2]*u[1],n[2]*u[0]-n[0]*u[2],n[0]*u[1]-n[1]*u[0]],ends=new Float64Array(2*9*3);
-  for(let end=0;end<2;end++){const base=end?b:a;for(let j=0;j<=8;j++)for(let axis=0;axis<3;axis++)ends[end*27+j*3+axis]=base[axis]+r*(angles[j*2]*u[axis]+angles[j*2+1]*v[axis])}
+  const v=[n[1]*u[2]-n[2]*u[1],n[2]*u[0]-n[0]*u[2],n[0]*u[1]-n[1]*u[0]];
+  for(let j=0;j<=8;j++)for(let axis=0;axis<3;axis++){const delta=r*(angles[j*2]*u[axis]+angles[j*2+1]*v[axis]);ends[j*3+axis]=a[axis]+delta;ends[27+j*3+axis]=b[axis]+delta}
   for(let j=0;j<8;j++)for(const index of [j,9+j,10+j,j,10+j,j+1]){for(let axis=0;axis<3;axis++)vertices[offset++]=ends[index*3+axis];vertices[offset++]=0;vertices[offset++]=0}
  }
- vertices.length=offset;mesh(vertices,color);
+ mesh(offset===vertices.length?vertices:vertices.slice(0,offset),color);
 }
 function benchmarkDisplay(x,y,z,w,h,title,retro=false){
  const casing=retro?[.46,.45,.32]:[.12,.23,.31],depth=retro?.50:.20;
@@ -1071,18 +1082,27 @@ function pickWorldControl(clientX,clientY,activate=true){
 const vertexArrays=gl.getExtension('OES_vertex_array_object');
 const uintIndices=!!gl.getExtension('OES_element_index_uint');
 // Share only bit-identical render attributes. Original triangles still drive exact picking.
-function indexRenderVertices(data,allowUint32,minCount=0){
+function indexRenderVertices(data,allowUint32,minCount=0,serialHash=false){
  if(data.length<minCount*11)return {vertices:data};
  const stride=11,count=data.length/stride,words=new Uint32Array(data.buffer,data.byteOffset,data.length),indices=new Uint32Array(count);
  let size=1;while(size<count*2)size*=2;
  const slots=new Uint32Array(size),mask=size-1;let unique=0;
  for(let i=0;i<count;i++){
   const offset=i*stride;let hash=2166136261;
-  for(let j=0;j<stride;j++)hash=Math.imul(hash^words[offset+j],16777619);
+  if(serialHash){for(let j=0;j<stride;j++)hash=Math.imul(hash^words[offset+j],16777619)}else{
+   // Mix all 11 words in independent lanes; equality still compares every bit.
+   let a=2166136261,b=0x7feb352d,c=0x846ca68b;
+   for(let j=0;j<3;j++){a=Math.imul(a^words[offset+j],16777619);b=Math.imul(b^words[offset+4+j],16777619);c=Math.imul(c^words[offset+8+j],16777619)}
+   a=Math.imul(a^words[offset+3],16777619);b=Math.imul(b^words[offset+7],16777619);
+   hash=a^((b<<11)|(b>>>21))^((c<<22)|(c>>>10));
+  }
   // Mix high Float32 bits down before choosing a power-of-two table slot.
   hash=Math.imul(hash^(hash>>>16),0x7feb352d);hash=Math.imul(hash^(hash>>>15),0x846ca68b);hash^=hash>>>16;
-  let slot=hash&mask;
-  while(slots[slot]){const first=slots[slot]-1,base=first*stride;let same=true;
+  let slot=hash&mask,probes=0;
+  while(slots[slot]){
+   // Retry once with the serial hash if a batch has unusually clustered keys.
+   if(!serialHash&&++probes>64)return indexRenderVertices(data,allowUint32,minCount,true);
+   const first=slots[slot]-1,base=first*stride;let same=true;
    for(let j=0;j<stride;j++)if(words[base+j]!==words[offset+j]){same=false;break}
    if(same)break;slot=(slot+1)&mask;
   }
