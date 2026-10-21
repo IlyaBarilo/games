@@ -167,6 +167,29 @@ function boundsInView(bounds,model,planes){
 }
 function geometryBounds(v){const lo=[Infinity,Infinity,Infinity],hi=[-Infinity,-Infinity,-Infinity];for(let k=0;k<v.length;k+=5)for(let j=0;j<3;j++){lo[j]=Math.min(lo[j],v[k+j]);hi[j]=Math.max(hi[j],v[k+j])}return {center:lo.map((n,j)=>(n+hi[j])/2),extent:lo.map((n,j)=>(hi[j]-n)/2)}}
 // Write upload data directly; keep only original coordinates for exact picking and later rebuilds.
+// Small immutable angle/topology tables are shared by all decorative models.
+const angularTemplates=new Map(),sphereTemplates=new Map();
+function circleTemplate(segments,divisor,multiple=1){
+ const key=segments+':'+divisor+':'+multiple;
+ if(!angularTemplates.has(key)){const values=new Float64Array((segments+1)*2);for(let k=0;k<=segments;k++){const a=k*Math.PI*multiple/divisor;values[k*2]=Math.cos(a);values[k*2+1]=Math.sin(a)}angularTemplates.set(key,values)}
+ return angularTemplates.get(key);
+}
+function sphereTemplate(lat,lon){
+ const key=lat+':'+lon;
+ if(!sphereTemplates.has(key)){const order=new Uint16Array(lat*lon*6);let n=0;for(let a=0;a<lat;a++)for(let b=0;b<lon;b++){const p=a*(lon+1)+b,q=p+lon+1;for(const index of [p,q+1,q,p,p+1,q+1])order[n++]=index}sphereTemplates.set(key,{latitude:circleTemplate(lat,lat),longitude:circleTemplate(lon,lon,2),order})}
+ return sphereTemplates.get(key);
+}
+function sphereVertices(x,y,z,rx,ry,rz,lat,lon,translateXZ=true){
+ const template=sphereTemplate(lat,lon),points=new Float64Array((lat+1)*(lon+1)*5);let offset=0;
+ for(let a=0;a<=lat;a++)for(let b=0;b<=lon;b++){
+  const sin=template.latitude[a*2+1],cos=template.latitude[a*2],px=rx*sin*template.longitude[b*2],pz=rz*sin*template.longitude[b*2+1];
+  // Evolution meshes omit X/Z translation; preserve their original signed zero as well.
+  points[offset++]=translateXZ?x+px:px;points[offset++]=y+ry*cos;points[offset++]=translateXZ?z+pz:pz;points[offset++]=b/lon;points[offset++]=a/lat;
+ }
+ const vertices=new Float64Array(template.order.length*5);offset=0;
+ for(const index of template.order)for(let j=0;j<5;j++)vertices[offset++]=points[index*5+j];
+ return vertices;
+}
 function writeRenderVertices(vertices,data,offset=0,color=null){
  for(let i=0;i<vertices.length;i+=15){
   const ux=vertices[i+5]-vertices[i],uy=vertices[i+6]-vertices[i+1],uz=vertices[i+7]-vertices[i+2],vx=vertices[i+10]-vertices[i],vy=vertices[i+11]-vertices[i+1],vz=vertices[i+12]-vertices[i+2];
@@ -217,7 +240,7 @@ standAnchors.forEach(([x,y,z],i)=>withStandGroup(i,()=>{const zone=zoneFloorColo
 
 // Decorative geometry belongs only to this local showcase prototype.
 const props=[];function prop(x,z,r){const group=activeStandGroup>=0?activeStandGroup:activePlatform,p={x,z,r,group,benchmarkVariant:activeBenchmarkVariant};props.push(p);if(group>=0)standGroups[group].obstacles.push(p)}
-function ball(x,y,z,rx,ry,rz,color){const vertices=[],lat=8,lon=12;function p(a,b){const theta=a*Math.PI/lat,phi=b*Math.PI*2/lon;return [x+rx*Math.sin(theta)*Math.cos(phi),y+ry*Math.cos(theta),z+rz*Math.sin(theta)*Math.sin(phi),b/lon,a/lat]}for(let a=0;a<lat;a++)for(let b=0;b<lon;b++)vertices.push(...p(a,b),...p(a+1,b+1),...p(a+1,b),...p(a,b),...p(a,b+1),...p(a+1,b+1));mesh(vertices,color)}
+function ball(x,y,z,rx,ry,rz,color){mesh(sphereVertices(x,y,z,rx,ry,rz,8,12),color)}
 function tree(x,z,size,scale=1){box(x,0,z,.55*scale,.45,.55*scale,[.21,.24,.19]);box(x,.4,z,.22*scale,size,.22*scale,[.38,.21,.12]);ball(x,size+.5,z,.75*scale,.85*scale,.7*scale,[.19,.45,.22]);ball(x-.35*scale,size+.35,z+.3*scale,.48*scale,.55*scale,.5*scale,[.27,.57,.25]);ball(x+.4*scale,size+.55,z,.55*scale,.65*scale,.55*scale,[.33,.62,.28]);prop(x,z,.85*scale)}
 function raisedFrame(x,y,z,w,h,inset,depth,color){
  // One extruded ring: shared corner coordinates, no overlapping trim bars.
@@ -338,11 +361,7 @@ activePlatform=4;
 const evolutionFields=[[-2.25,'1980'],[-.75,'1994'],[.75,'2003'],[2.25,'2026+']];
 function evolutionGlyph(character){const c=document.createElement('canvas');c.width=c.height=64;const q=c.getContext('2d');q.font='bold 54px Consolas,monospace';q.fillStyle='#9dfca6';q.textAlign='center';q.textBaseline='middle';q.fillText(character,32,34);return texture(c)}
 const terminalGlyphs={head:evolutionGlyph('O'),body:evolutionGlyph('#'),food:evolutionGlyph('*')};
-function evolutionBall(r,style,color){
- const lat=style===2?4:12,lon=style===2?6:20,vertices=[];
- function p(a,b){const t=a*Math.PI/lat,f=b*Math.PI*2/lon;return [r*Math.sin(t)*Math.cos(f),r+r*Math.cos(t),r*Math.sin(t)*Math.sin(f),b/lon,a/lat]}
- for(let a=0;a<lat;a++)for(let b=0;b<lon;b++)vertices.push(...p(a,b),...p(a+1,b+1),...p(a+1,b),...p(a,b),...p(a,b+1),...p(a+1,b+1));mesh(vertices,color);
-}
+function evolutionBall(r,style,color){const lat=style===2?4:12,lon=style===2?6:20;mesh(sphereVertices(0,r,0,r,r,r,lat,lon,false),color)}
 function evolutionPose(style,segment,t){
  const center=evolutionFields[style][0],phase=t*.65-segment*.22+style*.9;let x,z,angle;
  if(style<2){const q=((phase%4)+4)%4;
@@ -374,11 +393,20 @@ activePlatform=5;
 // Benchmark decor variants are real geometry belonging to the same movable stand.
 function benchmarkVariant(value,build){const previous=activeBenchmarkVariant;activeBenchmarkVariant=value;try{build()}finally{activeBenchmarkVariant=previous;motion=null;emissive=0}}
 function benchmarkRing(x,y,z,r,color,width=.025){
- const vertices=[];for(let k=0;k<36;k++){const a=k*Math.PI/18,b=(k+1)*Math.PI/18,p=(angle,radius)=>[x+Math.cos(angle)*radius,y+Math.sin(angle)*radius,z,0,0];vertices.push(...p(a,r),...p(b,r),...p(b,r-width),...p(a,r),...p(b,r-width),...p(a,r-width))}mesh(vertices,color);
+ const angles=circleTemplate(36,18),vertices=new Float64Array(36*30);let offset=0;
+ for(let k=0;k<36;k++)for(const [j,radius] of [[k,r],[k+1,r],[k+1,r-width],[k,r],[k+1,r-width],[k,r-width]]){vertices[offset++]=x+angles[j*2]*radius;vertices[offset++]=y+angles[j*2+1]*radius;vertices[offset++]=z;vertices[offset++]=0;vertices[offset++]=0}
+ mesh(vertices,color);
 }
 function benchmarkCable(points,r,color){
- const vertices=[];for(let k=1;k<points.length;k++){const a=points[k-1],b=points[k],d=b.map((v,j)=>v-a[j]),len=Math.hypot(...d);if(len<1e-5)continue;const n=d.map(v=>v/len),helper=Math.abs(n[1])>.9?[1,0,0]:[0,1,0],u=[n[1]*helper[2]-n[2]*helper[1],n[2]*helper[0]-n[0]*helper[2],n[0]*helper[1]-n[1]*helper[0]],ul=Math.hypot(...u);for(let j=0;j<3;j++)u[j]/=ul;const v=[n[1]*u[2]-n[2]*u[1],n[2]*u[0]-n[0]*u[2],n[0]*u[1]-n[1]*u[0]],p=(base,angle)=>[...base.map((x,j)=>x+r*(Math.cos(angle)*u[j]+Math.sin(angle)*v[j])),0,0];for(let j=0;j<8;j++){const s=j*Math.PI/4,t=(j+1)*Math.PI/4;vertices.push(...p(a,s),...p(b,s),...p(b,t),...p(a,s),...p(b,t),...p(a,t))}}
- mesh(vertices,color);
+ const angles=circleTemplate(8,4),vertices=new Array(Math.max(0,points.length-1)*8*30);let offset=0;
+ for(let k=1;k<points.length;k++){
+  const a=points[k-1],b=points[k],d=b.map((v,j)=>v-a[j]),len=Math.hypot(...d);if(len<1e-5)continue;
+  const n=d.map(v=>v/len),helper=Math.abs(n[1])>.9?[1,0,0]:[0,1,0],u=[n[1]*helper[2]-n[2]*helper[1],n[2]*helper[0]-n[0]*helper[2],n[0]*helper[1]-n[1]*helper[0]],ul=Math.hypot(...u);for(let j=0;j<3;j++)u[j]/=ul;
+  const v=[n[1]*u[2]-n[2]*u[1],n[2]*u[0]-n[0]*u[2],n[0]*u[1]-n[1]*u[0]],ends=new Float64Array(2*9*3);
+  for(let end=0;end<2;end++){const base=end?b:a;for(let j=0;j<=8;j++)for(let axis=0;axis<3;axis++)ends[end*27+j*3+axis]=base[axis]+r*(angles[j*2]*u[axis]+angles[j*2+1]*v[axis])}
+  for(let j=0;j<8;j++)for(const index of [j,9+j,10+j,j,10+j,j+1]){for(let axis=0;axis<3;axis++)vertices[offset++]=ends[index*3+axis];vertices[offset++]=0;vertices[offset++]=0}
+ }
+ vertices.length=offset;mesh(vertices,color);
 }
 function benchmarkDisplay(x,y,z,w,h,title,retro=false){
  const casing=retro?[.46,.45,.32]:[.12,.23,.31],depth=retro?.50:.20;
@@ -460,7 +488,7 @@ function exhibitClamp(v){return Math.max(0,Math.min(1,v))}
 function exhibitEase(v){v=exhibitClamp(v);return v*v*(3-2*v)}
 function exhibitPose(x,y,z,sx=1,sy=sx,sz=sx,angle=0){const m=transform(x,y,z,angle);for(const j of [0,1,2])m[j]*=sx;for(const j of [4,5,6])m[j]*=sy;for(const j of [8,9,10])m[j]*=sz;return m}
 function exhibitBeam(a,b,r,color){benchmarkCable([a,b],r,color)}
-function exhibitRing(x,y,z,rx,rz,color,width=.018,tilt=0){const points=[];for(let k=0;k<=48;k++){const a=k*Math.PI/24;points.push([x+Math.cos(a)*rx,y+Math.sin(a)*rz*Math.sin(tilt),z+Math.sin(a)*rz*Math.cos(tilt)])}benchmarkCable(points,width,color)}
+function exhibitRing(x,y,z,rx,rz,color,width=.018,tilt=0){const angles=circleTemplate(48,24),sin=Math.sin(tilt),cos=Math.cos(tilt),points=[];for(let k=0;k<=48;k++)points.push([x+angles[k*2]*rx,y+angles[k*2+1]*rz*sin,z+angles[k*2+1]*rz*cos]);benchmarkCable(points,width,color)}
 function exhibitDeck(x,z,rx,rz,height,color,n=12){const vertices=[];for(let k=0;k<n;k++){const a=k*Math.PI*2/n,b=(k+1)*Math.PI*2/n,p=[x+Math.cos(a)*rx,height,z+Math.sin(a)*rz],q=[x+Math.cos(b)*rx,height,z+Math.sin(b)*rz];vertices.push(x,height,z,0,0,...q,0,0,...p,0,0);quad([p[0],.06,p[2]],[q[0],.06,q[2]],q,p,color.map(v=>v*.72))}mesh(vertices,color)}
 // Smooth exhibit bases share closed geometry and a narrow bevel.
 function roundedPlatformContour(x,z,w,d,r,steps=12){
