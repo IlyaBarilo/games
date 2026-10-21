@@ -6,14 +6,14 @@ window.PAVILION_LOADING?.start(games.length);
 function preloadPreviews(entries){return entries.map(game=>new Promise(resolve=>{const image=new Image();image.decoding='async';image.onload=()=>resolve(image);image.onerror=()=>resolve(null);image.src=game.imageUrl}))}
 // Fetch artwork while the interface, shaders and models are being prepared.
 const previewImages=preloadPreviews(games);
-const travelPanel=document.querySelector('.travel'),viewStatus=document.getElementById('view-status'),mapPanel=document.querySelector('.minimap');travelPanel.append(viewStatus);
+const travelPanel=document.querySelector('.travel'),mapPanel=document.querySelector('.minimap');
 const mapToggle=document.getElementById('map-toggle'),mapContent=document.getElementById('map-content');
 let refreshVisitor=()=>{};
 function setMapCollapsed(collapsed){mapContent.hidden=collapsed;mapPanel.classList.toggle('is-collapsed',collapsed);mapToggle.setAttribute('aria-expanded',String(!collapsed));const label=collapsed?'Показать карту':'Свернуть карту';mapToggle.setAttribute('aria-label',label);mapToggle.title=label;}
 try{setMapCollapsed(localStorage.getItem('pavilion-map-collapsed')==='1')}catch{}
 mapToggle.onclick=()=>{const collapsed=!mapContent.hidden;setMapCollapsed(collapsed);if(!collapsed){updateStandMap();refreshVisitor()}try{localStorage.setItem('pavilion-map-collapsed',collapsed?'1':'0')}catch{}};
-const topbar=document.querySelector('.pavilion-topbar');
-function positionMapBelowControls(){const top=Math.ceil(topbar.getBoundingClientRect().bottom+10)+'px';if(mapPanel.style.top!==top){mapPanel.style.top=top;mapPanel.style.setProperty('--map-top',top)}}
+const topbar=document.querySelector('.pavilion-topbar'),settingsBounds=document.getElementById('settings-panel');
+function positionMapBelowControls(){const top=Math.ceil(topbar.getBoundingClientRect().bottom+10)+'px';if(mapPanel.style.top!==top){mapPanel.style.top=top;mapPanel.style.setProperty('--map-top',top);settingsBounds.style.setProperty('--controls-bottom',top)}}
 const controlsObserver=new ResizeObserver(positionMapBelowControls);controlsObserver.observe(topbar);window.addEventListener('resize',positionMapBelowControls);positionMapBelowControls();
 const helpToggle=document.getElementById('help-toggle'),helpContent=document.getElementById('help-content'),helpPanel=document.querySelector('.brand');
 function setHelpCollapsed(collapsed){helpContent.hidden=collapsed;helpPanel.hidden=collapsed;helpPanel.classList.toggle('is-collapsed',collapsed);helpToggle.setAttribute('aria-expanded',String(!collapsed));const label=collapsed?'Открыть настройки':'Закрыть настройки';helpToggle.setAttribute('aria-label',label);helpToggle.title=label;}
