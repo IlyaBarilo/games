@@ -150,6 +150,13 @@ for (const corrupt of ['{', JSON.stringify({...saved, base: 'outdated'}), JSON.s
 layoutContext.localStorage = {getItem(){throw Error('Denied')}, setItem(){throw Error('Denied')}, removeItem(){throw Error('Denied')}};
 assert.equal(layoutContext.restoreStandLayout(), false);assert.equal(layoutContext.saveStandLayout(), false);assert.equal(layoutContext.resetStandLayout(), false);
 assert.equal(JSON.stringify(plan.standGroups.map(group => group.position)), initial);
+// Viewing distances stay within clear approach lanes and persist without changing layout.
+const distanceStore=new Map();layoutContext.localStorage={getItem:k=>distanceStore.get(k)??null,setItem:(k,v)=>distanceStore.set(k,v)};
+for(const [input,expected] of [[4.2,4.2],[6,6],[9.5,9.5],['7.34',7.3],[-100,4.2],[100,9.5],['bad',8.8],[null,8.8],['',8.8]]){
+ assert.equal(layoutContext.setStandViewDistance(input),expected);
+ for(let i=0;i<plan.standGroups.length;i++){const point=layoutContext.standViewPoint(i);assert(!layoutContext.insideStandFootprint(point[0],point[2]));for(const closer of [.9,1.2])assert(!layoutContext.insideStandFootprint(point[0],Math.max(plan.standGroups[i].position[2]+4.2,point[2]-closer)))}
+}
+layoutContext.setStandViewDistance(7.1);const restoredDistance={games:layoutContext.games,document:layoutContext.document,window:{addEventListener(){}},localStorage:layoutContext.localStorage};vm.createContext(restoredDistance);vm.runInContext(source.slice(layoutStart,layoutEnd),restoredDistance);assert.equal(restoredDistance.window.PAVILION_LAYOUT.getViewDistance(),7.1);layoutContext.localStorage.setItem=()=>{throw Error('Storage denied')};assert.equal(layoutContext.setStandViewDistance(7.8),7.8);layoutContext.setStandViewDistance(8.8);
 console.log('Passed: atomic exchanges of all 66 pairs, local persistence, invalid-state recovery and clear aisles for all 12 stands.');
 
 // Exercise the tour controller without waiting through real-time pauses.
@@ -169,17 +176,17 @@ demoContext.cancelWalk=()=>{demoContext.stopDemo();demoContext.travel=null;demoC
 demoContext.startDemo();
 assert(demoContext.demo.active);assert.equal(new Set(demoContext.demo.order).size,12);
 const tourOrder=Array.from(demoContext.demo.order),visits=[];
-for(let step=0;step<13;step++){
+for(let step=0;step<37;step++){
  visits.push(demoContext.demo.target);demoContext.travel=null;demoContext.updateDemo(.04);
  assert.equal(demoContext.demo.phase,'viewing');assert.equal(demoContext.demo.remaining,14);
  const target=demoContext.demo.target;demoContext.updateDemo(13.9);assert.equal(demoContext.demo.target,target);
  demoContext.updateDemo(.11);assert.equal(demoContext.demo.phase,'walking');
 }
-assert.deepEqual(visits.slice(0,12),tourOrder);assert.equal(visits[12],visits[0]);
+for(let k=0;k<visits.length;k++)assert.equal(visits[k],tourOrder[k%12],'The tour must keep looping beyond its first circuit');
 demoContext.cancelWalk();assert(!demoContext.demo.active);demoContext.updateDemo(60);assert.equal(demoContext.travel,null);
-demoContext.blocked=()=>true;demoContext.startDemo();assert(!demoContext.demo.active);assert.equal(demoContext.travel,null);
-demoContext.blocked=()=>false;demoContext.findRoute=()=>null;demoContext.startDemo();assert(!demoContext.demo.active);
-console.log('Passed: demo visits all stands, waits, loops, stops on manual cancellation and handles missing routes.');
+demoContext.blocked=()=>true;demoContext.startDemo();assert(demoContext.demo.active);assert.equal(demoContext.demo.phase,'waiting');assert.equal(demoContext.travel,null);demoContext.updateDemo(3.1);assert.equal(demoContext.demo.phase,'waiting');
+demoContext.blocked=()=>false;demoContext.findRoute=()=>null;demoContext.startDemo();assert(demoContext.demo.active);assert.equal(demoContext.demo.phase,'waiting');demoContext.findRoute=(_x,_z,x,z)=>[[x,z]];demoContext.updateDemo(3.1);assert.equal(demoContext.demo.phase,'walking');const previewCursor=demoContext.demo.cursor;assert(demoContext.previewStandView());assert(demoContext.demo.active);assert.equal(demoContext.demo.cursor,previewCursor);vm.runInContext(declaration('pauseHiddenNavigation'),demoContext);demoContext.document.hidden=true;const activeTravel=demoContext.travel;demoContext.pauseHiddenNavigation();assert(demoContext.demo.active);assert.strictEqual(demoContext.travel,activeTravel);demoContext.stopDemo();demoContext.pauseHiddenNavigation();assert.equal(demoContext.travel,null);
+console.log('Passed: demo visits all stands, waits, loops, stops on manual cancellation, retries missing routes and survives a hidden tab.');
 
 // Moving exhibits must stay clear of their signs and finish turns smoothly.
 const exhibitContext = {};
@@ -216,6 +223,7 @@ assert.equal(solidContext.faces.length,6,'Solid boxes must have all six faces');
 assert(solidContext.faces.some(face=>face.every(p=>p[1]===0)),'The bottom face must exist');
 const boxEdges=new Map();for(const face of solidContext.faces)for(let i=0;i<4;i++){const key=[face[i].join(','),face[(i+1)%4].join(',')].sort().join('|');boxEdges.set(key,(boxEdges.get(key)||0)+1)}assert([...boxEdges.values()].every(count=>count===2),'Every box edge must join two faces');
 assert.equal(demoContext.demoViewPoint(0)[2],demoContext.standViewPoint(0)[2]-.9,'Demo must stop closer to each exhibit');
+const defaultView=demoContext.standViewPoint;demoContext.standViewPoint=i=>{const p=demoContext.stands[i];return [p[0],1.7,p[2]+4.2]};for(let i=0;i<12;i++)assert.equal(demoContext.demoViewPoint(i)[2],demoContext.stands[i][2]+4.2,'The closest demo point must stay outside the platform');demoContext.standViewPoint=defaultView;
 console.log('Passed: six-sided boxes are closed and demo observation points are closer.');
 
 const softContext={};vm.createContext(softContext);vm.runInContext(['roundedPlatformContour','ovalPlatformContour','cloudPlatformContour','platformSlice','softPlatformGeometry'].map(declaration).join('\n'),softContext);
@@ -540,3 +548,14 @@ assert(collisionResult.indices,'Repeated adversarial geometry must still be inde
 assert.deepEqual(collisionRestored,collisionOriginal);assert.deepEqual(collisionWords,collisionOriginal,'Nonzero-offset input remains unchanged');
 assert(collisionReads<collisionCount*200,'Clustered keys must switch hash before lookup becomes quadratic: '+collisionReads+' reads');
 console.log('Passed: adversarial hash collisions retain all float bits and index order with bounded lookup work and nonzero input offsets.');
+
+// Opening settings is transient; stale collapse preferences must never expose the panel on load.
+const settingsAttributes={},settingsEvents={};let settingsFocus=0;
+const settingsToggle={setAttribute:(k,v)=>settingsAttributes[k]=v,focus(){settingsFocus++}},settingsContent={hidden:false},settingsPanel={hidden:false,classList:{toggle(){}},addEventListener:(name,fn)=>settingsEvents[name]=fn};
+const settingsScope={document:{getElementById:id=>id==='help-toggle'?settingsToggle:settingsContent,querySelector:()=>settingsPanel},localStorage:{getItem(){throw Error('Settings visibility must not be restored')},setItem(){throw Error('Settings visibility must not be saved')}}};vm.createContext(settingsScope);
+vm.runInContext(source.slice(source.indexOf('const helpToggle='),source.indexOf('// Stand-group layout begin.')),settingsScope);
+assert(settingsPanel.hidden&&settingsContent.hidden);assert.equal(settingsAttributes['aria-expanded'],'false');assert.equal(settingsAttributes['aria-label'],'Открыть настройки');
+settingsToggle.onclick();assert(!settingsPanel.hidden&&!settingsContent.hidden);assert.equal(settingsAttributes['aria-expanded'],'true');assert.equal(settingsAttributes['aria-label'],'Закрыть настройки');
+settingsToggle.onclick();assert(settingsPanel.hidden);settingsToggle.onclick();let settingsPrevented=false;settingsEvents.keydown({key:'Escape',defaultPrevented:true,preventDefault(){throw Error('Nested editor already handled Escape')}});assert(!settingsPanel.hidden);
+settingsEvents.keydown({key:'Escape',defaultPrevented:false,preventDefault(){settingsPrevented=true}});assert(settingsPanel.hidden&&settingsPrevented);assert.equal(settingsFocus,1);
+console.log('Passed: settings start closed regardless of old storage, toggle both ways, expose accessible state and close with Escape without overriding the nested editor.');

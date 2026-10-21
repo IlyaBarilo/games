@@ -1,7 +1,14 @@
 (async () => {
  if(window.PAVILION_LOADING && !await window.PAVILION_LOADING.initialized)return;
  const layout=window.PAVILION_LAYOUT,toggle=document.getElementById('developer-toggle'),panel=document.getElementById('developer-panel'),status=document.getElementById('developer-status'),map=document.querySelector('.map-floor'),mapTitle=document.querySelector('.map-title');
+ const settingsDeveloper=document.getElementById('settings-developer');
  const games=window.GAMES_CATALOG.games.filter(game=>game.available),normalMapTitle=mapTitle.textContent;
+ const viewDistance=document.getElementById('developer-view-distance'),viewDistanceValue=document.getElementById('developer-view-distance-value');
+ function refreshViewDistance(){const value=layout.getViewDistance();viewDistance.value=value;viewDistanceValue.value=String(value).replace('.',',');viewDistance.setAttribute('aria-valuetext',String(value).replace('.',','))}
+ function previewView(){status.textContent=layout.previewView()?'Проверяем точку просмотра выбранной витрины.':'Выберите витрину на карте, чтобы проверить расстояние.'}
+ viewDistance.oninput=()=>{layout.setViewDistance(viewDistance.value);refreshViewDistance()};viewDistance.onchange=previewView;
+ document.getElementById('developer-view-preview').onclick=previewView;
+ document.getElementById('developer-view-reset').onclick=()=>{layout.setViewDistance(8.8);refreshViewDistance();previewView()};refreshViewDistance();
  let drag=null,suppressClick=null;
  function marker(element){const button=element?.closest('.map-floor button[data-zone]');return button&&button.dataset.zone!=='home'?button:null}
  function gameFor(button){return games[Number(button.dataset.zone)]}
@@ -12,11 +19,13 @@
   try{if(current.source.hasPointerCapture(current.pointerId))current.source.releasePointerCapture(current.pointerId)}catch{}
  }
  function cancelDrag(){if(drag?.moved)status.textContent='Перетаскивание отменено.';clearDrag()}
- function setOpen(open){cancelDrag();panel.hidden=!open;toggle.setAttribute('aria-pressed',String(open));map.classList.toggle('map-editing',open);mapTitle.textContent=open?'Карта · перетащите стенд на другой':normalMapTitle;if(open){layout.audit();document.getElementById('developer-close').focus({preventScroll:true})}else toggle.focus({preventScroll:true})}
+ function setOpen(open){if(open&&document.getElementById('settings-panel').hidden)document.getElementById('help-toggle').click();cancelDrag();panel.hidden=!open;settingsDeveloper.setAttribute('aria-expanded',String(open));toggle.setAttribute('aria-pressed',String(open));map.classList.toggle('map-editing',open);mapTitle.textContent=open?'Карта · перетащите стенд на другой':normalMapTitle;if(open){layout.audit();document.getElementById('developer-close').focus({preventScroll:true})}else (document.getElementById('settings-panel').hidden?toggle:settingsDeveloper).focus({preventScroll:true})}
  function exchange(source,target){
   try{const a=gameFor(source),b=gameFor(target);layout.swapStands(a.id,b.id);const saved=layout.save();status.textContent='Сцены '+String(Number(source.dataset.zone)+1).padStart(2,'0')+' «'+a.title+'» и «'+b.title+'» поменялись местами. '+(saved?'Сохранено в этом браузере.':'Сохранение недоступно: расстановка действует до закрытия страницы.')}
   catch(error){status.textContent=error.message}
  }
+ document.getElementById('help-toggle').addEventListener('click',()=>{if(document.getElementById('help-content').hidden&&!panel.hidden){setOpen(false);document.getElementById('help-toggle').focus({preventScroll:true})}});
+ settingsDeveloper.onclick=()=>setOpen(panel.hidden);
  toggle.onclick=()=>setOpen(panel.hidden);document.getElementById('developer-close').onclick=()=>setOpen(false);
  panel.addEventListener('keydown',event=>{if(event.key==='Escape'){event.preventDefault();setOpen(false)}});
  map.addEventListener('pointerdown',event=>{
