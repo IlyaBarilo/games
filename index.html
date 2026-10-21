@@ -6,7 +6,7 @@
     <title>Игры Ильи Барило — 3D-павильон</title>
     <meta name="description" content="Браузерные игры Ильи Барило: Змейка 3D, Крестики-нолики с сапёром, Робосклад и Шарики с поздравлениями. Играйте и читайте о замысле, механиках и роли ИИ в создании игр.">
     <meta name="author" content="Илья Барило">
-    <script src="assets/js/view-mode.js" data-view="3d" data-web-only></script>
+    <script src="assets/js/view-mode.js" data-view="3d"></script>
     <link rel="icon" type="image/png" href="assets/favicon.png">
     <link rel="stylesheet" href="assets/css/pavilion.css">
     <script defer src="assets/js/pavilion-loading.js"></script>
@@ -20,7 +20,7 @@
 <defs><clipPath id="loading-water-clip"><path d="M8 4h144v103H8z"/></clipPath></defs>
 <g data-mascot="robot">
  <ellipse cx="80" cy="116" rx="51" ry="3" fill="#88cdb4" opacity=".14"/>
- <path class="mascot-road" d="M17 117h12m10 0h12m10 0h12m10 0h12m10 0h12m10 0h12" stroke="#91b69a" stroke-width="1.3" opacity=".3"/>
+ <path class="mascot-road" d="M17 117H143" stroke-dasharray="12 10" stroke="#91b69a" stroke-width="1.3" opacity=".3"/>
  <g class="mascot-robot-drive">
   <path d="M38 89h83v14H38z" fill="#3b5b47" stroke="#94aa83" stroke-width="1.5"/>
   <rect x="36" y="62" width="87" height="35" rx="9" fill="#c7c79f" stroke="#647e5c" stroke-width="2"/>
@@ -28,8 +28,7 @@
   <path d="M45 66h65" stroke="#fff3cb" stroke-width="2" stroke-linecap="round"/>
   <path d="M92 65v28" stroke="#9ca885" stroke-width="1.5"/>
   <rect x="94" y="67" width="24" height="24" rx="6" fill="#304c43" stroke="#789077" stroke-width="1.5"/>
-  <g class="mascot-eyes"><rect x="106" y="72" width="6" height="8" rx="2.5" fill="#a4ebce"/></g>
-  <path d="M103 83q4 3 8 0" fill="none" stroke="#a4ebce" stroke-width="1.6" stroke-linecap="round"/>
+  <g class="mascot-eyes"><rect x="101.5" y="73" width="9" height="12" rx="3.5" fill="#a4ebce"/></g>
   <rect x="56" y="73" width="30" height="15" rx="3" fill="#acb694" stroke="#8b9e7a" stroke-width="1.2"/>
   <text x="71" y="83.7" text-anchor="middle" font-family="Segoe UI,sans-serif" font-size="9" font-weight="800" letter-spacing=".5" fill="#355240">БИП</text>
   <path d="M48 61v-8h10" fill="none" stroke="#789077" stroke-width="2.5" stroke-linejoin="round"/><circle class="mascot-light" cx="59" cy="53" r="3" fill="#f0d28d"/>

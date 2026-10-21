@@ -21,12 +21,14 @@ for (const mode of ['web', 'gamespace']) {
     const output = path.join(projectRoot, 'dist', mode);
     checkProject(output, mode);
     const entryHtml = fs.readFileSync(path.join(output, 'index.html'), 'utf8');
-    if (mode === 'gamespace') {
-        assert(!entryHtml.includes('data-web-only'), 'Web-only navigation leaked into offline kit');
-        assert(!entryHtml.includes('view-mode.js'), 'Offline kit must not remember or redirect site mode');
-    } else {
-        assert(entryHtml.includes('assets/js/view-mode.js'), 'Missing site mode preference');
-        assert(fs.readFileSync(path.join(output, 'gamespace.html'), 'utf8').includes('index.html?view=3d'), 'Missing return to pavilion');
+    assert(entryHtml.includes('id="scene"'), 'Missing 3D pavilion: ' + mode);
+    assert(entryHtml.includes('assets/js/view-mode.js'), 'Missing mode preference: ' + mode);
+    assert(entryHtml.includes('data-view="3d"'), 'Initial entry must be 3D: ' + mode);
+    const catalogHtml = fs.readFileSync(path.join(output, 'gamespace.html'), 'utf8');
+    assert(catalogHtml.includes('index.html?view=3d'), 'Missing return to pavilion: ' + mode);
+    assert(catalogHtml.includes('data-view="2d"'), 'Missing 2D catalog mode: ' + mode);
+    for (const resource of ['assets/js/pavilion.js', 'assets/js/pavilion-loading.js', 'assets/js/pavilion-developer.js', 'assets/js/view-mode.js', 'assets/css/pavilion.css', 'assets/js/gamespace.js', 'assets/css/gamespace.css']) {
+        assert.equal(hash(path.join(output, resource)), hash(path.join(projectRoot, resource)), 'Missing or changed showcase resource: ' + mode + '/' + resource);
     }
     // The kit must accompany unchanged game HTML in every distribution.
     for (const document of ['LICENSE.md', 'NOTICE.md', 'USAGE.md']) {

@@ -49,7 +49,6 @@ for (const mode of ['web', 'gamespace']) {
     const games = sourceCatalog.games.filter(game => game.available && (mode === 'web' || game.directory)).map(game => {
         const entry = { ...game };
         delete entry.detailsSource;
-        if (mode === 'gamespace') delete entry.detailsUrl;
         return entry;
     });
     const usedSections = new Set(games.map(game => game.section));
@@ -57,29 +56,22 @@ for (const mode of ['web', 'gamespace']) {
     fs.mkdirSync(path.join(output, 'catalog'), { recursive: true });
     fs.writeFileSync(path.join(output, 'catalog/games.js'), 'window.GAMES_CATALOG = ' + JSON.stringify(catalog, null, 4) + ';\n');
 
-    copy(mode === 'web' ? 'index.html' : 'gamespace.html', output, 'index.html');
-    if (mode === 'gamespace') {
-        const entry = path.join(output, 'index.html');
-        const html = fs.readFileSync(entry, 'utf8').replace(/<(script|a)\b(?=[^>]*\bdata-web-only\b)[^>]*>[\s\S]*?<\/\1>\s*/g, '');
-        fs.writeFileSync(entry, html);
-    }
+    copy('index.html', output);
     for (const resource of ['LICENSE.md', 'NOTICE.md', 'USAGE.md', 'licenses']) copy(resource, output);
     for (const [relative, html] of legalPages) fs.writeFileSync(path.join(output, relative), html);
-    const resources = ['assets/favicon.png', 'assets/js/catalog.js', 'assets/js/gamespace.js', 'assets/css/gamespace.css', 'assets/icons/role/teacher-cap-minimal.svg'];
-    if (mode === 'web') resources.push('assets/js/view-mode.js', 'gamespace.html', 'assets/css/site.css', 'assets/js/pavilion-loading.js', 'assets/js/pavilion.js', 'assets/js/pavilion-developer.js', 'assets/css/pavilion.css', 'game-info.html', 'assets/js/details.js', 'assets/social-preview.jpg', 'assets/js/qr-code.js', 'assets/css/qr-code.css', 'assets/vendor/qrcodegen-v1.8.0.js');
+    // Both distributions include the pavilion, 2D catalog and local information pages.
+    const resources = ['gamespace.html', 'assets/favicon.png', 'assets/js/catalog.js', 'assets/js/gamespace.js', 'assets/css/gamespace.css', 'assets/icons/role/teacher-cap-minimal.svg', 'assets/js/view-mode.js', 'assets/css/site.css', 'assets/js/pavilion-loading.js', 'assets/js/pavilion.js', 'assets/js/pavilion-developer.js', 'assets/css/pavilion.css', 'game-info.html', 'assets/js/details.js', 'assets/social-preview.jpg', 'assets/js/qr-code.js', 'assets/css/qr-code.css', 'assets/vendor/qrcodegen-v1.8.0.js'];
     for (const resource of resources) copy(resource, output);
     for (const directory of new Set(games.map(game => game.directory).filter(Boolean))) copy(directory, output);
-    if (mode === 'web') {
-        for (const game of games) {
-            if (!game.detailsUrl) continue;
-            if (descriptions.has(game.id)) {
-                const target = path.join(output, game.detailsUrl);
-                fs.mkdirSync(path.dirname(target), { recursive: true });
-                fs.writeFileSync(target, descriptions.get(game.id));
-                const media = `content/media/${game.id}`;
-                if (fs.existsSync(path.join(projectRoot, media))) copy(media, output);
-            } else copy(game.detailsUrl, output);
-        }
+    for (const game of games) {
+        if (!game.detailsUrl) continue;
+        if (descriptions.has(game.id)) {
+            const target = path.join(output, game.detailsUrl);
+            fs.mkdirSync(path.dirname(target), { recursive: true });
+            fs.writeFileSync(target, descriptions.get(game.id));
+            const media = `content/media/${game.id}`;
+            if (fs.existsSync(path.join(projectRoot, media))) copy(media, output);
+        } else copy(game.detailsUrl, output);
     }
     if (mode === 'web') applyMetadata(output, baseUrl);
     stampBuild(output, release);

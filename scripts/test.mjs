@@ -162,6 +162,7 @@ assert.deepEqual(htmlReferences(String.raw`
 ]);
 
 checkProject(projectRoot);
+checkProject(projectRoot, 'gamespace');
 console.log('Passed: restored word parameters, real preset selection, saved-difficulty override, shared catalog links and local resources.');
 
 // Real Markdown formatting, safe output, and a complete page under a subdirectory.

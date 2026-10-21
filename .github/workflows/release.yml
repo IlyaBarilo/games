@@ -39,8 +39,10 @@ jobs:
       - run: npm run check
       - run: npm test
       - run: npm run test:release
-      - run: npm run build
-      - run: npm run verify:build
+      - name: Build website and GameSpace with 3D and 2D
+        run: npm run build
+      - name: Verify both showcases and offline resources
+        run: npm run verify:build
       - name: Prepare release archives and checksums
         run: node scripts/release.mjs package
       - name: Attach files to the published release

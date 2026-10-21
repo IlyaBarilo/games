@@ -57,10 +57,8 @@ export function checkProject(root, mode = 'web') {
         // Validate the license kit as well as its generated HTML pages.
         renderLegalPages(root);
     }
-    if (mode === 'web') {
-        for (const game of catalog.games.filter(game => game.available && game.detailsSource)) {
-            generatedPages.set(path.resolve(root, game.detailsUrl), renderDetailsPage(root, game));
-        }
+    for (const game of catalog.games.filter(game => game.available && game.detailsSource)) {
+        generatedPages.set(path.resolve(root, game.detailsUrl), renderDetailsPage(root, game));
     }
     const isExternal = value => /^(?:https?:)?\/\//i.test(value);
 
@@ -135,17 +133,15 @@ export function checkProject(root, mode = 'web') {
             checkReference(difficulty.link);
         }
         if (levels.length && !isExternal(game.link)) assert(difficultyValues.has(entryUrl.searchParams.get('diff')), `Default difficulty is not in the catalog: ${game.id}`);
-        if (mode === 'web' && game.detailsUrl) checkReference(game.detailsUrl);
+        if (game.detailsUrl) checkReference(game.detailsUrl);
     }
     checkReference('index.html');
     checkReference('terms.html');
     checkReference('third-party.html');
     checkReference('LICENSE.md');
     checkReference('NOTICE.md');
-    if (mode === 'web') {
-        checkReference('gamespace.html');
-        checkReference('game-info.html');
-    }
+    checkReference('gamespace.html');
+    checkReference('game-info.html');
     checkReference('assets/icons/role/teacher-cap-minimal.svg', 'index.html', true);
     return { mode, activeGames: catalog.games.filter(game => game.available).length, hiddenGames: catalog.games.filter(game => !game.available).length, checkedFiles: checked.size };
 }
