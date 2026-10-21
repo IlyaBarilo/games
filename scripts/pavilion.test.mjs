@@ -333,12 +333,13 @@ vm.createContext(attributes);vm.runInContext(declaration('bindRenderGeometry'),a
 const geometry={buffer:{},batched:true};attributes.bindRenderGeometry(geometry);attributes.bindRenderGeometry(geometry);assert.equal(pointers,4);assert.equal(bindings,2);
 attributes.vertexArrays=null;pointers=0;attributes.bindRenderGeometry({buffer:{}});attributes.bindRenderGeometry({buffer:{}});assert.equal(pointers,6,'Browsers without the optional extension retain ordinary WebGL attributes');
 
-let uploads=0,deletions=0;
-const batching={objects:[],renderItems:[],batchedObjectCount:-1,motionIds:new WeakMap(),nextMotionId:1,canvas:{dataset:{}},vertexArrays:null,combinedBounds:renderContext.combinedBounds,gl:{ARRAY_BUFFER:1,STATIC_DRAW:2,createBuffer:()=>({}),bindBuffer(){},bufferData(){uploads++},deleteBuffer(){deletions++}}};
-vm.createContext(batching);vm.runInContext(declaration('rebuildRenderBatches'),batching);
-const part={group:0,n:3,expanded:Array(24).fill(0),color:[1,1,1],bounds:boxBounds,emission:0};batching.objects.push(part);batching.rebuildRenderBatches();const originalBatch=batching.renderItems[0];assert.equal(uploads,1);
+let uploads=0,deletions=0;const batchUploads=[];
+const batching={objects:[],renderItems:[],batchedObjectCount:-1,motionIds:new WeakMap(),nextMotionId:1,canvas:{dataset:{}},vertexArrays:null,combinedBounds:renderContext.combinedBounds,gl:{ARRAY_BUFFER:1,STATIC_DRAW:2,createBuffer:()=>({}),bindBuffer(){},bufferData(target,data){uploads++;batchUploads.push(Array.from(data))},deleteBuffer(){deletions++}}};
+vm.createContext(batching);vm.runInContext(['writeRenderVertices','rebuildRenderBatches'].map(declaration).join('\n'),batching);
+const part={group:0,n:3,vertices:[0,0,0,0,0,1,0,0,1,0,0,1,0,0,1],color:[1,1,1],bounds:boxBounds,emission:0};batching.objects.push(part);batching.rebuildRenderBatches();const originalBatch=batching.renderItems[0];assert.equal(uploads,1);
 batching.objects.push({...part,texture:{}});batching.rebuildRenderBatches();assert.equal(uploads,1);assert.strictEqual(batching.renderItems[0],originalBatch);assert.equal(batching.renderItems.length,2,'New previews append without replacing unchanged geometry');
 batching.objects.push({...part});batching.rebuildRenderBatches();assert.equal(uploads,2);assert.equal(deletions,1,'A genuine geometry change still rebuilds the batch');
+assert.deepEqual(batchUploads[1],[...batchUploads[0],...batchUploads[0]],'A full rebuild regenerates identical upload bytes from retained source triangles');
 console.log('Passed: conservative view culling, shared model transforms, optional vertex arrays and incremental preview uploads.');
 
 // Exact-time shared poses must advance, rewind and keep distinct articulated parts separate.
@@ -353,11 +354,41 @@ let createdBuffers=0,individualUploads=0;const uploaded=[];
 const lazy={objects:[],activeStandGroup:-1,activePlatform:-1,activeBenchmarkVariant:0,emissive:0,motion:null,waterline:null,
  gl:{ARRAY_BUFFER:1,STATIC_DRAW:2,FLOAT:3,createBuffer(){createdBuffers++;return {}},bindBuffer(){},bufferData(target,data){individualUploads++;uploaded.push(Array.from(data))},enableVertexAttribArray(){},disableVertexAttribArray(){},vertexAttribPointer(){}},
  vertexArrays:null,attrP:0,attrUV:1,attrNormal:2,attrTint:3};
-vm.createContext(lazy);vm.runInContext(['geometryBounds','mesh','bindRenderGeometry'].map(declaration).join('\n'),lazy);
+vm.createContext(lazy);vm.runInContext(['geometryBounds','writeRenderVertices','mesh','bindRenderGeometry'].map(declaration).join('\n'),lazy);
 const triangle=[0,0,0,0,0,1,0,0,1,0,0,1,0,0,1];lazy.mesh(triangle,[1,.5,0]);lazy.mesh(triangle,[0,.5,1]);
 assert.equal(createdBuffers,0);assert.equal(individualUploads,0);assert.strictEqual(lazy.objects[0].vertices,triangle,'Precise picking retains its source triangles');
 lazy.bindRenderGeometry(lazy.objects[0]);lazy.bindRenderGeometry(lazy.objects[0]);assert.equal(createdBuffers,1);assert.equal(individualUploads,1);
-assert.deepEqual(uploaded[0],Array.from(new Float32Array(lazy.objects[0].expanded)));assert.equal(lazy.objects[1].buffer,null,'Unseen individual geometry stays off the GPU');
+assert.deepEqual(uploaded[0],[0,0,0,0,0,0,0,1,1,0,0,1,0,0,0,1,0,1,0,0,1,0,0,1]);assert.equal(lazy.objects[1].buffer,null,'Unseen individual geometry stays off the GPU');
+
+assert(lazy.objects.every(o=>!('expanded' in o)),'Meshes do not retain intermediate upload arrays');
+// Preserve positions, UVs, winding, normalized normals and colors, including degenerate triangles.
+const uploadScope={};vm.createContext(uploadScope);vm.runInContext(declaration('writeRenderVertices'),uploadScope);
+const vertices=[0,0,0,.1,.2,1,0,0,.3,.4,0,3,4,.5,.6, 1,2,3,1,0,1,2,3,0,1,1,2,3,1,1];
+const normals=[[0,-.8,.6],[0,0,0]],tint=[.12,.46,.789],expected=[];
+for(let t=0;t<2;t++)for(let v=0;v<3;v++)expected.push(...vertices.slice(t*15+v*5,t*15+v*5+5),...normals[t],...tint);
+const packed=new Float32Array(68).fill(99),sourceCopy=vertices.slice();
+assert.equal(uploadScope.writeRenderVertices(vertices,packed,1,tint),67);assert.equal(packed[0],99);assert.equal(packed[67],99);
+assert.deepEqual(Array.from(packed.slice(1,67)),Array.from(new Float32Array(expected)));assert.deepEqual(vertices,sourceCopy);
+
+// All parts of one button share a pose, but different buttons and stands remain independent.
+let clock=1000;const timers=[],buttonScope={buttonPresses:new Map(),buttonMotions:new Map(),pendingButton:false,performance:{now:()=>clock},setTimeout:(fn,delay)=>timers.push({fn,delay}),transform:renderContext.transform};
+vm.createContext(buttonScope);vm.runInContext(['buttonMotion','pressButton'].map(declaration).join('\n'),buttonScope);
+const pressPose=buttonScope.buttonMotion(0,'play','actions');assert.strictEqual(pressPose,buttonScope.buttonMotion(0,'play','actions'));
+assert.notStrictEqual(pressPose,buttonScope.buttonMotion(1,'play','actions'));assert.notStrictEqual(pressPose,buttonScope.buttonMotion(0,'info','actions'));
+const difficultyPose=buttonScope.buttonMotion(0,'diff0','difficulty'),benchmarkPose=buttonScope.buttonMotion(5,'benchmark2','difficulty');let actions=0;
+buttonScope.pressButton(0,'play',()=>actions++);buttonScope.pressButton(0,'play',()=>actions++);assert.equal(timers.length,1);assert.equal(timers[0].delay,110);
+for(const elapsed of [0,70,110,140,210,279,280,400]){clock=1000+elapsed;const pulse=elapsed<280?Math.sin(Math.PI*elapsed/280):0;assert.equal(pressPose(8)[13],Math.fround(-.022*pulse),'Button advances on wall time even when scene animation time stays paused');assert.equal(pressPose(8)[14],0)}
+assert.equal(actions,0);timers[0].fn();assert.equal(actions,1);assert.equal(buttonScope.pendingButton,false);
+buttonScope.buttonPresses.set('0:diff0',1000);buttonScope.buttonPresses.set('5:benchmark2',1000);clock=1140;
+assert.equal(difficultyPose(8)[14],Math.fround(-.042));assert.equal(benchmarkPose(8)[14],Math.fround(-.042));assert.equal(buttonScope.buttonMotion(1,'diff0','difficulty')(8)[14],-0);
+
+// Identical action labels share one Canvas/texture; difficulty selections keep separate artwork.
+let canvasCount=0,textureCount=0;const textureScope={controlTextures:[],actionControlTexture:null,controlCanvas:(width,height)=>{canvasCount++;return {width,height}},texture:()=>({id:++textureCount})};
+vm.createContext(textureScope);vm.runInContext(declaration('controlTextureEntry'),textureScope);
+const actionEntry=textureScope.controlTextureEntry(0,'actions');const difficulties=[];
+for(let i=0;i<12;i++){assert.strictEqual(textureScope.controlTextureEntry(i,'actions'),actionEntry);difficulties.push(textureScope.controlTextureEntry(i,'difficulty'))}
+assert.equal(new Set(difficulties.map(e=>e.texture)).size,12);assert.equal(canvasCount,13);assert.equal(textureCount,13);assert.equal(textureScope.controlTextures.filter(e=>e.kind==='actions').length,1);assert.equal(actionEntry.canvas.height,60);
+console.log('Passed: exact packed geometry without retained upload copies, shared button pulses while paused and independent difficulty textures.');
 
 // All faces settle before the one initial refresh, including failed images.
 const pendingFaces=[],readyScope={difficultyArt:{a:1,b:1,c:1,d:1,e:1},difficultyFaceImages:{},difficultyFaceSource:kind=>kind,

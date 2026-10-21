@@ -166,7 +166,16 @@ function boundsInView(bounds,model,planes){
  return true;
 }
 function geometryBounds(v){const lo=[Infinity,Infinity,Infinity],hi=[-Infinity,-Infinity,-Infinity];for(let k=0;k<v.length;k+=5)for(let j=0;j<3;j++){lo[j]=Math.min(lo[j],v[k+j]);hi[j]=Math.max(hi[j],v[k+j])}return {center:lo.map((n,j)=>(n+hi[j])/2),extent:lo.map((n,j)=>(hi[j]-n)/2)}}
-function mesh(vertices,color,texture){const expanded=[];for(let i=0;i<vertices.length;i+=15){const a=vertices.slice(i,i+3),b=vertices.slice(i+5,i+8),c=vertices.slice(i+10,i+13),u=b.map((v,j)=>v-a[j]),v=c.map((v,j)=>v-a[j]),n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];const len=Math.hypot(...n)||1;for(let k=0;k<3;k++)expanded.push(...vertices.slice(i+k*5,i+k*5+5),...n.map(v=>v/len))}const group=activeStandGroup>=0?activeStandGroup:activePlatform,item={buffer:null,vertices,expanded,group,platform:group,bounds:geometryBounds(vertices),n:expanded.length/8,color,texture,emission:emissive,motion,waterline,benchmarkVariant:activeBenchmarkVariant};objects.push(item);if(group>=0)standGroups[group].children.push(item)}
+// Write upload data directly; keep only original coordinates for exact picking and later rebuilds.
+function writeRenderVertices(vertices,data,offset=0,color=null){
+ for(let i=0;i<vertices.length;i+=15){
+  const ux=vertices[i+5]-vertices[i],uy=vertices[i+6]-vertices[i+1],uz=vertices[i+7]-vertices[i+2],vx=vertices[i+10]-vertices[i],vy=vertices[i+11]-vertices[i+1],vz=vertices[i+12]-vertices[i+2];
+  const nx=uy*vz-uz*vy,ny=uz*vx-ux*vz,nz=ux*vy-uy*vx,len=Math.hypot(nx,ny,nz)||1;
+  for(let k=0;k<3;k++){for(let j=0;j<5;j++)data[offset++]=vertices[i+k*5+j];data[offset++]=nx/len;data[offset++]=ny/len;data[offset++]=nz/len;if(color)for(let j=0;j<3;j++)data[offset++]=color[j]}
+ }
+ return offset;
+}
+function mesh(vertices,color,texture){const group=activeStandGroup>=0?activeStandGroup:activePlatform,item={buffer:null,vertices,group,platform:group,bounds:geometryBounds(vertices),n:vertices.length/5,color,texture,emission:emissive,motion,waterline,benchmarkVariant:activeBenchmarkVariant};objects.push(item);if(group>=0)standGroups[group].children.push(item)}
 function quad(a,b,c,d,color,texture){mesh([...a,0,0,...b,1,0,...c,1,1,...a,0,0,...c,1,1,...d,0,1],color,texture)}
 function box(x,y,z,w,h,d,color){const a=x-w/2,b=x+w/2,c=y,dY=y+h,e=z-d/2,f=z+d/2;quad([a,c,f],[b,c,f],[b,dY,f],[a,dY,f],color);quad([b,c,e],[a,c,e],[a,dY,e],[b,dY,e],color.map(v=>v*.65));quad([a,c,e],[a,c,f],[a,dY,f],[a,dY,e],color.map(v=>v*.8));quad([b,c,f],[b,c,e],[b,dY,e],[b,dY,f],color.map(v=>v*.75));quad([a,dY,f],[b,dY,f],[b,dY,e],[a,dY,e],color.map(v=>Math.min(1,v*1.2)));quad([a,c,e],[b,c,e],[b,c,f],[a,c,f],color.map(v=>v*.55))}
 function texture(image){const t=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);if(image)gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,image);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);return t}
@@ -844,8 +853,14 @@ function keepSafeDistance(){if(!insideStandFootprint(eye[0],eye[2]))return;let n
 // Controls belong to the scene: depth testing hides them behind foreground objects.
 document.getElementById('screen-controls').hidden=true;
 document.getElementById('screen-controls').setAttribute('aria-hidden','true');
-const controlTextures=[];
+const controlTextures=[];let actionControlTexture=null;
 function controlCanvas(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;return c}
+function controlTextureEntry(i,kind){
+ if(kind==='actions'&&actionControlTexture)return actionControlTexture;
+ const entry={canvas:controlCanvas(600,kind==='difficulty'?130:60),i,kind,texture:texture(null)};controlTextures.push(entry);
+ if(kind==='actions')actionControlTexture=entry;
+ return entry;
+}
 function rounded(c,x,y,w,h,r,fill,stroke){c.beginPath();c.roundRect(x,y,w,h,r);c.fillStyle=fill;c.fill();if(stroke){c.strokeStyle=stroke;c.lineWidth=2;c.stroke()}}
 function drawControlTexture(entry){const {canvas:c,i,kind}=entry,ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);ctx.textAlign='center';ctx.textBaseline='middle';
  if(kind==='difficulty'){ctx.lineCap='round';ctx.lineJoin='round';
@@ -875,19 +890,21 @@ function actionBody(x,z,left,right,tint){
  quad(d,c,b,a,tint);for(const [u,v] of [[a,b],[b,c],[c,d],[d,a]])quad(lower(u),lower(v),v,u,tint.map(c=>c*.62));
 }
 
-const buttonPresses=new Map();let pendingButton=false;
+const buttonPresses=new Map(),buttonMotions=new Map();let pendingButton=false;
 function pressButton(i,key,action){if(pendingButton)return;buttonPresses.set(i+':'+key,performance.now());pendingButton=true;setTimeout(()=>{pendingButton=false;action()},110)}
-function buttonMotion(i,key,kind,link){
- return ()=>{const elapsed=performance.now()-(buttonPresses.get(i+':'+key)??-1e6),pulse=elapsed>=0&&elapsed<280?Math.sin(Math.PI*elapsed/280):0;
-  const selected=kind==='difficulty'&&difficultyLinks[i]===link;
+function buttonMotion(i,key,kind){
+ const id=i+':'+key,cacheKey=id+':'+kind;
+ if(!buttonMotions.has(cacheKey))buttonMotions.set(cacheKey,()=>{
+  const elapsed=performance.now()-(buttonPresses.get(id)??-1e6),pulse=elapsed>=0&&elapsed<280?Math.sin(Math.PI*elapsed/280):0;
   return kind==='difficulty'?transform(0,0,-(.042*pulse)):transform(0,-.022*pulse,0);
- };
+ });
+ return buttonMotions.get(cacheKey);
 }
 function controlFace(x,z,i,entry,left,right,top,bottom,key,link){
  const kind=entry.kind,v=(u,t)=>kind==='difficulty'?[x-1.5+u/600*3,1.25-t/130*.65,z+.400]:[x-1.5+u/600*3,.725-t/60*.26,z+.63+t/60*.148];
  const a=v(left,bottom),b=v(right,bottom),c=v(right,top),d=v(left,top),h=entry.canvas.height;
  mesh([...a,left/600,1-bottom/h,...b,right/600,1-bottom/h,...c,right/600,1-top/h,...a,left/600,1-bottom/h,...c,right/600,1-top/h,...d,left/600,1-top/h],[1,1,1],entry.texture);
- const obj=objects[objects.length-1];obj.oneSided=true;obj.emission=1;obj.motion=buttonMotion(i,key,kind,link);
+ const obj=objects[objects.length-1];obj.oneSided=true;obj.emission=1;obj.motion=buttonMotion(i,key,kind);
  obj.controlHit=world=>{const m=obj.motion(),p=world.map((n,j)=>n-m[12+j]),u=(p[0]-(x-1.5))/3*600;
   if(kind==='difficulty'){const t=(1.25-p[1])/.65*130,cx=(left+right)/2;if(Math.hypot(u-cx,t-65)>53)return null;return ()=>pressButton(i,key,()=>setDifficulty(i,link))}
   const t=(.725-p[1])/.26*60;if(u<left||u>right||t<3||t>57)return null;
@@ -897,11 +914,11 @@ function controlFace(x,z,i,entry,left,right,top,bottom,key,link){
 standAnchors.forEach(([x,y,z],i)=>withStandGroup(i,()=>{
  for(const kind of ['difficulty','actions']){
   const ds=Object.values(games[i].difficulties||{});if(kind==='difficulty'&&!ds.length)continue;
-  const c=controlCanvas(600,kind==='difficulty'?130:60),entry={canvas:c,i,kind,texture:texture(null)};controlTextures.push(entry);
+  const entry=controlTextureEntry(i,kind);
   if(kind==='difficulty')ds.forEach((d,j)=>{
    const cx=300+(j-(ds.length-1)/2)*112,key='diff'+j,from=objects.length;
    difficultyBody(x+(j-(ds.length-1)/2)*.56,.925,z+.322,.248);
-   objects.slice(from).forEach(o=>{o.motion=buttonMotion(i,key,kind,d.link);o.difficultyLink=d.link;o.standIndex=i});
+   objects.slice(from).forEach(o=>{o.motion=buttonMotion(i,key,kind);o.difficultyLink=d.link;o.standIndex=i});
    controlFace(x,z,i,entry,cx-54,cx+54,8,130,key,d.link);
   });else for(const [left,right,key,tint] of [[3,287,'play',[.43,.64,.32]],[313,597,'info',[.22,.38,.44]]]){
    actionSeat(x,z,left,right);const from=objects.length;actionBody(x,z,left,right,tint);objects.slice(from).forEach(o=>o.motion=buttonMotion(i,key,kind));
@@ -1021,7 +1038,7 @@ function rebuildRenderBatches(){
  }
  const batches=[];for(const group of groups.values()){
   const data=new Float32Array(group.parts.reduce((n,o)=>n+o.n*11,0));let offset=0;
-  for(const o of group.parts)for(let k=0;k<o.expanded.length;k+=8){for(let j=0;j<8;j++)data[offset++]=o.expanded[k+j];for(let j=0;j<3;j++)data[offset++]=o.color[j]}
+  for(const o of group.parts)offset=writeRenderVertices(o.vertices,data,offset,o.color);
   const buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,data,gl.STATIC_DRAW);
   batches.push({...group,bounds:combinedBounds(group.parts),parts:undefined,buffer,n:data.length/11,batched:true,texture:null});
  }
@@ -1030,7 +1047,7 @@ function rebuildRenderBatches(){
 }
 function bindRenderGeometry(object){
  // Individual faces upload on first use. Batched parts never allocate a second GPU copy.
- if(!object.buffer){object.buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,object.buffer);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(object.expanded),gl.STATIC_DRAW)}
+ if(!object.buffer){const data=new Float32Array(object.n*8);writeRenderVertices(object.vertices,data);object.buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,object.buffer);gl.bufferData(gl.ARRAY_BUFFER,data,gl.STATIC_DRAW)}
  if(vertexArrays&&object.vertexArray){vertexArrays.bindVertexArrayOES(object.vertexArray);return}
  if(vertexArrays){object.vertexArray=vertexArrays.createVertexArrayOES();vertexArrays.bindVertexArrayOES(object.vertexArray)}
  gl.bindBuffer(gl.ARRAY_BUFFER,object.buffer);const stride=object.batched?44:32;
