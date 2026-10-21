@@ -61,7 +61,7 @@ for (const mode of ['web', 'gamespace']) {
     for (const resource of ['LICENSE.md', 'NOTICE.md', 'USAGE.md', 'licenses']) copy(resource, output);
     for (const [relative, html] of legalPages) fs.writeFileSync(path.join(output, relative), html);
     const resources = ['assets/favicon.png', 'assets/js/catalog.js', 'assets/js/gamespace.js', 'assets/css/gamespace.css', 'assets/icons/role/teacher-cap-minimal.svg'];
-    if (mode === 'web') resources.push('gamespace.html', 'assets/css/site.css', 'assets/js/pavilion.js', 'assets/css/pavilion.css', 'game-info.html', 'assets/js/details.js', 'assets/social-preview.jpg', 'assets/js/qr-code.js', 'assets/css/qr-code.css', 'assets/vendor/qrcodegen-v1.8.0.js');
+    if (mode === 'web') resources.push('gamespace.html', 'assets/css/site.css', 'assets/js/pavilion-loading.js', 'assets/js/pavilion.js', 'assets/js/pavilion-developer.js', 'assets/css/pavilion.css', 'game-info.html', 'assets/js/details.js', 'assets/social-preview.jpg', 'assets/js/qr-code.js', 'assets/css/qr-code.css', 'assets/vendor/qrcodegen-v1.8.0.js');
     for (const resource of resources) copy(resource, output);
     for (const directory of new Set(games.map(game => game.directory).filter(Boolean))) copy(directory, output);
     if (mode === 'web') {

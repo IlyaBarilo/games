@@ -217,7 +217,6 @@
     const createGameCard = (game) => {
         const cardLink = document.createElement('div');
         cardLink.className = 'game-card';
-        if (game.imageShape === 'square') cardLink.classList.add('game-card-square');
         cardLink.setAttribute('role', 'link');
         cardLink.setAttribute('aria-label', game.title || 'Открыть игру');
         cardLink.tabIndex = 0;

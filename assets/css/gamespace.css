@@ -321,13 +321,9 @@ body {
     transition: transform 0.25s ease, box-shadow 0.35s, border-color 0.2s;
     overflow: visible;
     border: 0.11vw solid var(--card-border);
-    height: 100%;
+    align-self: start;
     will-change: transform;
     min-width: 0;
-}
-
-.game-card-square {
-    --image-ratio: 100%;
 }
 
 .game-card:hover {
