@@ -228,7 +228,7 @@ function writeRenderVertices(vertices,data,offset=0,color=null){
  return offset;
 }
 function mesh(vertices,color,texture){const group=activeStandGroup>=0?activeStandGroup:activePlatform,item={buffer:null,vertices,group,platform:group,bounds:geometryBounds(vertices),n:vertices.length/5,color,texture,emission:emissive,motion,waterline,benchmarkVariant:activeBenchmarkVariant};objects.push(item);if(group>=0)standGroups[group].children.push(item)}
-function quad(a,b,c,d,color,texture){mesh([...a,0,0,...b,1,0,...c,1,1,...a,0,0,...c,1,1,...d,0,1],color,texture)}
+function quad(a,b,c,d,color,texture){mesh([a[0],a[1],a[2],0,0,b[0],b[1],b[2],1,0,c[0],c[1],c[2],1,1,a[0],a[1],a[2],0,0,c[0],c[1],c[2],1,1,d[0],d[1],d[2],0,1],color,texture)}
 function box(x,y,z,w,h,d,color){const a=x-w/2,b=x+w/2,c=y,dY=y+h,e=z-d/2,f=z+d/2;quad([a,c,f],[b,c,f],[b,dY,f],[a,dY,f],color);quad([b,c,e],[a,c,e],[a,dY,e],[b,dY,e],color.map(v=>v*.65));quad([a,c,e],[a,c,f],[a,dY,f],[a,dY,e],color.map(v=>v*.8));quad([b,c,f],[b,c,e],[b,dY,e],[b,dY,f],color.map(v=>v*.75));quad([a,dY,f],[b,dY,f],[b,dY,e],[a,dY,e],color.map(v=>Math.min(1,v*1.2)));quad([a,c,e],[b,c,e],[b,c,f],[a,c,f],color.map(v=>v*.55))}
 function texture(image){const t=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);if(image)gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,image);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);return t}
 function gameSign(title,subtitle,x,z){
