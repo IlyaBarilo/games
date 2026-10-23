@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import './licenses.test.mjs';
+import './html-scripts.test.mjs';
 import './qr.test.mjs';
 import './pavilion.test.mjs';
 import './view-mode.test.mjs';
@@ -7,6 +8,7 @@ import './pavilion-preload.test.mjs';
 import './showcase-scripts.test.mjs';
 import path from 'node:path';
 import vm from 'node:vm';
+import { parse } from 'acorn';
 import assert from 'node:assert/strict';
 import { projectRoot, loadCatalog, checkProject, htmlReferences } from './check.mjs';
 import { renderDescription, renderDetailsPage } from './descriptions.mjs';
@@ -64,9 +66,32 @@ for (const id of numericGames) for (const search of ['', '?diff=invalid', '?diff
     assert.equal(resolveNumericGame(id, search).selected, '3', id + ' must retain its default difficulty');
 }
 function resolveLagoon(search) {
-    const source = read('games/tictac-sea/tictac-sea.html');
-    const rules = between(source, 'var Qa=', 'function Np(');
-    return JSON.parse(vm.runInNewContext(rules + '\nconst selected=Up(' + JSON.stringify(search) + '); JSON.stringify({selected:selected.difficulty,config:Qa[selected.difficulty],presets:Object.keys(Qa)});', { URLSearchParams }));
+    const html = read('games/tictac-sea/tictac-sea.html');
+    const source = [...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)]
+        .map(match => match[1]).find(script => /new\s+URLSearchParams\b/.test(script));
+    assert(source, 'Missing Lagoon URL parser script');
+    const program = parse(source, { ecmaVersion: 'latest' });
+    const statements = program.body[0]?.expression?.callee?.body?.body;
+    assert(Array.isArray(statements), 'Missing standalone Lagoon scope');
+    // Discover the real preset table and URL parser by structure, not minified names.
+    let table, declaration;
+    for (const statement of statements.filter(node => node.type === 'VariableDeclaration')) {
+        for (const variable of statement.declarations) {
+            if (variable.init?.type !== 'ObjectExpression') continue;
+            const keys = variable.init.properties.map(property => property.key.name ?? property.key.value);
+            if (keys.length === 4 && ['easy', 'normal', 'hard', 'expert'].every(key => keys.includes(key))) {
+                table = variable.id.name;
+                declaration = statement;
+            }
+        }
+    }
+    const parser = statements.find(node => node.type === 'FunctionDeclaration'
+        && /new\s+URLSearchParams\b/.test(source.slice(node.start, node.end))
+        && /\bdifficulty\s*:/.test(source.slice(node.start, node.end)));
+    assert(table && declaration && parser && parser.start > declaration.start, 'Missing Lagoon preset table or URL parser');
+    const rules = source.slice(declaration.start, parser.end);
+    return JSON.parse(vm.runInNewContext(rules + '\nconst selected=' + parser.id.name + '(' + JSON.stringify(search)
+        + '); JSON.stringify({selected:selected.difficulty,config:' + table + '[selected.difficulty],presets:Object.keys(' + table + ')});', { URLSearchParams }));
 }
 for (const query of ['', '?diff=invalid']) assert.equal(resolveLagoon(query).selected, 'normal');
 const contracts = {

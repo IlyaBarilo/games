@@ -35,6 +35,16 @@ try {
         fs.copyFileSync(path.join(root, 'games', id, id + '.html'), path.join(folder, id + '.html'));
     }
     checkEmbeddedLicenses(temporary);
+    // A complete notice remains valid when duplicated or when just one copy is removed.
+    const duplicatedGame = path.join(temporary, 'games/snake3d-turns/snake3d-turns.html');
+    const originalGame = fs.readFileSync(duplicatedGame, 'utf8').replace(/\r\n/g, '\n');
+    const notice = fs.readFileSync(path.join(root, 'licenses', files[0]), 'utf8').replace(/\r\n/g, '\n').trim();
+    const duplicate = originalGame.replaceAll(notice, '') + '\n<!--\n' + notice + '\n-->\n<!--\n' + notice + '\n-->\n';
+    fs.writeFileSync(duplicatedGame, duplicate);
+    checkEmbeddedLicenses(temporary);
+    fs.writeFileSync(duplicatedGame, duplicate.replace(notice, ''));
+    checkEmbeddedLicenses(temporary);
+    fs.writeFileSync(duplicatedGame, originalGame);
     for (const [id, removed] of [
         ['snake3d-turns', fs.readFileSync(path.join(root, 'licenses', files[0]), 'utf8').trim()],
         ['tictac-robots', complete.trim()],
@@ -46,7 +56,7 @@ try {
         const html = fs.readFileSync(game, 'utf8').replace(/\r\n/g, '\n');
         const normalized = removed.replace(/\r\n/g, '\n');
         assert(html.includes(normalized));
-        fs.writeFileSync(game, html.replace(normalized, ''));
+        fs.writeFileSync(game, html.replaceAll(normalized, ''));
         assert.throws(() => checkEmbeddedLicenses(temporary), /Missing complete/);
         fs.writeFileSync(game, html);
     }
@@ -55,4 +65,4 @@ try {
     assert(path.basename(temporary).startsWith('games-license-test-'));
     fs.rmSync(temporary, { recursive: true });
 }
-console.log('Passed: missing or truncated supplemental and embedded licenses, and missing author terms, are rejected.');
+console.log('Passed: complete duplicate notices are accepted; missing or truncated supplemental and embedded licenses, and missing author terms, are rejected.');

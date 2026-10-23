@@ -41,6 +41,19 @@ export function htmlReferences(source) {
     return references;
 }
 
+// JSON data blocks retain their own syntax validation alongside JavaScript checks.
+export function checkInlineScripts(source, filename) {
+    for (const script of source.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {
+        const attribute = script[1].match(/(?:^|\s)type\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/i);
+        const type = (attribute?.[1] ?? attribute?.[2] ?? attribute?.[3] ?? '').split(';')[0].trim().toLowerCase();
+        if (type === 'application/json' || type === 'application/ld+json') {
+            assert.doesNotThrow(() => JSON.parse(script[2]), 'Invalid JSON script in ' + filename);
+        } else {
+            new vm.Script(script[2], { filename });
+        }
+    }
+}
+
 export function checkProject(root, mode = 'web') {
     root = path.resolve(root);
     const catalog = loadCatalog(root);
@@ -87,9 +100,7 @@ export function checkProject(root, mode = 'web') {
             return;
         }
         if (extension === '.html') {
-            for (const script of source.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)) {
-                new vm.Script(script[1], { filename: relative });
-            }
+            checkInlineScripts(source, relative);
             for (const { reference, dependency } of htmlReferences(source)) checkReference(reference, relative, dependency);
         } else {
             for (const match of source.matchAll(/url\(\s*["']?([^"')]+)["']?\s*\)/gi)) {

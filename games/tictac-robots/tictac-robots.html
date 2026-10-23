@@ -1,12 +1,8 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
 <!-- COLLECTION_AUTHOR_LICENSE
-Игры Ильи Барило — https://github.com/IlyaBarilo/games
-Полные условия автора приведены ниже. Уведомления сторонних компонентов
-сохранены в этом HTML отдельно; ссылки на NOTICE.md относятся к полному комплекту.
-
 # Условия использования материалов Ильи Барило
 
 Редакция от 18 октября 2026 года.
@@ -138,8 +134,8 @@
 Ограничение ответственности действует только в допускаемых законом пределах.
 Все права на авторские материалы, прямо не предоставленные этими условиями,
 и не разрешённые законом или отдельным соглашением, сохраняются за автором.
-END_COLLECTION_AUTHOR_LICENSE -->
 
+END_COLLECTION_AUTHOR_LICENSE -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; font-src 'none'; media-src 'none'; object-src 'none'; worker-src 'none'; base-uri 'none'; form-action 'none'">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232b6058'/%3E%3Cpath d='m9 9 14 14m0-14L9 23' stroke='%2384dfc9' stroke-width='5'/%3E%3C/svg%3E">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -196,7 +192,7 @@ dialog{zoom:var(--hud-scale,1)}
 .token-x{display:grid;place-items:center;background:#173e39;border:1px solid #59d8bc55;color:#83ead1;width:44px;min-width:44px;height:44px;border-radius:10px;font-size:38px;line-height:1;font-weight:800;transition:background .25s,color .25s}
 .token-x.ai{color:#ffc480;background:#4c3a2e;border-color:#faaf6044;font-size:32px}
 .eyebrow{font-size:12px;letter-spacing:.7px;font-weight:750;color:#a3d6c5;margin-bottom:5px}#status{font-size:14px;line-height:1.4}
-.score-section{display:flex;gap:12px;align-items:center}.score-section>span{display:flex;gap:5px;align-items:center}.score-section i{font-size:24px;font-style:normal}.mini-x{color:#84dfc9}.mini-o{color:#ffc38a}.score-section b{font:500 16px Consolas,monospace}
+.score-section{display:flex;gap:12px;align-items:center}.score-section>span{display:flex;gap:5px;align-items:center}.score-section i{font-size:24px;font-style:normal;display:inline-flex;align-items:center;justify-content:center;height:32px;flex-shrink:0}.mini-x{color:#84dfc9;width:16.421875px}.mini-o{color:#ffc38a;width:20.671875px}.score-section i svg{display:block;width:100%;height:100%;stroke-width:1.8}.score-section b{font:500 16px Consolas,monospace}
 .console-divider{height:32px;width:1px;background:#ffffff17}
 .scan-button{display:flex;gap:8px;align-items:center;justify-content:center;background:linear-gradient(#4c7164,#3c5e55);color:#f1f2d9;padding:0 13px;min-height:44px;border:1px solid #9ab89955;border-radius:9px;font-size:14px;font-weight:600;box-shadow:0 2px 0 #0c2824,inset 0 1px 0 #a5c69a33}.scan-button:hover{background:#527b6c}.scan-button svg{width:20px;height:20px}
 .small-button{height:44px;min-width:44px;display:grid;place-items:center;background:#17332f;color:#d0dfd5;border:1px solid #86a28d33;box-shadow:0 2px 0 #0d2723;border-radius:9px;font-size:16px}.small-button:hover{background:#304e43}
@@ -208,7 +204,7 @@ dialog{zoom:var(--hud-scale,1)}
 body.night{color:#d1e5df;background:#172c38}.night .brand-mark{background:#19313988}.night .light-switch{background:#112a35bb;border-color:#829d9d44}.night .light-switch button{color:#a6bac1}.night .light-switch button.active{background:#3e5960;color:#fff1c5}.night .icon-button{background:#213c46cc;border-color:#829d9d44}.night .live-dot{background:#91d6b5;box-shadow:0 0 8px #67cba9}
 .night .bottom-ui{background:linear-gradient(150deg,#3c5355,#263f43);border-color:#1b353e;box-shadow:0 5px 0 #142c36,0 13px 30px #071c2c70,inset 0 2px 0 #78928d66;color:#c3d9d2}.night .console{background:#162e35;border-color:#0b242b}.night .under-console{color:#a5c1b5}.night .under-console i{background:#8be1b5}
 .zoomed .topbar{background:#e0e2d0f2;box-shadow:0 0 0 12px #e0e2d0f2;border-radius:8px}.zoomed .scene-label{background:#e0e2d0ed;border-radius:4px;padding:4px}.night.zoomed .topbar{background:#183540f5;box-shadow:0 0 0 12px #183540f5}.night.zoomed .scene-label{background:#183540ed}
-dialog{width:min(490px,calc(var(--hud-width,100vw) - 28px));max-width:none;max-height:calc(var(--hud-height,100vh) - 28px);overflow:auto;padding:var(--dialog-padding,32px);border:2px solid #acbda2;border-radius:19px;background:#eef0df;color:#2c4443;box-shadow:0 30px 100px #061b2a55}dialog::backdrop{background:#132b3b66;backdrop-filter:blur(5px)}.dialog-close{position:absolute;right:8px;top:8px;width:44px;height:44px;background:none;color:#667d75;font-size:28px}.dialog-tag{display:block;padding-right:20px;font-size:11px;letter-spacing:.7px;font-weight:750;color:#527365}dialog h2{font-size:30px;line-height:1.15;letter-spacing:-.7px;margin:22px 0}dialog p{font-size:14px;line-height:1.65;color:#4e675b}.help-grid{display:grid;grid-template-columns:var(--help-columns,1fr 1fr);gap:20px;margin:24px 0}.help-grid b{font-size:14px;display:block;margin-bottom:7px}.help-grid span{font-size:14px;line-height:1.5;color:#4f6c5b;display:block}.prototype-note{border-top:1px solid #657c6c33;padding-top:16px;font-size:13px}.start-button{display:flex;justify-content:space-between;width:100%;padding:15px 18px;border-radius:10px;background:#2a6058;color:#f4f1dd;font-size:14px;font-weight:600;margin-top:22px}.start-button:hover{background:#35786d}
+dialog{width:min(490px,calc(var(--hud-width,100vw) - 28px));max-width:none;max-height:calc(var(--hud-height,100vh) - 28px);overflow:auto;padding:var(--dialog-padding,32px);border:2px solid #acbda2;border-radius:19px;background:#eef0df;color:#2c4443;box-shadow:0 30px 100px #061b2a55}dialog::backdrop{background:#132b3b66;backdrop-filter:blur(5px)}.dialog-close{position:absolute;right:8px;top:8px;width:44px;height:44px;background:none;color:#667d75;font-size:28px}.dialog-tag{display:block;padding-right:20px;font-size:11px;letter-spacing:.7px;font-weight:750;color:#527365}dialog h2{font-size:30px;line-height:1.15;letter-spacing:-.7px;margin:22px 0}dialog p{font-size:14px;line-height:1.65;color:#4e675b}.help-grid{display:grid;grid-template-columns:var(--help-columns,1fr 1fr);gap:20px;margin:24px 0}.help-grid b{font-size:14px;display:block;margin-bottom:7px}.help-grid span{font-size:14px;line-height:1.5;color:#4f6c5b;display:block}.prototype-note{border-top:1px solid #657c6c33;padding-top:16px;font-size:13px}.start-button{display:flex;justify-content:space-between;width:100%;padding:15px 18px;border-radius:10px;background:#2a6058;color:#f4f1dd;font-size:14px;font-weight:600;margin-top:22px}.start-button:hover{background:#35786d}.start-button .button-arrow{display:block;width:12.09375px;height:19px;stroke-width:1.2}
 .setting-label{display:block;font-size:14px;font-weight:650;margin:20px 0 9px}select{width:100%;min-height:48px;padding:12px;background:#fffdf2;color:#2b4c40;border:1px solid #91a58e;border-radius:9px;font:inherit;font-size:16px}.settings-summary{padding:13px;border-radius:9px;background:#dce6d3;color:#285541;font-size:14px}.result-actions{display:flex;justify-content:space-between;gap:12px;margin-top:12px}.result-actions button{background:none;min-height:44px;color:#3c6957;font-size:14px}
 .console.game-over .token-x{background:#655435;color:#ffe2a7;border-color:#bc9b61}.console.player-win .token-x{background:#255c4e;color:#bbffd7;border-color:#71bd92}.console.game-over .eyebrow{color:#f2d4a4}.console.player-win .eyebrow{color:#b5f0d0}
 @container hud (max-width:1000px){.brand p{max-width:240px}.score-section{display:none}.under-console span:nth-child(2){display:none}.corner-note{display:none}}
@@ -344,6 +340,12 @@ dialog{width:min(490px,calc(var(--hud-width,100vw) - 28px));max-width:none;max-h
  .scan-button,.small-button{width:44px;min-width:44px;height:44px}.scan-button{grid-column:2;padding:0}.scan-button svg{display:block}
  .console.game-over .turn-section{display:flex}.console.game-over .reset-button{grid-column:1/4;width:auto;min-width:0}.console.game-over #speed{grid-column:4}
 }
+/* Keep the damaged tile visible on short phone windows without reframing the board. */
+@container hud (max-height:600px) and (min-width:601px){
+ .result-board{padding:6px 10px;gap:8px;min-height:38px}
+ .result-emblem{flex-basis:24px;width:24px;height:24px;border-radius:6px}.result-emblem svg{width:19px;height:19px}
+ .result-board h2{font-size:17px;line-height:1.15;margin:0}.result-board p,#result-tag{display:none}
+}
 </style>
 </head>
 <body>
@@ -381,7 +383,7 @@ dialog{width:min(490px,calc(var(--hud-width,100vw) - 28px));max-width:none;max-h
     </div>
     <div class="console">
       <div class="turn-section"><div id="turn-symbol" class="token-x" aria-hidden="true"><svg viewBox="0 0 32 32"><path class="symbol-cross" d="m8 8 16 16M24 8 8 24"/><circle class="symbol-ring" cx="16" cy="16" r="10"/><path class="symbol-alert" d="M16 7v12m0 6v.1"/></svg></div><div><div class="eyebrow" id="turn-caption">ВАШ ХОД</div><div id="status" aria-live="polite">Выберите свободную ячейку</div></div></div>
-      <div class="score-section" aria-label="Установленные фигуры"><span><i class="mini-x">×</i><b id="player-count">00</b></span><span><i class="mini-o">○</i><b id="ai-count">00</b></span></div>
+      <div class="score-section" aria-label="Установленные фигуры"><span><i class="mini-x" role="img" aria-label="Крестики"><svg viewBox="0 0 16.421875 32" aria-hidden="true" focusable="false"><path d="m2.5 10.5 11.4 11m0-11-11.4 11"/></svg></i><b id="player-count">00</b></span><span><i class="mini-o" role="img" aria-label="Нолики"><svg viewBox="0 0 20.671875 32" aria-hidden="true" focusable="false"><circle cx="10.3359375" cy="16" r="8.25"/></svg></i><b id="ai-count">00</b></span></div>
       <div class="console-divider"></div>
       <button id="scan" class="scan-button" aria-label="Показать безопасные плиты" title="Показать плиты с ✓. Не расходует ход и не добавляет новых подсказок."><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg><b id="hint-count" class="hint-badge" aria-hidden="true">3</b></button>
       <button id="speed" class="small-button" aria-label="Скорость анимации: обычная" title="Скорость анимации">×1</button>
@@ -401,16 +403,16 @@ dialog{width:min(490px,calc(var(--hud-width,100vw) - 28px));max-width:none;max-h
     <p class="prototype-note">Склад живой: нажимайте на робота, ящики, растения, вентиляцию, трубы, фонари, краны, роликовый стол, шкаф питания и инструменты. У предметов несколько разных реакций. Свободные руки слегка двигаются. Между ходами предметы занимаются своими делами: стол проверяет ролики, ящики шуршат упаковкой, шкаф проверяет аккумуляторы. Эти сценки отличаются от реакций на нажатие и не расходуют ходы. На занятом кране сначала дождитесь установки фигуры.</p>
     <p class="prototype-note"><b>Переносимые ящики ↔.</b> Перетащите ящик со стрелкой на свободный пол вокруг поля. Бип подбирает груз на дороге и перекладывает на конвейер. Лента везёт ящики к Пику, который возвращает их по местам. Если место занято, ящик ждёт на выдаче. Во время возврата площадка посадки резервируется. Нажмите на ленту, чтобы узнать её состояние. На поле, зарядку и конвейер ящики ставить нельзя. При новой партии или изменении размера окна ящики возвращаются на места.</p>
     <p class="prototype-note">Как в исходной игре, ИИ знает расположение неисправных плит и обходит их. Он старается завершить свою линию и помешать вашей. Если свободных безопасных клеток больше нет и никто не собрал линию — ничья. Бип останавливается на зарядной площадке, пополняет батарею и едет дальше. С грузом он сначала заканчивает доставку. День, ночь и робот не влияют на правила.</p>
-    <button id="start" class="start-button">На склад <span>→</span></button>
+    <button id="start" class="start-button">На склад <svg class="button-arrow" viewBox="0 0 12.09375 19" aria-hidden="true" focusable="false"><path d="M1 9.5h10m-4-4 4 4-4 4"/></svg></button>
   </dialog>
   <dialog id="settings" aria-labelledby="settings-title">
     <button id="close-settings" class="dialog-close" aria-label="Закрыть настройки">×</button>
     <span class="dialog-tag">НОВАЯ СМЕНА</span><h2 id="settings-title">Настроим участок.</h2>
     <form id="settings-form">
-      <label class="setting-label" for="field-size">Размер поля</label><select id="field-size"><option value="6x6">6 × 6 — компактное</option><option value="8x8">8 × 8 — квадратное</option><option value="10x12">10 × 12 — просторное</option><option value="10x20">10 × 20 — как в оригинале</option><option value="12x20">12 × 20 — большой склад</option></select>
+      <label class="setting-label" for="field-size">Размер поля</label><select id="field-size"><option value="6x6">6 × 6 — компактное</option><option value="6x12">6 × 12 — вертикальное</option><option value="12x6">12 × 6 — горизонтальное</option><option value="8x8">8 × 8 — квадратное</option><option value="10x12">10 × 12 — просторное</option><option value="10x20">10 × 20 — как в оригинале</option><option value="12x20">12 × 20 — большой склад</option></select>
       <label class="setting-label" for="difficulty">Сложность</label><select id="difficulty"><option value="simple">Лёгкая</option><option value="normal">Обычная</option><option value="hard">Сложная</option><option value="expert">Эксперт</option><option value="test">Без поломок</option></select>
       <p id="settings-summary" class="settings-summary" aria-live="polite"></p><p class="prototype-note">Сложность меняет число неисправных плит, длину линии и количество безопасных подсказок. Стратегия ИИ одинакова. Новая игра заменит текущую партию.</p>
-      <button class="start-button" type="submit">Начать новую игру <span>→</span></button>
+      <button class="start-button" type="submit">Начать новую игру <svg class="button-arrow" viewBox="0 0 12.09375 19" aria-hidden="true" focusable="false"><path d="M1 9.5h10m-4-4 4 4-4 4"/></svg></button>
     </form>
   </dialog>
   <script>/* Keep the instrument panel at its opening size when browser page zoom changes.
@@ -418,7 +420,10 @@ dialog{width:min(490px,calc(var(--hud-width,100vw) - 28px));max-width:none;max-h
 (() => {
   'use strict';
   function metrics(width,height,density,reference){
-    const scale=reference/density;
+    const zoomScale=reference/density;
+    // Large displays need readable controls; measure before browser-zoom compensation.
+    const displayScale=Math.max(1,Math.min(width/zoomScale,height/zoomScale)/900);
+    const scale=zoomScale*displayScale;
     return {scale,width:width/scale,height:height/scale};
   }
   window.RoboUI={metrics};
@@ -863,6 +868,7 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 
+
 ## Additional retained attributions
 
 Matter SVG conversion: Copyright (c) Gavin Kistner; upstream modifications: tidy formatting and naming.
@@ -881,7 +887,7 @@ Phaser curves: based on three.js Curve classes by zz85; matrices/vectors adapted
     expert:{label:'Эксперт',density:50/200,winLength:5,safeHints:2},
     test:{label:'Без поломок',density:0,winLength:5,safeHints:2}
   });
-  const SIZES=Object.freeze([[6,6],[8,8],[10,12],[10,20],[12,20]]);
+  const SIZES=Object.freeze([[6,6],[6,12],[12,6],[8,8],[10,12],[10,20],[12,20]]);
   const DIRECTIONS=[[0,1],[1,0],[1,1],[1,-1]];
   // Catalogue uses 1, 3, 4 and 5; diff=2 remains a legacy alias for easy.
   const LEVELS=Object.freeze(['simple','simple','normal','hard','expert']);
@@ -1001,25 +1007,36 @@ Phaser curves: based on three.js Curve classes by zz85; matrices/vectors adapted
       {vx:0,vy:-1,x:b.x+b.w*.62,y:top-gapToLane,length:top-gapToLane-bounds.top},
       {vx:0,vy:1,x:b.x+b.w*.76,y:bottom+gapToLane,length:bounds.bottom-bottom-gapToLane}
     ];
+    // A wide phone field can dispatch through the empty floor below the side console.
+    // Its stop stays on the straight aisle; cargo hands still reach a perpendicular belt.
+    if(options.dispatchBelow){
+      const y=Math.max(options.dispatchBelow.top+36,top+corner+1);
+      if(y<=bottom-corner-1&&y+36<=bounds.bottom)candidates.unshift({vx:1,vy:0,x:right+gapToLane,y,length:options.dispatchBelow.right-right-gapToLane,belowConsole:true});
+    }
     let conveyor=null;
     for(const c of candidates){
       const length=Math.min(230,c.length);if(length<136)continue;
       const x=c.vx<0?c.x-length:c.vx>0?c.x:c.x-36,y=c.vy<0?c.y-length:c.vy>0?c.y:c.y-36,wc=c.vx?length:72,hc=c.vy?length:72;
-      if(x<bounds.left||y<bounds.top||x+wc>bounds.right||y+hc>bounds.bottom)continue;
+      if(x<bounds.left||y<bounds.top||x+wc>(c.belowConsole?options.dispatchBelow.right:bounds.right)||y+hc>bounds.bottom)continue;
       const input={x:c.x+c.vx*32,y:c.y+c.vy*32},output={x:c.x+c.vx*(length-32),y:c.y+c.vy*(length-32)},stop={x:c.x-c.vx*gapToLane,y:c.y-c.vy*gapToLane};
       conveyor={kind:'dispatch-belt',x,y,w:wc,h:hc,vx:c.vx,vy:c.vy,input,output,stop,length:length-64};break;
     }
+    const traffic=route.map((a,i)=>{
+      const next=route[(i+1)%route.length],r=radius+12;
+      return {a,next,zone:{x:Math.min(a.x,next.x)-r,y:Math.min(a.y,next.y)-r,w:Math.abs(a.x-next.x)+2*r,h:Math.abs(a.y-next.y)+2*r}};
+    });
     const allowed=p=>{
-      if(p.x<36||p.x+p.w>w-36||p.y<(options.top||110)+12||p.y+p.h>(options.bottom||h-60)-8||intersects(p,boardBounds,8)||props.some(q=>intersects(p,q,12))||conveyor&&intersects(p,conveyor,14))return false;
-      return route.every((a,i)=>{
-        const next=route[(i+1)%route.length],steps=Math.max(1,Math.ceil(Math.hypot(next.x-a.x,next.y-a.y)/4));
+      if(p.x<36||p.x+p.w>w-36||p.y<(options.top||110)+12||p.y+p.h>(options.bottom||h-60)-8||(options.exclusions||[]).some(q=>intersects(p,q,12))||intersects(p,boardBounds,8)||props.some(q=>intersects(p,q,12))||conveyor&&intersects(p,conveyor,14))return false;
+      return traffic.every(({a,next,zone})=>{
+        if(!intersects(p,zone))return true;
+        const steps=Math.max(1,Math.ceil(Math.hypot(next.x-a.x,next.y-a.y)/4));
         for(let j=0;j<=steps;j++){const t=j/steps;if(pointRectDistance({x:a.x+(next.x-a.x)*t,y:a.y+(next.y-a.y)*t},p)<radius+12)return false;}return true;
       });
     };
     // Equipment belongs to compact work bays next to the aisle, never to a global scatter grid.
     const playRight=options.right||w,bayTop=(options.top||110)+18,bayBottom=(options.bottom||h-60)-12;
     const split=playRight/2,edge=36,gap=18,upperEnd=top-radius-16,lowerStart=bottom+radius+16;
-    const upperY=Math.max(bayTop,upperEnd-144),lowerEnd=Math.min(bayBottom,lowerStart+144);
+    const upperY=Math.max(bayTop,upperEnd-144),lowerEnd=bayBottom;
     const sideLeft=left-radius-16-edge,sideRight=playRight-edge-(right+radius+16);
     const bays={
       service:[{id:'service-side',x:edge,y:b.y-94,w:sideLeft,h:b.h*.48},{id:'service-top',x:edge,y:upperY,w:split-edge-gap,h:upperEnd-upperY}],
@@ -1049,17 +1066,37 @@ Phaser curves: based on three.js Curve classes by zz85; matrices/vectors adapted
     // Reserved pallet bays occupy spare floor, leaving the entire driving aisle clear.
     const freight=[],palletCandidates=[],armSegments=[];
     for(const side of ['left','right']){const isLeft=side==='left',base={x:isLeft?-20:w+20,y:b.y+b.h*(isLeft?.42:.58)},tip={x:isLeft?b.x-100:b.x+b.w+100,y:b.y+b.h*(isLeft?.4:.6)},elbow={x:base.x+(tip.x-base.x)*.48,y:base.y+(tip.y-base.y)*.45+(isLeft?-117:117)};armSegments.push([base,elbow],[elbow,tip]);}
-    for(let y=bayTop+8;y+64<bayBottom;y+=104)for(let x=edge+10;x+88<playRight-edge;x+=116){
-      const p={kind:'freight',x,y,w:88,h:64,bay:'freight:'+Math.floor(y/104)};
+    // Large equipment gets first choice of space. Smaller pallets fill the remaining gaps.
+    const equipment=[['container',240,110],['trolley',110,92],['reel',84,84],['container',148,92],['reel',68,68],['trolley',88,108],['container',112,156],['reel',100,100]];
+    // Keep a few aerial stock bays available even when large equipment fills the floor.
+    const reservedStock=[];
+    for(let y=bayTop+8;y+64<bayBottom&&reservedStock.length<3;y+=104)for(let x=edge+10;x+88<playRight-edge&&reservedStock.length<3;x+=116){
+      const p={kind:'freight',x,y,w:88,h:64,bay:'stock-reserve'};
+      if(allowed(p)&&armSegments.every(([a,z])=>pointSegmentDistance({x:x+44,y:y+32},a,z)>100))reservedStock.push(p);
+    }
+    equipment.forEach(([kind,pw,ph],index)=>{
+      const choices=[];
+      for(let y=bayTop+9+(index%3)*7;y+ph<bayBottom;y+=23)for(let x=edge+7+(index%4)*9;x+pw<(options.exclusions?w:playRight)-edge;x+=27){
+        const p={kind,x,y,w:pw,h:ph,variant:Math.floor(index/3)%3,stackCount:kind==='container'?2+(index%2):1,bay:'equipment:'+index};
+        if(allowed(p)&&!reservedStock.some(q=>intersects(p,q,12))&&armSegments.every(([a,z])=>pointSegmentDistance({x:x+pw/2,y:y+ph/2},a,z)>Math.max(pw,ph)/2+32)){
+          const score=Math.min(...props.map(q=>Math.hypot(x+pw/2-q.x-q.w/2,y+ph/2-q.y-q.h/2)),Math.max(w,h));choices.push({p,score});
+        }
+      }
+      choices.sort((a,z)=>z.score-a.score);if(choices.length)props.push(choices[0].p);
+    });
+    for(let y=bayTop+8;y+64<bayBottom;y+=88)for(let x=edge+10;x+88<(options.exclusions?w:playRight)-edge;x+=104){
+      const p={kind:'freight',x:x+((Math.floor(y/88)%3)-1)*6,y:y+((Math.floor(x/104)%3)-1)*4,w:88,h:64,bay:'freight:'+Math.floor(y/104)};
       if(allowed(p)&&armSegments.every(([a,z])=>pointSegmentDistance({x:x+44,y:y+32},a,z)>100))palletCandidates.push(p);
     }
-    // Fill neighbouring slots in a row to read as storage bays, not scattered obstacles.
-    const maxSlots=Math.min(10,Math.max(2,Math.floor(w*h/105000)));
+    palletCandidates.push(...reservedStock);
+    // Fill the largest remaining pockets first, keeping each pallet a small coherent station.
+    const maxSlots=Math.min(64,palletCandidates.length);
     while(palletCandidates.length&&freight.length<maxSlots){
-      const previous=freight.at(-1);palletCandidates.sort((a,z)=>previous?Math.hypot(a.x-previous.x,(a.y-previous.y)*1.8)-Math.hypot(z.x-previous.x,(z.y-previous.y)*1.8):a.y-z.y||a.x-z.x);
+      const openSpace=p=>Math.min(...props.map(q=>Math.hypot(p.x+p.w/2-q.x-q.w/2,p.y+p.h/2-q.y-q.h/2)),Math.max(w,h));
+      palletCandidates.sort((a,z)=>openSpace(z)-openSpace(a)||a.y-z.y||a.x-z.x);
       const p=palletCandidates.shift();if(!allowed(p))continue;p.freightId=freight.length;p.bay+=':'+Math.floor(p.x/350);freight.push(p);props.push(p);
     }
-    const stations=[];for(const id of new Set(props.map(p=>p.bay))){const items=props.filter(p=>p.bay===id),x=Math.min(...items.map(p=>p.x))-7,y=Math.min(...items.map(p=>p.y))-7;stations.push({id,x,y,w:Math.max(...items.map(p=>p.x+p.w))+7-x,h:Math.max(...items.map(p=>p.y+p.h))+7-y});}
+    const stations=[];for(const id of new Set(props.map(p=>p.bay))){const items=props.filter(p=>p.bay===id),x=Math.min(...items.map(p=>p.x))-7,y=Math.min(...items.map(p=>p.y))-7;stations.push({id,freight:items.every(p=>p.kind==='freight'),x,y,w:Math.max(...items.map(p=>p.x+p.w))+7-x,h:Math.max(...items.map(p=>p.y+p.h))+7-y});}
     const dock={x:b.x+b.w/2,y:bottom,w:94,h:76};
     // Lamps are mounted outside the traffic lane, never on a drivable tile.
     const lamps=[{x:options.edgeFixtures?0:14,y:b.y-36},{x:options.edgeFixtures?w:w-14,y:b.y+b.h+12}];
@@ -1376,10 +1413,10 @@ Phaser curves: based on three.js Curve classes by zz85; matrices/vectors adapted
     c.save(); c.globalAlpha *= alpha; c.beginPath(); c.rect(x, y, w, h); c.clip(); c.fillStyle = '#c6a65e'; c.fillRect(x, y, w, h);
     for (let i = -h; i < w + h; i += 23) poly(c, [[x+i,y],[x+i+11,y],[x+i+11-h,y+h],[x+i-h,y+h]], '#485b50'); c.restore();
   }
-  function crate(c,x,y,w=74,h=64,color='teal',angle=0,label='07'){
+  function crate(c,x,y,w=74,h=64,color='teal',angle=0,label='07',castShadow=true){
     c.save();c.translate(x,y);c.rotate(angle);
     // Keep the screen-space soft shadow live; cache only the rigid painted box.
-    shadow(c,-w/2,-h/2,w,h,7,.22);
+    if(castShadow)shadow(c,-w/2,-h/2,w,h,7,.22);
     modelLayer(c,'crate:'+w+':'+h+':'+color+':'+label,[-w/2-4,-h/2-4,w+8,h+16],ctx=>crateBody(ctx,0,0,w,h,color,0,label));c.restore();
   }
   function crateBody(c, x, y, w, h, color, angle, label) {
@@ -1439,8 +1476,60 @@ Phaser curves: based on three.js Curve classes by zz85; matrices/vectors adapted
     }
     c.restore();
   }
+  function warehouseProp(c,p){
+    const layers=Math.min(3,Math.max(1,p.stackCount||1));
+    if(p.kind==='container'&&layers>1){
+      for(let i=0;i<layers;i++)warehouseProp(c,{...p,x:p.x+i*5,y:p.y+(layers-1-i)*9,w:p.w-(layers-1)*5,h:p.h-(layers-1)*9,stackCount:1});
+      return;
+    }
+    const {x,y,w,h,kind}=p,v=p.variant||0;
+    c.save();c.translate(x,y);shadow(c,0,2,w,h,8,.18);
+    if(kind==='container'){
+      const paint=['#7f9e96','#acb6bb','#c2a46f'][v],edge=['#3e645c','#596e77','#7e704c'][v];
+      box(c,0,5,w,h-5,8,edge,'#3b5149',2);box(c,0,0,w,h-7,8,gradient(c,0,0,h,'#c6d0bb',paint),edge,2);
+      box(c,10,10,w-20,h-28,4,paint,edge,1.5);
+      for(let xx=19;xx<w-14;xx+=15){line(c,xx,16,xx,h-28,edge,4);line(c,xx+2,16,xx+2,h-28,'#dce0c066',2);}
+      for(const yy of [5,h-16]){box(c,4,yy,w-8,7,2,'#c7ceac',edge);for(const xx of [9,w-10])bolt(c,xx,yy+3,2.3);}
+      line(c,w*.5,12,w*.5,h-24,'#344e48',2);for(const xx of [w*.5-10,w*.5+10]){line(c,xx,h*.4,xx,h*.65,'#3b514b',5);line(c,xx-1,h*.4,xx-1,h*.65,'#d5d8bc',2);}
+      box(c,12,18,30,20,2,'#e8deaf',edge);text(c,'C-'+(v+1),27,28,10,'#5a6f60','center');stripes(c,w-38,h-16,30,7,.8);
+      for(const xx of [4,w-8])for(const yy of [7,h-24])bolt(c,xx+2,yy,2);
+    }else if(kind==='trolley'){
+      for(const xx of [7,w-19])for(const yy of [6,h-19])box(c,xx,yy,12,17,4,'#304d47','#233d38',1.5);
+      box(c,8,4,w-16,h-14,5,'#506d66','#2b4f48',3);box(c,13,9,w-26,h-25,2,'#a1b2a1','#d8dac0',2);
+      for(let xx=18;xx<w-14;xx+=10)line(c,xx,12,xx,h-20,'#667f7388',1);
+      for(let yy=14;yy<h-16;yy+=10)line(c,16,yy,w-16,yy,'#667f7388',1);
+      for(let i=0;i<4;i++){const xx=26+(i%2)*(w-50),yy=25+Math.floor(i/2)*(h-52);circle(c,xx,yy,11,'#708e82','#3e655a',2);for(let k=0;k<8;k++){const a=k*TAU/8;line(c,xx+Math.cos(a)*8,yy+Math.sin(a)*8,xx+Math.cos(a)*13,yy+Math.sin(a)*13,'#416459',4);}circle(c,xx,yy,4,'#d6c593','#526c5c',2);}
+      line(c,5,4,w-5,4,'#c8d7ba',4);line(c,w-8,1,w-8,h-15,'#d8e1c5',3);line(c,8,h-15,w-8,h-15,'#d8e1c5',3);
+      line(c,w*.3,h-4,w*.7,h-4,'#365b50',5);line(c,w*.3,h-4,w*.3,h-12,'#365b50',4);line(c,w*.7,h-4,w*.7,h-12,'#365b50',4);
+    }else if(kind==='reel'){
+      const r=Math.min(w,h)*.46,cx=w/2,cy=h/2;
+      circle(c,cx,cy+4,r,'#6d7254','#486451',2);circle(c,cx,cy,r,'#c9b584','#7d805a',2);
+      for(let rr=r-6;rr>r*.35;rr-=4)circle(c,cx,cy,rr,'#425f57','#799184',2);
+      circle(c,cx,cy,r*.35,'#c1b484','#7a805b',2);circle(c,cx,cy,5,'#385b52','#e2d3a7',2);
+      for(let i=0;i<6;i++){const a=i*TAU/6;bolt(c,cx+Math.cos(a)*r*.8,cy+Math.sin(a)*r*.8,2);}
+      line(c,cx+r*.65,cy+r*.4,w-2,h-9,'#3e6157',4);box(c,w-10,h-14,9,8,2,'#ddbd75','#65785b');
+    }
+    c.restore();
+  }
+  function warehouseReaction(c,p,r){
+    const e=Math.sin(Math.PI*r.p),ambient=r.source==='ambient',motion=r.reduced?0:e;
+    c.save();c.translate(p.x+p.w/2,p.y+p.h/2);
+    if(p.kind==='trolley')c.rotate(Math.sin(r.p*TAU*(ambient?1:3))*.025*motion);
+    c.drawImage(p.sprite,-p.w/2-24,-p.h/2-24,p.w+48,p.h+48);c.globalAlpha=e;
+    if(p.kind==='container'){
+      if(ambient){circle(c,p.w/2-16,-p.h/2+18,3,'#bbebad');line(c,-p.w*.25,p.h*.3,p.w*.25,p.h*.3,'#dfe3bc',2);}
+      else {box(c,-p.w*.23,-p.h*.3,p.w*.46,p.h*.5*e,3,'#29463e');for(const xx of [-8,8])circle(c,xx,-p.h*.2+6,3,'#d1efb4');line(c,-p.w*.23,-p.h*.3,p.w*.23,-p.h*.3,'#d6dbba',4);}
+    }else if(p.kind==='reel'){
+      c.strokeStyle='#537569';c.lineWidth=3;c.beginPath();c.moveTo(p.w*.34,p.h*.23);c.bezierCurveTo(p.w*.48+14*motion,p.h*.17,p.w*.28-18*motion,p.h*.46,p.w*.4,p.h*.36);c.stroke();
+      if(!ambient){circle(c,p.w*.4,p.h*.36,4,'#ddc78c');line(c,-9,-5,9,5,'#ead7a3',2);}
+    }else if(p.kind==='trolley'){
+      for(let i=0;i<3;i++){const xx=(i-1)*16,yy=-5-Math.abs(Math.sin(r.p*TAU*(ambient?1:3)+i))*9*motion;circle(c,xx,yy,6,'#c6b782','#587460',2);circle(c,xx,yy,2,'#4c6f60');}
+    }
+    c.restore();
+  }
   function prop(c,p){
-      if(p.kind==='freight')pallet(c,p);
+      if(['container','trolley','reel'].includes(p.kind))warehouseProp(c,p);
+      else if(p.kind==='freight')pallet(c,p);
       else if(p.kind==='crate')crate(c,p.x+p.w/2,p.y+p.h/2,p.w,p.h,p.color);
       else if(p.kind==='vent')vent(c,p.x,p.y,p.w,p.h);
       else if(p.kind==='plant')plant(c,p.x+p.w/2,p.y+p.h/2,1);
@@ -1455,6 +1544,7 @@ Phaser curves: based on three.js Curve classes by zz85; matrices/vectors adapted
       if(p.movable)return;
       const r=reactions.get('prop:'+index,time),cx=p.x+p.w/2,cy=p.y+p.h/2;
       if(!r){c.drawImage(p.sprite,p.x-24,p.y-24,p.w+48,p.h+48);return;}
+      if(['container','trolley','reel'].includes(p.kind)){warehouseReaction(c,p,r);return;}
       if(['conveyor','power','toolbox'].includes(p.kind)){workshop(c,p,r);return;}
       if(r.source==='ambient'){ambientProp(c,p,r);return;}
       if(p.kind==='crate'){crateReaction(c,p,r);return;}
@@ -1482,8 +1572,8 @@ Phaser curves: based on three.js Curve classes by zz85; matrices/vectors adapted
     for(let i=0;i<4;i++){const yy=y+i*(h-4)/4;box(c,x,yy,w,11,2,gradient(c,x,yy,11,'#b6b393','#8f9978'),'#748266',1);line(c,x+9,yy+4,x+w-12,yy+4,'#d6d2ad66',1);for(const xx of [x+9,x+w-10])circle(c,xx,yy+6,1.1,'#5e7358');}
     box(c,x+w-21,y+h-15,17,10,1,'#e3dcaf');text(c,String((p.freightId||0)+11),x+w-13,y+h-10,7,'#62785c','center');
   }
-  function freightLoad(c,x,y,slot){
-    crate(c,x,y-2,58,44,slot.color,0,slot.label);
+  function freightLoad(c,x,y,slot,castShadow=true){
+    crate(c,x,y-2,58,44,slot.color,0,slot.label,castShadow);
     line(c,x-24,y+10,x+24,y+10,'#e0cc91',3);line(c,x-19,y-22,x-19,y+18,'#d7c38a',3);
   }
   function freight(c,delivery){for(const slot of delivery?.slots||[])if(slot.full)freightLoad(c,slot.x+slot.w/2,slot.y+slot.h/2,slot);}
@@ -1504,7 +1594,7 @@ Phaser curves: based on three.js Curve classes by zz85; matrices/vectors adapted
     c.save();c.globalAlpha=.12+(.1*(1-lift/76));c.beginPath();c.ellipse(x+10,y+18,52,29,0,0,TAU);c.fillStyle='#345747';c.fill();c.restore();
     if(night>.05)glow(c,x,y,70,'#e5f0a544',night*.55);
     // Cargo reaches the very same coordinates as the pallet stock at the hand-off.
-    if(carrying){if(pose.box)crate(c,x,y-lift,pose.box.w,pose.box.h,pose.box.color,0,'↔');else freightLoad(c,x,y-lift,slot);}
+    if(carrying){if(pose.box)crate(c,x,y-lift,pose.box.w,pose.box.h,pose.box.color,0,'↔',false);else freightLoad(c,x,y-lift,slot,false);}
     c.save();c.translate(x,bodyY+bob);
     modelLayer(c,'drone-frame',[-60,-45,120,92],droneFrame);
     for(const xx of [-39,39])for(const yy of [-24,24]){
@@ -1542,7 +1632,7 @@ Phaser curves: based on three.js Curve classes by zz85; matrices/vectors adapted
       line(c,p.x+7,p.y+4,p.x+7,p.y+p.h-4,'#e0e3c5',2);
       for(let y=p.y+25;y<p.y+p.h-12;y+=90)box(c,p.x,y,p.w,8,3,'#95aa91','#68866e');
     }
-    for(const bay of layout.stations||[]){box(c,bay.x,bay.y+3,bay.w,bay.h,6,'#748c7130');for(let yy=bay.y+8;yy<bay.y+bay.h-6;yy+=6)line(c,bay.x+7,yy,bay.x+bay.w-7,yy,'#536f5713',1);}
+    for(const bay of layout.stations||[]){if(bay.freight)continue;box(c,bay.x,bay.y+3,bay.w,bay.h,6,'#748c7130');for(let yy=bay.y+8;yy<bay.y+bay.h-6;yy+=6)line(c,bay.x+7,yy,bay.x+bay.w-7,yy,'#536f5713',1);}
     // Props are cached separately so reactions can move them without leaving ghosts.
     for(const p of layout.props){const sprite=document.createElement('canvas');const quality=layout.renderQuality||1,density=Math.min(8,(layout.renderScale||1)/quality*3)*quality;sprite.width=Math.ceil((p.w+48)*density);sprite.height=Math.ceil((p.h+48)*density);const sc=sprite.getContext('2d');sc.roboResolutionScale=quality;sc.scale(density,density);sc.translate(24-p.x,24-p.y);prop(sc,p);p.sprite=sprite;}
     for(const lamp of layout.lamps){
@@ -1636,16 +1726,38 @@ Phaser curves: based on three.js Curve classes by zz85; matrices/vectors adapted
     // A small inspection stamp, with no cell border, reticle or scanning ring.
     poly(c,[[-s*.13,-s*.01],[-s*.065,s*.065],[s*.13,-s*.13],[s*.17,-s*.09],[-s*.06,s*.145],[-s*.17,s*.035]],color);c.restore();
   }
-  function fault(c,x,y,size=1,hit=false){
-    c.save();c.translate(x,y);c.scale(size,size);
-    if(hit){
-      // The exact losing crate stays visibly open, with the player's block caught in its mechanism.
-      box(c,-31,-21,62,51,7,'#89664c','#5b5b43',2);box(c,-28,-24,56,44,5,'#c7a568','#776447',2);box(c,-22,-18,44,30,4,'#354c43');
-      for(let i=0;i<8;i++){const a=i*TAU/8;box(c,Math.cos(a)*12-3,Math.sin(a)*12-6,6,7,1,'#a7b4a0');}circle(c,0,-3,11,'#6f8a77','#c6cbb0',2);
-      c.save();c.translate(-3,-25);c.rotate(-.28);box(c,-30,-16,60,17,4,gradient(c,0,-16,17,'#e5c580','#b48d53'),'#786743',2);line(c,-21,-11,20,-11,'#f4deb0',2);c.restore();
-      piece(c,3,-4,'x',.64,0,0,0,.3);box(c,-23,21,46,13,3,'#f0d698','#9b8657',1);text(c,'РЕМОНТ',0,28,7,'#705a3c','center',800);c.restore();return;
+  function brokenTile(c,x,y,s,age=1000,reduced=false){
+    const q=Math.max(0,Math.min(1,age/260)),impact=reduced?0:Math.sin(q*Math.PI)*(1-q);
+    c.save();c.translate(x+Math.sin(q*24)*s*.012*impact,y+s*.018*q);
+    rr(c,-s/2+2,-s/2+2,s-4,s-5,Math.min(6,s*.08));c.clip();
+    box(c,-s*.47,-s*.46,s*.94,s*.91,Math.min(6,s*.08),gradient(c,0,-s*.46,s,'#a6b69f','#829b85'),'#5a7663',Math.max(.7,s*.012));
+    // Hairline fractures branch unevenly across a sunken plate, without separate polygon tiles.
+    const cracks=[[[.06,.02],[.17,.09],[.2,.22],[.31,.26],[.33,.4],[.43,.46]],[[.2,.22],[.09,.29],[.07,.42],[-.01,.47]],[[.06,.02],[-.12,-.05],[-.17,-.19],[-.3,-.24],[-.34,-.42],[-.44,-.46]],[[-.17,-.19],[-.1,-.29],[-.13,-.42]],[[.17,.09],[.29,.03],[.35,-.08],[.47,-.13]],[[-.12,-.05],[-.27,.04],[-.37,.02],[-.47,.14]]];
+    for(const points of cracks)for(let i=1;i<points.length;i++){
+      const a=points[i-1],b=points[i];line(c,a[0]*s,a[1]*s,b[0]*s,b[1]*s,'#a5b39b',Math.max(.7,s*.018));
+      line(c,a[0]*s,a[1]*s-s*.008,b[0]*s,b[1]*s-s*.008,'#748c76',Math.max(.5,s*.009));
     }
-    modelLayer(c,'fault-closed',[-36,-36,72,76],faultBody);c.restore();
+    poly(c,[[s*.26,s*.21],[s*.39,s*.27],[s*.32,s*.34],[s*.24,s*.3]],'#6d8572');
+    line(c,s*.26,s*.25,s*.31,s*.29,'#ceb271',Math.max(1,s*.02));line(c,s*.36,s*.25,s*.33,s*.3,'#92b3a5',Math.max(1,s*.02));
+    c.restore();
+  }
+  // Draw above the piece and lighting so the live fault remains visible.
+  function faultSparks(c,x,y,s,age=1000,reduced=false){
+    if(reduced)return;
+    const cycle=age<1800?age:(age-1800)%2300,burst=age<1800?1:.5+.5*Math.max(0,1-cycle/650);
+    if(burst<=0)return;
+    c.save();c.translate(x+s*.33,y+s*.3);c.globalAlpha=burst;c.globalCompositeOperation='screen';
+    glow(c,0,0,s*.32,'#ffc75e88',burst);
+    for(let i=0;i<9;i++){
+      const t=(cycle*.0028+i/9)%1,a=i*2.4,r=t*s*.4,dx=Math.cos(a),dy=Math.sin(a),sx=dx*r,sy=dy*r+t*t*s*.13;
+      c.globalAlpha=burst*(1-t*.65);
+      line(c,sx,sy,sx+dx*s*.095,sy+dy*s*.095,i%2?'#ffe8ae':'#f6bb56',Math.max(1.1,s*.024));
+      circle(c,sx,sy,Math.max(.7,s*.012),'#fff3cf');
+    }
+    c.restore();
+  }
+  function fault(c,x,y,size=1){
+    c.save();c.translate(x,y);c.scale(size,size);modelLayer(c,'fault-closed',[-36,-36,72,76],faultBody);c.restore();
   }
   function faultBody(c){
     box(c,-28,-24,56,54,7,'#435f54','#354f44',1.5);
@@ -1725,6 +1837,18 @@ Phaser curves: based on three.js Curve classes by zz85; matrices/vectors adapted
     box(c,-12,-32,24,7,3,'#344f43');box(c,-8,-31,16,4,2,left?'#8ae6c2':'#f8c789');
     for(const dx of [-16,16]){box(c,dx-4,-26,8,11,3,'#2e4f43','#8ba38d',1);box(c,dx-2,-24,4,7,1,night*arm.workLight>.15?'#fff2bf':'#9fac90');}
     c.restore();
+    if(arm.faulted){
+      circle(c,tip.x,tip.y-17*gripScale,4*gripScale,'#e5b963','#805e3c',1);
+      if(arm.sparkPower>0){
+        c.save();c.globalAlpha=arm.sparkPower;
+        for(let i=0;i<7;i++){
+          const phase=(time*.003+i*.143)%1,a=i*2.399+Math.sin(time*.005)*.2,r=(9+phase*32)*gripScale;
+          const sx=tip.x+Math.cos(a)*r,sy=tip.y-14*gripScale+Math.sin(a)*r+phase*phase*16*gripScale;
+          line(c,sx,sy,sx+Math.cos(a)*6*gripScale,sy+Math.sin(a)*6*gripScale,i%2?'#f9df9c':'#e1ac60',Math.max(1,2*gripScale));
+        }
+        glow(c,tip.x,tip.y-14*gripScale,24*gripScale,'#ffd68b55',arm.sparkPower);c.restore();
+      }
+    }
     // Stencilled ID on the shoulder housing.
     const idX=base.x+(elbow.x-base.x)*.22,idY=base.y+(elbow.y-base.y)*.22;
     c.save();c.translate(idX,idY);c.rotate(Math.atan2(elbow.y-base.y,elbow.x-base.x)+(left?0:Math.PI));text(c,left?'A—01':'B—02',0,0,11,'#53684a','center',800);c.restore();
@@ -1788,11 +1912,6 @@ Phaser curves: based on three.js Curve classes by zz85; matrices/vectors adapted
       poly(c,[[xx-4,-36],[xx+4,-36],[xx+60,-200],[xx-60,-200]],g);
   }
   function lighting(c,w,h,b,night,time,bot,layout,arms,flyer=null){
-    if(night<.995){
-      c.save();c.globalAlpha=(1-night)*.13;c.globalCompositeOperation='screen';
-      const sun=c.createLinearGradient(0,130,w*.6,h*.7);sun.addColorStop(0,'#fff6cf');sun.addColorStop(1,'#fff6cf00');
-      poly(c,[[100,130],[180,130],[w*.55,h],[w*.43,h]],sun);poly(c,[[215,130],[275,130],[w*.72,h],[w*.64,h]],sun);c.restore();
-    }
     if(night>.002){
       if(!lightMask){lightMask=document.createElement('canvas');lightCtx=lightMask.getContext('2d');}
       const quality=layout.renderQuality||1,mw=Math.max(1,Math.floor(w*quality)),mh=Math.max(1,Math.floor(h*quality));
@@ -1842,7 +1961,8 @@ Phaser curves: based on three.js Curve classes by zz85; matrices/vectors adapted
   }
   // Autonomous routines have their own drawings; no click reaction is replayed here.
   function ambientProp(c,p,r){
-    if(['conveyor','power','toolbox'].includes(p.kind)){workshop(c,p,r);return;}
+    if(['container','trolley','reel'].includes(p.kind)){warehouseReaction(c,p,r);return;}
+      if(['conveyor','power','toolbox'].includes(p.kind)){workshop(c,p,r);return;}
     const q=r.p,e=Math.sin(Math.PI*q),t=q*TAU,x=p.x+p.w/2,y=p.y+p.h/2;
     if(p.kind==='crate')crate(c,x,y,p.w,p.h,p.color,Math.sin(t*2)*.012*e,p.movable?'↔':'07');
     else if(p.sprite)c.drawImage(p.sprite,p.x-24,p.y-24,p.w+48,p.h+48);else prop(c,p);
@@ -1949,13 +2069,13 @@ Phaser curves: based on three.js Curve classes by zz85; matrices/vectors adapted
     const density=Math.min(Math.max(1,dpr),3,8192/width,8192/height,Math.sqrt(16000000/(width*height)));
     const w=Math.max(1,Math.floor(Math.floor(width*density)*quality)),h=Math.max(1,Math.floor(Math.floor(height*density)*quality));return {width:w,height:h,sx:w/worldW,sy:h/worldH};
   }
-  window.RoboArt={renderMetrics,board,cachedBoard,freight,drone,TAU,rr,box,line,circle,poly,text,gradient,random,bolt,glow,stripes,background,decorations,armPose,playEffects,piece,clue,safeHint,fault,arm,robot,lighting,award,cargo,charging,conveyor,robotGrippers};
+  window.RoboArt={renderMetrics,board,cachedBoard,freight,drone,TAU,rr,box,line,circle,poly,text,gradient,random,bolt,glow,stripes,background,decorations,armPose,playEffects,piece,clue,safeHint,brokenTile,faultSparks,fault,arm,robot,lighting,award,cargo,charging,conveyor,robotGrippers};
 })();
 </script>
   <script>/* Decorative reactions are isolated from the match and have bounded lifetimes. */
 (() => {
   'use strict';
-  const durations={robot:2200,crate:1800,vent:1900,plant:2200,arm:1700,lamp:1500,pipe:1400,dock:1600,piece:650,conveyor:3200,power:3000,toolbox:2300};
+  const durations={robot:2200,crate:1800,vent:1900,plant:2200,arm:1700,lamp:1500,pipe:1400,dock:1600,piece:650,conveyor:3200,power:3000,toolbox:2300,container:2200,trolley:2000,reel:2100};
   class Reactions{
     constructor(reduced=false){this.reduced=reduced;this.active=new Map();this.sequence=0;this.variants=new Map();this.ambientSequence=0;this.ambientVariants=new Map();}
     trigger(key,kind,time){
@@ -1965,7 +2085,7 @@ Phaser curves: based on three.js Curve classes by zz85; matrices/vectors adapted
       this.active.set(key,{kind,born:time,duration:this.reduced?650:durations[kind],variant,reduced:this.reduced,source:'click'});return true;
     }
     triggerAmbient(key,kind,time){
-      if(this.reduced||!['crate','conveyor','power','toolbox','plant','vent'].includes(kind)||this.get(key,time))return false;
+      if(this.reduced||!['crate','conveyor','power','toolbox','plant','vent','container','trolley','reel'].includes(kind)||this.get(key,time))return false;
       this.prune(time);if(this.active.size>=12)return false;
       const variant=this.ambientVariants.has(key)?1-this.ambientVariants.get(key):this.ambientSequence++%2;this.ambientVariants.set(key,variant);
       this.active.set(key,{kind,born:time,duration:4600,variant,reduced:false,source:'ambient'});return true;
@@ -1993,7 +2113,7 @@ Phaser curves: based on three.js Curve classes by zz85; matrices/vectors adapted
       if(this.reduced||!ready)return null;
       // Only count visible, idle frames. Returning from a background tab cannot cause a burst.
       this.remaining-=Math.min(Math.max(delta,0),80);if(this.remaining>0)return null;
-      this.remaining=14000+this.random()*8000;return ['crate','conveyor','power','toolbox','plant','vent'][this.sequence++%6];
+      this.remaining=14000+this.random()*8000;return ['crate','conveyor','power','toolbox','plant','vent','container','trolley','reel'][this.sequence++%9];
     }
   }
   function idleArmPose(arm,time,reduced,busy){
@@ -2133,7 +2253,7 @@ Phaser curves: based on three.js Curve classes by zz85; matrices/vectors adapted
     openSettings(){$('field-size').value=`${this.config.cols}x${this.config.rows}`;$('difficulty').value=this.config.difficulty;this.settingsSummary();openDialog('settings');}
     updateSpeed(){$('speed').textContent='×'+this.speed;$('speed').setAttribute('aria-label','Скорость анимации: '+(this.speed===1?'обычная':'двойная'));}
     reset(options=this.config){
-      this.cancelCargoDrag();this.play.clear();this.hintFade.clear();this.cargo=null;this.model=new R.Game(options);this.config=this.model.config;this.cells=[];this.action=null;this.pendingAI=0;this.effects=[];this.press=null;this.hover=null;this.resultShown=false;this.scanTime=this.timeNow;this.hintAttentionUntil=0;this.winTime=0;this.focusCell={r:0,c:0};this.view={zoom:1,ox:0,oy:0};
+      this.cancelCargoDrag();this.play.clear();this.hintFade.clear();this.cargo=null;this.model=new R.Game(options);this.config=this.model.config;this.cells=[];this.action=null;this.pendingAI=0;this.effects=[];this.press=null;this.hover=null;this.resultShown=false;this.failure=null;this.scanTime=this.timeNow;this.hintAttentionUntil=0;this.winTime=0;this.focusCell={r:0,c:0};this.view={zoom:1,ox:0,oy:0};
       this.ambient.reset();this.ambientCaptionUntil=0;this.botGreeting=0;$('result').hidden=true;$('hud').classList.remove('match-finished');clearTimeout(toastTimer);$('toast').classList.remove('visible');document.querySelector('.console').classList.remove('game-over','player-win');this.setStatus('player');this.updateHUD();if(this.board)this.resize(this.scale.gameSize);this.updateZoomUI();
     }
     resizeInterface(){
@@ -2143,23 +2263,36 @@ Phaser curves: based on three.js Curve classes by zz85; matrices/vectors adapted
     resize(size){
       this.cancelCargoDrag();this.play.clear();const vw=Math.max(1,size.width),vh=Math.max(1,size.height);this.portrait=vw/vh<.85;this.W=this.portrait?840:1440;this.H=Math.round(this.W*vh/vw);
       const ui=window.RoboUI?.current||{width:vw,height:vh,scale:1},ratio=this.W/vw,top=document.querySelector('.topbar').getBoundingClientRect().bottom,deck=document.querySelector('.bottom-ui').getBoundingClientRect(),compact=ui.height<=600,sidebar=(compact&&ui.width>600)||ui.width>=1100;
-      const floorBottom=sidebar?vh:deck.top,playWidth=sidebar?Math.max(200*ui.scale,deck.left-12*ui.scale):vw,mobile=ui.width<=700||(compact&&ui.width<=1000),robotScale=mobile?.7:1,aisleGap=mobile?34:35,clearance=robotScale*108+aisleGap+7;
+      const floorBottom=sidebar?vh:deck.top,playWidth=sidebar?Math.max(200*ui.scale,deck.left-12*ui.scale):vw,mobile=ui.width<ui.height||ui.width<=700||(compact&&ui.width<=1000),robotScale=mobile?.7:1,aisleGap=mobile?34:35,clearance=robotScale*108+aisleGap+7;
+      const exclusions=sidebar&&Number.isFinite(deck.width)&&Number.isFinite(deck.height)?[{x:deck.left*ratio,y:deck.top*ratio,w:deck.width*ratio,h:deck.height*ratio}]:[];
       const result=$('result');result.style.top=(top/ui.scale+12)+'px';result.style.left=playWidth/ui.scale/2+'px';result.style.width=Math.min(520,playWidth/ui.scale-28)+'px';
       document.querySelector('.scene-label').style.left=playWidth/ui.scale/2+'px';
+      const labelBounds=document.querySelector('.scene-label').getBoundingClientRect();
+      if(labelBounds.width&&labelBounds.height)exclusions.push({x:labelBounds.left*ratio,y:labelBounds.top*ratio,w:labelBounds.width*ratio,h:labelBounds.height*ratio});
       const floorTop=this.resultShown?result.getBoundingClientRect().bottom:top;
-      const landscapePhone=mobile&&sidebar,topGap=landscapePhone?4:20,bottomGap=landscapePhone?4:8;
+      const landscapePhone=mobile&&sidebar,widePhone=landscapePhone&&this.config.cols>this.config.rows,dispatchBelow=widePhone&&Number.isFinite(deck.bottom)&&vh-deck.bottom>72/ratio+14*ui.scale,topGap=landscapePhone?4:20,bottomGap=landscapePhone?4:8;
+      // Keep a dispatch bay beside desktop fields and wide phone fields, clear of the driving aisle.
       const space=(floorBottom-floorTop-(topGap+bottomGap)*ui.scale)*ratio,verticalClearance=this.resultShown?Math.min(clearance,Math.max(0,(space-180)/2)):clearance;
-      const topY=(floorTop+topGap*ui.scale)*ratio+verticalClearance,bottomY=(floorBottom-bottomGap*ui.scale)*ratio-verticalClearance,availableH=Math.max(180,bottomY-topY),availableW=Math.max(120,playWidth*ratio-(mobile?2*(clearance+4*ui.scale*ratio):370));
-      // Desktop preserves viewport centering. Phones maximize the usable field first.
+      const topY=(floorTop+topGap*ui.scale)*ratio+verticalClearance,bottomY=(floorBottom-bottomGap*ui.scale)*ratio-verticalClearance,availableH=Math.max(180,bottomY-topY),availableW=Math.max(120,playWidth*ratio-(mobile?2*(clearance+4*ui.scale*ratio)+(widePhone&&!dispatchBelow?210:0):520));
+      // Fit the field to the usable floor, preserving its center whenever the controls allow it.
       // Very short layouts must instead fit the usable floor between the controls.
-      const middle=this.H/2,symmetricH=2*Math.min(middle-topY,bottomY-middle),centered=symmetricH>=180;
-      const fieldH=mobile?availableH:centered?Math.min(availableH,symmetricH):availableH;
-      const s=Math.min(mobile?Infinity:this.portrait?90:82,availableW/this.config.cols,fieldH/this.config.rows);
-      const centerY=mobile?clamp(middle,topY+s*this.config.rows/2,bottomY-s*this.config.rows/2):centered?middle:topY+availableH/2;
-      this.board={cols:this.config.cols,rows:this.config.rows,cell:s,w:s*this.config.cols,h:s*this.config.rows,x:landscapePhone?clearance+4*ui.scale*ratio:(playWidth*ratio-s*this.config.cols)/2,y:centerY-s*this.config.rows/2};
+      const middle=this.H/2;
+      const fieldH=availableH;
+      const s=Math.min(availableW/this.config.cols,fieldH/this.config.rows);
+      const centerY=clamp(middle,topY+s*this.config.rows/2,bottomY-s*this.config.rows/2);
+// Center a narrow field within the floor before the console when both side bays fit.
+      const centeredPhone=landscapePhone&&availableW-s*this.config.cols>=360;
+      this.board={cols:this.config.cols,rows:this.config.rows,cell:s,w:s*this.config.cols,h:s*this.config.rows,x:landscapePhone&&!centeredPhone?clearance+4*ui.scale*ratio:(playWidth*ratio-s*this.config.cols)/2-(mobile?0:90),y:centerY-s*this.config.rows/2};
       // Leave a full text line plus a gap below the coordinate rail, including short result layouts.
       if(this.resultShown)this.board.y=Math.min(this.board.y,(floorBottom-36*ui.scale)*ratio-32-this.board.h);
-      this.layout=L.create(this.W,this.H,this.board,{top:(floorTop+16*ui.scale)*ratio,bottom:floorBottom*ratio,right:playWidth*ratio,compact,robotScale,aisleGap,edgeFixtures:mobile,pixelRatio:ratio});
+      this.layout=L.create(this.W,this.H,this.board,{top:(floorTop+16*ui.scale)*ratio,bottom:floorBottom*ratio,right:playWidth*ratio,exclusions,dispatchBelow:dispatchBelow?{top:(deck.bottom+7*ui.scale)*ratio,right:this.W-36}:null,compact,robotScale,aisleGap,edgeFixtures:mobile,pixelRatio:ratio});
+      // Short/narrow windows may have no straight aisle opposite the space below the console.
+      // Retain the previous side bay there rather than lose unloading or intersect the turn.
+      if(dispatchBelow&&!this.layout.conveyor){
+        const cell=Math.min(Math.max(120,availableW-210)/this.config.cols,fieldH/this.config.rows),w=cell*this.config.cols,h=cell*this.config.rows;
+        this.board={...this.board,cell,w,h,y:clamp(middle,topY+h/2,bottomY-h/2)-h/2};
+        this.layout=L.create(this.W,this.H,this.board,{top:(floorTop+16*ui.scale)*ratio,bottom:floorBottom*ratio,right:playWidth*ratio,exclusions,compact,robotScale,aisleGap,edgeFixtures:mobile,pixelRatio:ratio});
+      }
       this.cargo=new window.RoboCargo.Cargo(this.layout,this.board);this.delivery=new window.RoboDelivery.Delivery(this.layout,reduced,Math.random,this.cargo);
       this.refreshRendering(vw,vh);this.arms.forEach(a=>this.restArm(a));this.makeRoute();this.hover=null;this.press=null;this.lastPaint=0;this.setZoom(this.view.zoom,true);
     }
@@ -2189,7 +2322,7 @@ Phaser curves: based on three.js Curve classes by zz85; matrices/vectors adapted
       try{localStorage.setItem(RENDER_KEY,String(this.renderPercent));}catch{}
       this.refreshRendering();this.updateRenderQualityUI();announce('Чёткость сцены: '+this.renderPercent+'%. Эффекты сохранены.');
     }
-    restArm(a){const b=this.board,left=a.side==='left';a.x=left?b.x-100:b.x+b.w+100;a.y=b.y+b.h*(left?.4:.6);a.lift=.6;a.grip=.8;a.carrying=false;a.workLight=0;a.angle=0;a.parkedAt=this.idleTime;}
+    restArm(a){const b=this.board,left=a.side==='left';a.x=left?b.x-100:b.x+b.w+100;a.y=b.y+b.h*(left?.4:.6);a.lift=.6;a.grip=.8;a.carrying=false;a.workLight=0;a.angle=0;a.parkedAt=this.idleTime;delete a.faulted;delete a.sparkPower;}
     clampView(){this.view.ox=clamp(this.view.ox,this.W*(1-this.view.zoom),0);this.view.oy=clamp(this.view.oy,this.H*(1-this.view.zoom),0);}
     setZoom(value,recenter=false){
       const z=clamp(value,1,3),old=this.view.zoom;if(z===1)this.view={zoom:1,ox:0,oy:0};else{const anchor=recenter||old===1?{x:this.board.x+this.board.w/2,y:this.board.y+this.board.h/2}:{x:(this.W/2-this.view.ox)/old,y:(this.H/2-this.view.oy)/old};this.view={zoom:z,ox:this.W/2-anchor.x*z,oy:this.H/2-anchor.y*z};this.clampView();}this.hover=null;this.updateZoomUI();
@@ -2222,7 +2355,7 @@ Phaser curves: based on three.js Curve classes by zz85; matrices/vectors adapted
     finishGame(){
       if(this.resultShown||!this.model.result)return;this.resultShown=true;const result=this.model.result,state=result.kind==='mine'?'mine':result.kind==='draw'?'draw':result.winner==='x'?'win':'lose';this.setStatus(state);
       document.querySelector('.console').classList.add('game-over');document.querySelector('.console').classList.toggle('player-win',state==='win');
-      const titles={mine:'Пора вызвать мастера.',draw:'Смена без победителя.',win:'Линия собрана!',lose:'Склад оказался быстрее.'},descriptions={mine:`Заклинило ящик ${result.hit?String.fromCharCode(65+result.hit.r)+(result.hit.c+1):''}. Поломки отмечены бирками ремонта.`,draw:'Свободные безопасные плиты закончились.',win:`Ваши ${this.config.winLength} энергоблока прошли приёмку!`,lose:`ИИ собрал ${this.config.winLength} реакторов. Попробуем ещё?`};
+      const titles={mine:'Пора вызвать мастера.',draw:'Смена без победителя.',win:'Линия собрана!',lose:'Склад оказался быстрее.'},descriptions={mine:`Повреждена плита ${result.hit?String.fromCharCode(65+result.hit.r)+(result.hit.c+1):''}. Плитка просела и треснула. Манипулятор остановлен.`,draw:'Свободные безопасные плиты закончились.',win:`Ваши ${this.config.winLength} энергоблока прошли приёмку!`,lose:`ИИ собрал ${this.config.winLength} реакторов. Попробуем ещё?`};
       $('result-title').textContent=titles[state];$('result-description').textContent=descriptions[state];$('result-tag').textContent=state==='win'?'ПРИЁМКА ПРОЙДЕНА':'СМЕНА ЗАВЕРШЕНА';$('result').hidden=false;$('result').classList.toggle('player-win',state==='win');$('result').classList.toggle('repair',state==='mine');$('hud').classList.add('match-finished');this.updateHUD();this.winTime=this.timeNow;
     }
     setNight(value){
@@ -2246,6 +2379,13 @@ Phaser curves: based on three.js Curve classes by zz85; matrices/vectors adapted
       this.bot.wheelTurn=this.wheelTurn;this.bot.angle=this.robotAngle;
     }
     displayArm(arm){
+      if(this.failure?.type===(arm.side==='left'?'x':'o')){
+        const age=Math.max(0,this.timeNow-this.failure.born),target=this.tokenCenter(this.failure.r,this.failure.c),s=this.board.cell;
+        // Lift clear, then stop halfway along the return to the parking position.
+        const b=this.board,left=arm.side==='left',home={x:left?b.x-100:b.x+b.w+100,y:b.y+b.h*(left?.4:.6)};
+        const lift=reduced?1:ease(clamp((age-100)/300)),retreat=reduced?.5:.5*ease(clamp((age-400)/450));
+        return {...arm,x:mix(target.x,home.x,retreat),y:mix(target.y-s*.26*lift,home.y,retreat),lift:.55*lift,angle:0,grip:.8*lift,carrying:false,workLight:0,faulted:false,sparkPower:0};
+      }
       if(this.action?.type===(arm.side==='left'?'x':'o'))return arm;
       const r=this.play.get('arm:'+arm.side,this.timeNow);if(!r)return window.RoboPlay.idleArmPose(arm,this.idleTime,reduced,false);
       const wave=r.reduced?0:Math.sin(r.p*A.TAU*2)*Math.sin(Math.PI*r.p),lift=r.reduced?0:Math.sin(Math.PI*r.p);
@@ -2265,7 +2405,7 @@ Phaser curves: based on three.js Curve classes by zz85; matrices/vectors adapted
         if(L.pointSegmentDistance(pos,pose.base,pose.elbow)<36||L.pointSegmentDistance(pos,pose.elbow,pose.tip)<28||Math.hypot(pos.x-pose.tip.x,pos.y-pose.tip.y)<32)return {key:'arm:'+arm.side,kind:'arm',arm};
       }
       if(Math.hypot(pos.x-this.bot.x,pos.y-this.bot.y)<54*this.bot.scale)return {key:'robot',kind:'robot'};
-      for(let i=0;i<this.layout.props.length;i++){const p=this.layout.props[i];if(!p.movable&&['crate','vent','plant','conveyor','power','toolbox','freight'].includes(p.kind)&&pos.x>=p.x&&pos.x<=p.x+p.w&&pos.y>=p.y&&pos.y<=p.y+p.h)return {key:'prop:'+i,kind:p.kind,freightId:p.freightId};}
+      for(let i=0;i<this.layout.props.length;i++){const p=this.layout.props[i];if(!p.movable&&['crate','vent','plant','conveyor','power','toolbox','freight','container','trolley','reel'].includes(p.kind)&&pos.x>=p.x&&pos.x<=p.x+p.w&&pos.y>=p.y&&pos.y<=p.y+p.h)return {key:'prop:'+i,kind:p.kind,freightId:p.freightId};}
       for(let i=0;i<this.layout.lamps.length;i++){const p=this.layout.lamps[i];if(Math.abs(pos.x-p.x)<18&&Math.abs(pos.y-p.y)<34)return {key:'lamp:'+i,kind:'lamp'};}
       for(let i=0;i<this.layout.pipes.length;i++){const p=this.layout.pipes[i];if(pos.x>=p.x-4&&pos.x<=p.x+p.w+4&&pos.y>=p.y&&pos.y<=p.y+p.h)return {key:'pipe:'+i,kind:'pipe'};}
       if(Math.abs(pos.x-this.layout.dock.x)<this.layout.dock.w/2&&Math.abs(pos.y-this.layout.dock.y)<this.layout.dock.h/2)return {key:'dock',kind:'dock'};
@@ -2286,7 +2426,7 @@ Phaser curves: based on three.js Curve classes by zz85; matrices/vectors adapted
       if(target.kind==='arm'&&this.action?.type===(target.arm.side==='left'?'x':'o')){announce('Рука занята: сначала поставлю фигуру, потом помашу!');return true;}
       if(!this.play.trigger(target.key,target.kind,this.timeNow))return true;
       const messages={robot:['Бип-бип! Танцевальная пауза.','Груз принят. Бип — доставка без выходных!','Поворот на 360°. Работа на все 100!'],crate:['Тс-с! Кто-то прячется под крышкой. Ящик можно перетащить.','Робот на пружинке! А весь ящик можно перетащить.','Осторожно, у посылки выросли ноги. Её можно перетащить.'],vent:['Документы проветриваются.','Доставка авиапочтой. Рейс вокруг решётки!','Найден носок. Второй всё ещё в розыске.'],plant:['Плюс один цветочек к производительности.','Перископ поднят. Подозрительных леек не вижу!','Это листочек? Кажется, уже бабочка.'],arm:['Механический привет!','Пять! Хотя пальцев всего два.','Хватка крепкая. Настроение мягкое.'],lamp:['Подмигнул. Экономно.','Светлая мысль!','Лампочка одобряет.'],pipe:['Бульк! Охлаждение работает.','По трубам идёт хорошее настроение.','Давление в норме. Любопытство — повышено.'],dock:['Зарядная площадка готова. Бип остановится на контактах.','Сначала развезём груз, потом зарядим батарею.','Бип заряжается здесь на каждом свободном круге.']};
-      Object.assign(messages,{conveyor:['Посылка проходит через сканер.','Ролики проверены. Отправляем груз!','Штрихкод прочитан. Всё на своём месте.'],power:['Шкаф питания проверяет запас энергии.','Контакты исправны. Питание подано.','Три аккумулятора готовы к смене.'],toolbox:['Подтянули болт. Теперь держится!','Шайбы проверены. Ящик закрывается.','Щёлк! Трещотка подтянула крепление.']});
+      Object.assign(messages,{container:['Проверка пломбы: внутри кто-то моргает.','Большой груз, маленький секрет.','Контейнер готов к отправке.'],trolley:['Шестерёнки пересчитаны. Почти все на месте!','Тележка проверяет подвеску.','Детали готовы к сборке.'],reel:['Кабель разматывается и возвращается на место.','Контакт есть!','Катушка держит провод в порядке.'],conveyor:['Посылка проходит через сканер.','Ролики проверены. Отправляем груз!','Штрихкод прочитан. Всё на своём месте.'],power:['Шкаф питания проверяет запас энергии.','Контакты исправны. Питание подано.','Три аккумулятора готовы к смене.'],toolbox:['Подтянули болт. Теперь держится!','Шайбы проверены. Ящик закрывается.','Щёлк! Трещотка подтянула крепление.']});
       const r=this.play.get(target.key,this.timeNow);announce(messages[target.kind][r.variant]);tone(['crate','vent','plant','pipe'].includes(target.kind)?target.kind:'beep');
       if(target.kind==='robot')this.botGreeting=this.timeNow+2200;return true;
     }
@@ -2298,7 +2438,7 @@ Phaser curves: based on three.js Curve classes by zz85; matrices/vectors adapted
       const index=this.layout.props.findIndex(p=>p.kind===kind&&!p.movable);
       if(index>=0)return this.play.triggerAmbient('prop:'+index,kind,this.timeNow);
       // Small layouts may omit a prop; choose another present object without retry timers.
-      const fallback=this.layout.props.findIndex(p=>!p.movable&&['crate','conveyor','power','toolbox','plant','vent'].includes(p.kind));
+      const fallback=this.layout.props.findIndex(p=>!p.movable&&['crate','conveyor','power','toolbox','plant','vent','container','trolley','reel'].includes(p.kind));
       return fallback>=0&&this.play.triggerAmbient('prop:'+fallback,this.layout.props[fallback].kind,this.timeNow);
     }
     updateAmbient(dt){
@@ -2312,8 +2452,9 @@ Phaser curves: based on three.js Curve classes by zz85; matrices/vectors adapted
         const depart=p<.43?1-ease(p/.43):0;arm.angle=(m.departure?.angle||0)*depart;
         arm.x=mix(home.x,target.x,travel)+(m.departure?.dx||0)*depart;arm.y=mix(home.y,target.y,travel)+(m.departure?.dy||0)*depart-Math.sin(travel*Math.PI)*(reduced?0:22);arm.lift=p<.43?1:p<.57?1-ease((p-.43)/.14):p>.68?ease((p-.68)/.32):0;arm.grip=p<.56?0:p<.67?ease((p-.56)/.11):1;arm.carrying=!m.placed;
         arm.workLight=Math.min(clamp(p/.12),clamp((1-p)/.22));
-        if(p>=.57&&!m.placed){m.placed=true;arm.carrying=false;if(this.model.commit(m.ticket)){const mine=this.model.result?.kind==='mine';this.effects.push({r:m.r,c:m.c,born:this.timeNow,type:mine?'fault':m.type});this.updateHUD();tone(mine?'fault':'place');if(this.model.result){this.winTime=this.timeNow;if(this.model.result.kind==='line'&&this.model.result.winner==='x')tone('win');}}}
-        if(p>=1){this.restArm(arm);this.action=null;this.model.finish(m.ticket);this.updateHUD();if(this.model.result)this.finishGame();else if(m.type==='x'){this.pendingAI=this.timeNow+200;this.setStatus('ai');}else{this.scanTime=this.timeNow;this.setStatus('player');}}
+        if(p>=.57&&!m.placed){m.placed=true;arm.carrying=false;if(this.model.commit(m.ticket)){const mine=this.model.result?.kind==='mine';if(mine)this.failure={r:m.r,c:m.c,type:m.type,born:this.timeNow};this.effects.push({r:m.r,c:m.c,born:this.timeNow,type:mine?'fault':m.type});this.updateHUD();tone(mine?'fault':'place');if(this.model.result){this.winTime=this.timeNow;if(this.model.result.kind==='line'&&this.model.result.winner==='x')tone('win');}}}
+        if(this.failure?.type===m.type)Object.assign(arm,this.displayArm(arm));
+        if(p>=1){if(this.failure?.type!==m.type)this.restArm(arm);this.action=null;this.model.finish(m.ticket);this.updateHUD();if(this.model.result)this.finishGame();else if(m.type==='x'){this.pendingAI=this.timeNow+200;this.setStatus('ai');}else{this.scanTime=this.timeNow;this.setStatus('player');}}
       }else if(this.pendingAI&&this.timeNow>=this.pendingAI){this.pendingAI=0;this.chooseAI();}
     }
     drawGridEffects(c){
@@ -2323,14 +2464,22 @@ Phaser curves: based on three.js Curve classes by zz85; matrices/vectors adapted
     }
     drawOutcome(c){
       const b=this.board,result=this.model.result;
+      if(this.failure){const pos=this.center(this.failure.r,this.failure.c);A.faultSparks(c,pos.x,pos.y,b.cell,this.timeNow-this.failure.born,reduced);}
       if(this.resultShown&&result?.kind==='line')result.line.forEach((p,i)=>{const pos=this.center(p.r,p.c),age=this.timeNow-this.winTime-i*140;A.award(c,pos.x,pos.y,b.cell,age,reduced,this.night.value);});
       for(const eff of this.effects){const age=(this.timeNow-eff.born)/350;if(age>=1||eff.type==='fault'||reduced)continue;const pos=this.center(eff.r,eff.c),radius=(.26+age*.17)*b.cell;c.save();c.globalAlpha=(1-age)*.2;
         for(let i=0;i<6;i++){const a=i*A.TAU/6;A.circle(c,pos.x+Math.cos(a)*radius,pos.y+Math.sin(a)*radius,Math.max(.1,b.cell*.03*(1-age)),'#526f58');}c.restore();}
     }
+    drawFault(c,p){
+      const hit=this.model.result?.hit;
+      if(!hit||hit.r!==p.r||hit.c!==p.c)return;
+      const pos=this.center(p.r,p.c),b=this.board,token=this.tokenCenter(p.r,p.c);
+      A.brokenTile(c,pos.x,pos.y,b.cell,this.timeNow-(this.failure?.born??this.timeNow),reduced);
+      A.piece(c,token.x,token.y+b.cell*.025,'x',b.cell/83*.86,this.night.value,0,0,.25);
+    }
     paint(){
       const c=this.ctx,b=this.board,n=this.night.value,t=this.timeNow,v=this.view;c.setTransform(this.renderMetrics.sx,0,0,this.renderMetrics.sy,0,0);c.clearRect(0,0,this.W,this.H);c.save();c.translate(v.ox,v.oy);c.scale(v.zoom,v.zoom);c.drawImage(this.backdrop,0,0,this.W,this.H);A.cachedBoard(c,b,this.layout,v.zoom);A.decorations(c,this.layout,this.play,t);A.freight(c,this.delivery);A.conveyor(c,this.cargo,n);A.cargo(c,this.cargo,this.bot,this.play,t,false);this.drawGridEffects(c);
       for(const p of this.cells){
-        const pos=this.center(p.r,p.c);if(p.mine){A.fault(c,pos.x,pos.y,b.cell/83,this.model.result?.hit?.r===p.r&&this.model.result?.hit?.c===p.c);continue;}
+        const pos=this.center(p.r,p.c);if(p.mine){this.drawFault(c,p);continue;}
         const fx=this.effects.find(f=>f.r===p.r&&f.c===p.c),reveal=reduced||!fx?1:1-Math.pow(1-clamp((t-fx.born)/210),3);A.clue(c,pos.x,pos.y,b.cell,p.clue,n,reveal);let bounce=0;if(fx&&!reduced){const age=(t-fx.born)/250;if(age<1)bounce=Math.sin(age*Math.PI)*.06;}
         const token=this.tokenCenter(p.r,p.c),reaction=this.play.get(`piece:${p.r}:${p.c}`,t),wobble=!reaction||reaction.reduced?0:Math.sin(reaction.p*A.TAU*2)*Math.sin(Math.PI*reaction.p)*.12;
         const winIndex=this.resultShown?(this.model.result?.line?.findIndex(q=>q.r===p.r&&q.c===p.c)??-1):-1,winAge=t-this.winTime-winIndex*140,winLift=winIndex<0||reduced?0:Math.sin(clamp(winAge/650)*Math.PI)*b.cell*.11;
