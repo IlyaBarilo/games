@@ -28,10 +28,16 @@ A/D и стрелки влево/вправо поворачивают. На с�
 |---|---|
 | Змейка 3D | [snake3d-turns.html](https://github.com/IlyaBarilo/games/blob/main/games/snake3d-turns/snake3d-turns.html) |
 | Крестики-нолики с сапёром | [tictac.html](https://github.com/IlyaBarilo/games/blob/main/games/tictac/tictac.html) |
-| Змейка: эволюция видеоигр | [snake-evolution.html](https://github.com/IlyaBarilo/games/blob/main/games/snake-evolution/snake-evolution.html) |
-| Диагностика интерактивного экрана | [interactive-screen-benchmark.html](https://github.com/IlyaBarilo/games/blob/main/games/interactive-screen-benchmark/interactive-screen-benchmark.html) |
 | Робосклад | [tictac-robots.html](https://github.com/IlyaBarilo/games/blob/main/games/tictac-robots/tictac-robots.html) |
+| Лагуна | [tictac-sea.html](https://github.com/IlyaBarilo/games/blob/main/games/tictac-sea/tictac-sea.html) |
+| Змейка: эволюция видеоигр | [snake-evolution.html](https://github.com/IlyaBarilo/games/blob/main/games/snake-evolution/snake-evolution.html) |
+| Звёздный курьер | [zvezdny-kurer.html](https://github.com/IlyaBarilo/games/blob/main/games/zvezdny-kurer/zvezdny-kurer.html) |
+| Стая светлячков | [staya-svetlyachkov.html](https://github.com/IlyaBarilo/games/blob/main/games/staya-svetlyachkov/staya-svetlyachkov.html) |
+| Башня облаков | [bashnya-oblakov.html](https://github.com/IlyaBarilo/games/blob/main/games/bashnya-oblakov/bashnya-oblakov.html) |
+| Башня до облаков | [bashnya-do-oblakov.html](https://github.com/IlyaBarilo/games/blob/main/games/bashnya-do-oblakov/bashnya-do-oblakov.html) |
+| Подводная экспедиция | [podvodnaya-ekspeditsiya.html](https://github.com/IlyaBarilo/games/blob/main/games/podvodnaya-ekspeditsiya/podvodnaya-ekspeditsiya.html) |
 | Шарики с поздравлениями к 8 Марта | [8march-shariki.html](https://github.com/IlyaBarilo/games/blob/main/games/8march-shariki/8march-shariki.html) |
+| Диагностика интерактивного экрана | [interactive-screen-benchmark.html](https://github.com/IlyaBarilo/games/blob/main/games/interactive-screen-benchmark/interactive-screen-benchmark.html) |
 
 1. Откройте нужный файл по ссылке из таблицы.
 2. На странице GitHub нажмите «Download raw file» — кнопку скачивания исходного файла.
@@ -41,11 +47,9 @@ A/D и стрелки влево/вправо поворачивают. На с�
 4. Выберите режим в самой игре, если он предусмотрен, и следуйте её подсказкам.
 
 Для запуска отдельных HTML интернет не требуется. Браузер должен поддерживать
-JavaScript; для «Змейки 3D» также нужен WebGL. Способ открытия локального HTML
+JavaScript; для «Змейки 3D» и «Лагуны» также нужен WebGL. Способ открытия локального HTML
 на телефоне зависит от системы и браузера; для коллекции на телефоне можно использовать GameSpace.
 Полные условия автора и сторонние уведомления уже находятся внутри файлов игр.
-Исключение — текущий HTML диагностического теста: полный текст условий автора
-в него пока не встроен; для него также действуют [условия коллекции](LICENSE.md).
 
 ## Скачать готовую коллекцию
 
