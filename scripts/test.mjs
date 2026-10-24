@@ -204,6 +204,19 @@ assert(!formatted.includes('<script>'));
 assert(!formatted.includes('href="javascript:'));
 assert.throws(() => renderDescription('# Только заголовок'), /empty/);
 assert.throws(() => renderDescription('Текст\n\n# Второй заголовок'), /Use ##/);
+
+const photos = renderDescription('![Экран](../media/screen.webp "Общий вид <экрана>")\n![Проверка](../media/test.webp "Ранняя версия")');
+assert.equal((photos.match(/class="photo-gallery"/g) || []).length, 1);
+assert.equal((photos.match(/<figure>/g) || []).length, 2);
+assert(photos.includes('<figcaption>Общий вид &lt;экрана&gt;</figcaption>'));
+assert(photos.includes('href="../media/screen.webp"'));
+assert(photos.includes('loading="lazy"'));
+assert(!renderDescription('![Один кадр](../media/one.webp)').includes('photo-gallery'));
+assert(!renderDescription('Подпись ![Один](../media/one.webp) ![Два](../media/two.webp)').includes('photo-gallery'));
+const escapedPhotoCaption = renderDescription('![Один](one.webp "<script>alert(1)</script>")\n![Два](two.webp)');
+assert(!escapedPhotoCaption.includes('<script>'));
+assert(escapedPhotoCaption.includes('&lt;script&gt;'));
+
 const described = active.find(game => game.id === 'snake3d-turns');
 const page = renderDetailsPage(projectRoot, described);
 assert.equal((page.match(/<h1\b/g) || []).length, 1);

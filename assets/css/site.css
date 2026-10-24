@@ -81,3 +81,11 @@ h3 { font-size: 1.3rem; margin: 0 0 12px; }
     html { scroll-behavior: auto; }
     .card-cover img { transition: none; }
 }
+
+
+/* Consecutive Markdown photos form a responsive gallery; originals keep their proportions. */
+.article-body .photo-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); gap: 18px; margin: 24px 0; align-items: start; }
+.article-body .photo-gallery figure { min-width: 0; margin: 0; }
+.article-body .photo-gallery a { display: block; border-radius: 14px; }
+.article-body .photo-gallery img { width: 100%; height: auto; aspect-ratio: auto 3 / 4; }
+.article-body .photo-gallery figcaption { margin-top: 8px; color: var(--muted); font-size: .88rem; line-height: 1.5; }

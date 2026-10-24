@@ -8,12 +8,37 @@ import MarkdownIt from 'markdown-it';
 const markdown = new MarkdownIt({ html: false, typographer: false });
 export const escapeHtml = value => markdown.utils.escapeHtml(String(value || ''));
 
+
+function groupPhotoParagraphs(tokens) {
+    for (let index = 0; index + 2 < tokens.length; index++) {
+        const opening = tokens[index], inline = tokens[index + 1], closing = tokens[index + 2];
+        if (opening.type !== 'paragraph_open' || inline.type !== 'inline' || closing.type !== 'paragraph_close') continue;
+        const children = inline.children || [];
+        const images = children.filter(token => token.type === 'image');
+        if (images.length < 2 || children.some(token => token.type !== 'image' && token.type !== 'softbreak' && token.type !== 'hardbreak' && !(token.type === 'text' && !token.content.trim()))) continue;
+        const figures = images.map(image => {
+            image.attrSet('loading', 'lazy');
+            image.attrSet('decoding', 'async');
+            const picture = markdown.renderer.rules.image([image], 0, markdown.options, {}, markdown.renderer);
+            const caption = image.attrGet('title');
+            return '<figure><a href="' + escapeHtml(image.attrGet('src')) + '">' + picture + '</a>'
+                + (caption ? '<figcaption>' + escapeHtml(caption) + '</figcaption>' : '') + '</figure>';
+        });
+        opening.type = 'html_block';
+        opening.tag = '';
+        opening.nesting = 0;
+        opening.content = '<div class="photo-gallery">\n' + figures.join('\n') + '\n</div>\n';
+        tokens.splice(index + 1, 2);
+    }
+}
+
 export function renderDescription(source) {
     const tokens = markdown.parse(source, {});
     // The page template supplies the single h1 from the catalog.
     if (tokens[0]?.type === 'heading_open' && tokens[0].tag === 'h1') tokens.splice(0, 3);
     assert(tokens.length > 0, 'Markdown description is empty');
     assert(!tokens.some(token => token.type === 'heading_open' && token.tag === 'h1'), 'Use ## for description sections; the page already has a title');
+    groupPhotoParagraphs(tokens);
     return markdown.renderer.render(tokens, markdown.options, {});
 }
 

@@ -182,7 +182,9 @@ window.GAMES_CATALOG = {
             },
             "available": true,
             "creator": "teacher",
-            "directory": "games/snake-evolution"
+            "directory": "games/snake-evolution",
+            "detailsUrl": "content/games/snake-evolution.html",
+            "detailsSource": "content/games/snake-evolution.md"
         },
         {
             "id": "interactive-screen-benchmark",
@@ -194,7 +196,9 @@ window.GAMES_CATALOG = {
             "link": "games/interactive-screen-benchmark/interactive-screen-benchmark.html",
             "available": true,
             "creator": "teacher",
-            "directory": "games/interactive-screen-benchmark"
+            "directory": "games/interactive-screen-benchmark",
+            "detailsUrl": "content/games/interactive-screen-benchmark.html",
+            "detailsSource": "content/games/interactive-screen-benchmark.md"
         },
         {
             "id": "zvezdny-kurer",
@@ -233,7 +237,9 @@ window.GAMES_CATALOG = {
             },
             "available": true,
             "creator": "teacher",
-            "directory": "games/zvezdny-kurer"
+            "directory": "games/zvezdny-kurer",
+            "detailsUrl": "content/games/zvezdny-kurer.html",
+            "detailsSource": "content/games/zvezdny-kurer.md"
         },
         {
             "id": "staya-svetlyachkov",
