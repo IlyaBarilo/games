@@ -126,7 +126,9 @@ window.GAMES_CATALOG = {
             },
             "available": true,
             "creator": "teacher",
-            "directory": "games/tictac-robots"
+            "directory": "games/tictac-robots",
+            "detailsUrl": "content/games/tictac-robots.html",
+            "detailsSource": "content/games/tictac-robots.md"
         },
         {
             "id": "8march-shariki",
@@ -422,7 +424,9 @@ window.GAMES_CATALOG = {
             },
             "available": true,
             "creator": "teacher",
-            "directory": "games/tictac-sea"
+            "directory": "games/tictac-sea",
+            "detailsUrl": "content/games/tictac-sea.html",
+            "detailsSource": "content/games/tictac-sea.md"
         }
     ]
 };
