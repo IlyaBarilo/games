@@ -3,6 +3,7 @@ import './licenses.test.mjs';
 import './html-scripts.test.mjs';
 import './qr.test.mjs';
 import './pavilion.test.mjs';
+import './pavilion-state.test.mjs';
 import './view-mode.test.mjs';
 import './pavilion-preload.test.mjs';
 import './showcase-scripts.test.mjs';

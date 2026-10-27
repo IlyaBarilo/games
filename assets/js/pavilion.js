@@ -122,9 +122,42 @@ function setDifficulty(i,link){difficultyLinks[i]=link;document.querySelectorAll
 games.forEach((g,i)=>{const panel=document.createElement('section');panel.className='screen-panel';panel.dataset.panelGame=i;panel.setAttribute('aria-label','Экран — '+g.title);const title=document.createElement('h3');title.textContent=g.title;panel.append(title);difficultyButtons(i,panel);const actions=document.createElement('div');actions.className='screen-actions';const play=document.createElement('a');play.className='play';play.href=difficultyLinks[i];play.target='_self';play.textContent='▶ Играть';play.setAttribute('aria-label','Играть — '+g.title);const details=document.createElement('button');details.textContent='ⓘ Информация';details.setAttribute('aria-label','Информация — '+g.title);details.onclick=()=>openInfo(i);for(const button of [play,details]){const caption=document.createElement('span');caption.className='button-caption';caption.textContent=button.textContent;button.replaceChildren(caption)}actions.append(play,details);const podium=document.createElement('section');podium.className='podium-controls';podium.dataset.panelGame=i;podium.setAttribute('aria-label','Кнопки перед телевизором — '+g.title);podium.append(actions);document.getElementById('screen-controls').append(panel,podium);screenPanels.push(panel);podiumPanels.push(podium);panel.querySelectorAll('[data-difficulty]').forEach(b=>{const d=Object.values(g.difficulties).find(d=>d.link===b.dataset.difficulty);b.replaceChildren(difficultySymbol(d.link))})});
 
 
-function savePavilionState(){try{const state={layout:layoutSignature(),eye:[...eye],yaw,pitch,zoom,zoomTarget,sensitivity,renderScale,benchmarkScene,difficultyLinks:[...difficultyLinks],jump:jump.value,lighting:document.getElementById('lighting').getAttribute('aria-pressed')==='true',animated:document.getElementById('animate').getAttribute('aria-pressed')==='true'};history.replaceState({...history.state,pavilion:state},'')}catch{}}
-function restorePavilionState(){const s=history.state?.pavilion;if(!s||!Array.isArray(s.eye)||s.eye.length!==3||!s.eye.every(Number.isFinite))return;keys.clear();stopStick();cancelWalk();const changedLayout=s.layout!==layoutSignature(),savedIndex=s.jump==='home'?-1:Number(s.jump),point=changedLayout?standViewPoint(savedIndex):s.eye;eye=[Math.max(walkBounds.left,Math.min(walkBounds.right,point[0])),1.7,Math.max(walkBounds.back,Math.min(walkBounds.front,point[2]))];yaw=!changedLayout&&Number.isFinite(s.yaw)?s.yaw:0;pitch=!changedLayout&&Number.isFinite(s.pitch)?Math.max(-1.5,Math.min(1.5,s.pitch)):0;zoom=zoomTarget=Number.isFinite(s.zoomTarget)?Math.max(1,Math.min(2,s.zoomTarget)):1;setZoom(zoomTarget);setRenderScale(s.renderScale);const savedBenchmarkScene=s.benchmarkScene===4?2:s.benchmarkScene;if(savedBenchmarkScene===1||savedBenchmarkScene===2){benchmarkScene=savedBenchmarkScene;refreshBenchmarkControls()}if(Number.isFinite(s.sensitivity)){sensitivity=s.sensitivity;document.getElementById('sensitivity').value=sensitivity}if(Array.isArray(s.difficultyLinks))s.difficultyLinks.forEach((link,i)=>{const g=games[i];if(g&&(link===g.link||Object.values(g.difficulties||{}).some(d=>d.link===link)))setDifficulty(i,link)});if(document.getElementById('lighting').getAttribute('aria-pressed')!==String(s.lighting))document.getElementById('lighting').click();if(document.getElementById('animate').getAttribute('aria-pressed')!==String(s.animated))document.getElementById('animate').click();if([...jump.options].some(o=>o.value===s.jump))jump.value=s.jump;keepSafeDistance()}
-document.addEventListener('click',e=>{const a=e.target.closest('a.play');if(a){cancelWalk();stopStick();keys.clear();savePavilionState()}},true);window.addEventListener('pagehide',savePavilionState);window.addEventListener('pageshow',e=>{if(e.persisted){restorePavilionState();last=0}});
+const pavilionStateUrl=new URL(location.href);
+const pavilionStateKey='pavilion:visit-state:'+new URL('.',pavilionStateUrl).href+':'+(pavilionStateUrl.searchParams.get('gamespaceIndexSession')||'default');
+let pavilionStateReady=false;
+function validPavilionState(state){return state&&Array.isArray(state.eye)&&state.eye.length===3&&state.eye.every(Number.isFinite)}
+function pavilionNavigationType(){
+ try{const type=performance.getEntriesByType?.('navigation')[0]?.type;if(type)return type;return performance.navigation?.type===2?'back_forward':performance.navigation?.type===1?'reload':'navigate'}catch{return 'navigate'}
+}
+function returningFromPavilionContent(){
+ try{
+  if(!document.referrer)return false;
+  const previous=new URL(document.referrer),base=new URL('.',pavilionStateUrl);
+  const pages=['game-info.html',...games.flatMap(game=>[game.link,game.detailsUrl,...Object.values(game.difficulties||{}).map(level=>level.link)]).filter(Boolean)];
+  return pages.some(page=>{const target=new URL(page,base);return target.protocol===previous.protocol&&target.host===previous.host&&target.pathname===previous.pathname});
+ }catch{return false}
+}
+function readPavilionState(fromHistory=false){
+ // Reload and a fresh visit start at the entrance, even when this tab has a saved position.
+ const navigationType=pavilionNavigationType();
+ if(!fromHistory&&(navigationType==='reload'||(navigationType!=='back_forward'&&!returningFromPavilionContent())))return null;
+ try{if(validPavilionState(history.state?.pavilion))return history.state.pavilion}catch{}
+ try{
+  const saved=JSON.parse(sessionStorage.getItem(pavilionStateKey));
+  if(saved?.v===1&&validPavilionState(saved.state))return saved.state;
+ }catch{}
+ return null;
+}
+function savePavilionState(){
+ // Leaving during initialization must not overwrite the previous visit with the entrance.
+ if(!pavilionStateReady)return;
+ const state={layout:layoutSignature(),eye:[...eye],yaw,pitch,zoom,zoomTarget,sensitivity,renderScale,benchmarkScene,difficultyLinks:[...difficultyLinks],jump:jump.value,lighting:document.getElementById('lighting').getAttribute('aria-pressed')==='true',animated:document.getElementById('animate').getAttribute('aria-pressed')==='true'};
+ try{history.replaceState({...history.state,pavilion:state},'')}catch{}
+ // A return link creates a new history entry, so retain a fallback in this tab.
+ try{sessionStorage.setItem(pavilionStateKey,JSON.stringify({v:1,state}))}catch{}
+}
+function restorePavilionState(fromHistory=false){const s=readPavilionState(fromHistory);if(!s)return;keys.clear();stopStick();cancelWalk();const changedLayout=s.layout!==layoutSignature(),savedIndex=s.jump==='home'?-1:Number(s.jump),point=changedLayout?standViewPoint(savedIndex):s.eye;eye=[Math.max(walkBounds.left,Math.min(walkBounds.right,point[0])),1.7,Math.max(walkBounds.back,Math.min(walkBounds.front,point[2]))];yaw=!changedLayout&&Number.isFinite(s.yaw)?s.yaw:0;pitch=!changedLayout&&Number.isFinite(s.pitch)?Math.max(-1.5,Math.min(1.5,s.pitch)):0;zoom=zoomTarget=Number.isFinite(s.zoomTarget)?Math.max(1,Math.min(2,s.zoomTarget)):1;setZoom(zoomTarget);setRenderScale(s.renderScale);const savedBenchmarkScene=s.benchmarkScene===4?2:s.benchmarkScene;if(savedBenchmarkScene===1||savedBenchmarkScene===2){benchmarkScene=savedBenchmarkScene;refreshBenchmarkControls()}if(Number.isFinite(s.sensitivity)){sensitivity=s.sensitivity;document.getElementById('sensitivity').value=sensitivity}if(Array.isArray(s.difficultyLinks))s.difficultyLinks.forEach((link,i)=>{const g=games[i];if(g&&(link===g.link||Object.values(g.difficulties||{}).some(d=>d.link===link)))setDifficulty(i,link)});if(document.getElementById('lighting').getAttribute('aria-pressed')!==String(s.lighting))document.getElementById('lighting').click();if(document.getElementById('animate').getAttribute('aria-pressed')!==String(s.animated))document.getElementById('animate').click();if([...jump.options].some(o=>o.value===s.jump))jump.value=s.jump;keepSafeDistance()}
+document.addEventListener('click',e=>{const a=e.target.closest('a.play');if(a){cancelWalk();stopStick();keys.clear();savePavilionState()}},true);window.addEventListener('pagehide',savePavilionState);window.addEventListener('pageshow',e=>{if(e.persisted&&pavilionStateReady){restorePavilionState(true);last=0}});
 
 function go(value){cancelWalk();stopStick();keys.clear();const home=value==='home',i=Number(value);if(!home&&(!Number.isInteger(i)||!stands[i]))return;const target=standViewPoint(home?-1:i),route=findRoute(eye[0],eye[2],target[0],target[2]);if(!route){hint('Свободный проход к стенду не найден.');return}destination=[target[0],target[2]];travel={kind:'walk',route:roundWalkRoute([eye[0],eye[2]],route),index:0,faceIndex:home?-1:i,speed:reduced.matches?6:10};jump.value=value;hint('Идём к '+(home?'входу':'стенду')+' по проходу · Esc — отменить');canvas.focus({preventScroll:true})}jump.onchange=()=>go(jump.value);document.getElementById('reset').onclick=()=>go('home');document.querySelectorAll('[data-zone]').forEach(b=>b.onclick=()=>go(b.dataset.zone));
 
@@ -1225,7 +1258,7 @@ await Promise.all([difficultyFacesReady,waitForShaderProgram(gl,pr,programShader
 initializeShaderProgram();
 controlTextures.filter(entry=>entry.kind==='actions').forEach(drawControlTexture);
 games.forEach((g,i)=>refreshStandControls(i));
-restorePavilionState();keepSafeDistance();window.PAVILION_LOADING?.sceneInitialized();requestAnimationFrame(frame);
+restorePavilionState();keepSafeDistance();pavilionStateReady=true;window.PAVILION_LOADING?.sceneInitialized();requestAnimationFrame(frame);
 }
 
 } catch(error) { window.PAVILION_LOADING?.fail(); console.error(error); }
