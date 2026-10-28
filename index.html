@@ -9,6 +9,7 @@
     <script src="assets/js/view-mode.js" data-view="3d"></script>
     <link rel="icon" type="image/png" href="assets/favicon.png">
     <link rel="stylesheet" href="assets/css/pavilion.css">
+    <script defer src="assets/js/pavilion-ui.js"></script>
     <script defer src="assets/js/pavilion-loading.js"></script>
     <script defer src="catalog/games.js"></script>
     <script defer src="assets/js/catalog.js"></script>
@@ -80,8 +81,8 @@
 <p>На карте перетащите один стенд на другой, чтобы поменять сцены местами. Можно мышью или пальцем. Обычное нажатие переносит к стенду.</p>
 <div id="view-status" class="view-status"><output id="zoom-level" aria-live="off">Масштаб ×1 · колесо / два пальца</output><output class="location" id="location" aria-live="off">Вход</output></div>
 <fieldset class="developer-view-settings"><legend>Точка просмотра витрин</legend>
-<label for="developer-view-distance">Расстояние до витрины <output id="developer-view-distance-value" for="developer-view-distance">8,8</output></label>
-<input id="developer-view-distance" type="range" min="4.2" max="9.5" step="0.1" value="8.8">
+<label for="developer-view-distance">Расстояние до витрины <output id="developer-view-distance-value" for="developer-view-distance">6</output></label>
+<input id="developer-view-distance" type="range" min="4.2" max="9.5" step="0.1" value="6">
 <div class="developer-view-actions"><button id="developer-view-preview">Проверить точку</button><button id="developer-view-reset">По умолчанию</button></div>
 <p class="developer-note">Выберите витрину на карте. Дальность применяется ко всем витринам и сохраняется в этом браузере. В демо камера подходит немного ближе, пока перед площадкой есть место.</p>
 </fieldset>

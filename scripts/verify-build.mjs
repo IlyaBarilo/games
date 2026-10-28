@@ -33,7 +33,7 @@ for (const mode of ['web', 'gamespace']) {
     assert(!catalogHtml.includes('data-pavilion-preloads'), '2D must not preload 3D artwork');
     assert(catalogHtml.includes('index.html?view=3d'), 'Missing return to pavilion: ' + mode);
     assert(catalogHtml.includes('data-view="2d"'), 'Missing 2D catalog mode: ' + mode);
-    for (const resource of ['assets/js/pavilion.js', 'assets/js/pavilion-loading.js', 'assets/js/pavilion-developer.js', 'assets/js/view-mode.js', 'assets/css/pavilion.css', 'assets/js/gamespace.js', 'assets/css/gamespace.css']) {
+    for (const resource of ['assets/js/pavilion.js', 'assets/js/pavilion-ui.js', 'assets/js/pavilion-loading.js', 'assets/js/pavilion-developer.js', 'assets/js/view-mode.js', 'assets/css/pavilion.css', 'assets/js/gamespace.js', 'assets/css/gamespace.css']) {
         const expectedHash = preparedScripts.has(resource) ? createHash('sha256').update(preparedScripts.get(resource)).digest('hex') : hash(path.join(projectRoot, resource));
         assert.equal(hash(path.join(output, resource)), expectedHash, 'Missing or changed showcase resource: ' + mode + '/' + resource);
     }

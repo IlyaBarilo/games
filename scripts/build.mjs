@@ -66,7 +66,7 @@ for (const mode of ['web', 'gamespace']) {
     for (const resource of ['LICENSE.md', 'NOTICE.md', 'USAGE.md', 'licenses']) copy(resource, output);
     for (const [relative, html] of legalPages) fs.writeFileSync(path.join(output, relative), html);
     // Both distributions include the pavilion, 2D catalog and local information pages.
-    const resources = ['gamespace.html', 'assets/favicon.png', 'assets/js/catalog.js', 'assets/js/gamespace.js', 'assets/css/gamespace.css', 'assets/icons/role/teacher-cap-minimal.svg', 'assets/js/view-mode.js', 'assets/css/site.css', 'assets/js/pavilion-loading.js', 'assets/js/pavilion.js', 'assets/js/pavilion-developer.js', 'assets/css/pavilion.css', 'game-info.html', 'assets/js/details.js', 'assets/social-preview.jpg', 'assets/js/qr-code.js', 'assets/css/qr-code.css', 'assets/vendor/qrcodegen-v1.8.0.js'];
+    const resources = ['gamespace.html', 'assets/favicon.png', 'assets/js/catalog.js', 'assets/js/gamespace.js', 'assets/css/gamespace.css', 'assets/icons/role/teacher-cap-minimal.svg', 'assets/js/view-mode.js', 'assets/css/site.css', 'assets/js/pavilion-ui.js', 'assets/js/pavilion-loading.js', 'assets/js/pavilion.js', 'assets/js/pavilion-developer.js', 'assets/css/pavilion.css', 'game-info.html', 'assets/js/details.js', 'assets/social-preview.jpg', 'assets/js/qr-code.js', 'assets/css/qr-code.css', 'assets/vendor/qrcodegen-v1.8.0.js'];
     for (const resource of resources) {
         if (preparedScripts.has(resource)) {
             const target = path.join(output, resource);

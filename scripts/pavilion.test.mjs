@@ -152,7 +152,7 @@ assert.equal(layoutContext.restoreStandLayout(), false);assert.equal(layoutConte
 assert.equal(JSON.stringify(plan.standGroups.map(group => group.position)), initial);
 // Viewing distances stay within clear approach lanes and persist without changing layout.
 const distanceStore=new Map();layoutContext.localStorage={getItem:k=>distanceStore.get(k)??null,setItem:(k,v)=>distanceStore.set(k,v)};
-for(const [input,expected] of [[4.2,4.2],[6,6],[9.5,9.5],['7.34',7.3],[-100,4.2],[100,9.5],['bad',8.8],[null,8.8],['',8.8]]){
+for(const [input,expected] of [[4.2,4.2],[6,6],[9.5,9.5],['7.34',7.3],[-100,4.2],[100,9.5],['bad',6],[null,6],['',6]]){
  assert.equal(layoutContext.setStandViewDistance(input),expected);
  for(let i=0;i<plan.standGroups.length;i++){const point=layoutContext.standViewPoint(i);assert(!layoutContext.insideStandFootprint(point[0],point[2]));for(const closer of [.9,1.2])assert(!layoutContext.insideStandFootprint(point[0],Math.max(plan.standGroups[i].position[2]+4.2,point[2]-closer)))}
 }
