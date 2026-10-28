@@ -152,7 +152,7 @@ svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stroke
 #stage{position:absolute;inset:0}#stage canvas{display:block;touch-action:none;-webkit-touch-callout:none}
 #stage canvas:focus-visible{outline:2px solid #5ab69d;outline-offset:-3px}
 /* The HUD has its own density-compensated coordinate system. */
-#hud{position:absolute;left:0;top:0;transform-origin:top left;pointer-events:none;container-type:size;container-name:hud}
+#hud{position:absolute;left:0;top:0;pointer-events:none;container-type:size;container-name:hud}
 #hud .bottom-ui{pointer-events:auto}
 html{text-size-adjust:100%;-webkit-text-size-adjust:100%}
 dialog{zoom:var(--hud-scale,1)}
@@ -437,7 +437,9 @@ dialog{width:min(490px,calc(var(--hud-width,100vw) - 28px));max-width:none;max-h
       try{const saved=Number(sessionStorage.getItem(key));if(saved>=.25&&saved<=8)reference=saved;else sessionStorage.setItem(key,String(reference));}catch{}
     }
     const m=metrics(window.innerWidth,window.innerHeight,density,reference);window.RoboUI.current=m;
-    hud.style.width=m.width+'px';hud.style.height=m.height+'px';hud.style.transform=`scale(${m.scale})`;
+    // Layout zoom combines with Chrome page zoom before border widths are rounded.
+    // A transform magnifies already-rounded 1px borders when the page is zoomed out.
+    hud.style.width=m.width+'px';hud.style.height=m.height+'px';hud.style.zoom=String(m.scale);
     const root=document.documentElement.style;root.setProperty('--hud-scale',m.scale);root.setProperty('--hud-width',m.width+'px');root.setProperty('--hud-height',m.height+'px');root.setProperty('--help-columns',m.width<=520?'1fr':'1fr 1fr');root.setProperty('--dialog-padding',m.width<=520?'28px 22px':'32px');
   }
   function watchDensity(){
@@ -2285,13 +2287,14 @@ Phaser curves: based on three.js Curve classes by zz85; matrices/vectors adapted
       this.board={cols:this.config.cols,rows:this.config.rows,cell:s,w:s*this.config.cols,h:s*this.config.rows,x:landscapePhone&&!centeredPhone?clearance+4*ui.scale*ratio:(playWidth*ratio-s*this.config.cols)/2-(mobile?0:90),y:centerY-s*this.config.rows/2};
       // Leave a full text line plus a gap below the coordinate rail, including short result layouts.
       if(this.resultShown)this.board.y=Math.min(this.board.y,(floorBottom-36*ui.scale)*ratio-32-this.board.h);
-      this.layout=L.create(this.W,this.H,this.board,{top:(floorTop+16*ui.scale)*ratio,bottom:floorBottom*ratio,right:playWidth*ratio,exclusions,dispatchBelow:dispatchBelow?{top:(deck.bottom+7*ui.scale)*ratio,right:this.W-36}:null,compact,robotScale,aisleGap,edgeFixtures:mobile,pixelRatio:ratio});
+      // Canvas annotations use logical HUD pixels in world space, not raw viewport pixels.
+      this.layout=L.create(this.W,this.H,this.board,{top:(floorTop+16*ui.scale)*ratio,bottom:floorBottom*ratio,right:playWidth*ratio,exclusions,dispatchBelow:dispatchBelow?{top:(deck.bottom+7*ui.scale)*ratio,right:this.W-36}:null,compact,robotScale,aisleGap,edgeFixtures:mobile,pixelRatio:ratio*ui.scale});
       // Short/narrow windows may have no straight aisle opposite the space below the console.
       // Retain the previous side bay there rather than lose unloading or intersect the turn.
       if(dispatchBelow&&!this.layout.conveyor){
         const cell=Math.min(Math.max(120,availableW-210)/this.config.cols,fieldH/this.config.rows),w=cell*this.config.cols,h=cell*this.config.rows;
         this.board={...this.board,cell,w,h,y:clamp(middle,topY+h/2,bottomY-h/2)-h/2};
-        this.layout=L.create(this.W,this.H,this.board,{top:(floorTop+16*ui.scale)*ratio,bottom:floorBottom*ratio,right:playWidth*ratio,exclusions,compact,robotScale,aisleGap,edgeFixtures:mobile,pixelRatio:ratio});
+        this.layout=L.create(this.W,this.H,this.board,{top:(floorTop+16*ui.scale)*ratio,bottom:floorBottom*ratio,right:playWidth*ratio,exclusions,compact,robotScale,aisleGap,edgeFixtures:mobile,pixelRatio:ratio*ui.scale});
       }
       this.cargo=new window.RoboCargo.Cargo(this.layout,this.board);this.delivery=new window.RoboDelivery.Delivery(this.layout,reduced,Math.random,this.cargo);
       this.refreshRendering(vw,vh);this.arms.forEach(a=>this.restArm(a));this.makeRoute();this.hover=null;this.press=null;this.lastPaint=0;this.setZoom(this.view.zoom,true);
