@@ -139,11 +139,12 @@ test('Release packaging creates an identical permanent GameSpace asset and cover
     }
 });
 
-test('Pavilion release version uses its header slot and preserves the first version 0.1', () => {
+test('Pavilion release version uses its settings slot and preserves the first version 0.1', () => {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), 'games-pavilion-version-'));
     try {
         const slot = '<span class="release-version" data-release-slot hidden></span>';
-        assert(fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8').includes(slot), 'The real pavilion must provide its release header slot');
+        const template = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+        assert(template.includes('<p class="settings-version">Версия ' + slot + '</p>'), 'The real pavilion must provide its release slot in settings');
         const html = `<html><body><main><header>Павильон ${slot}</header><canvas></canvas></main></body></html>`;
         const file = path.join(root, 'index.html');
         fs.writeFileSync(file, html);

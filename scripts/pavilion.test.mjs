@@ -85,6 +85,7 @@ console.log('Passed: kraken submerges at fixed size, game pieces float on water,
 const catalogContext = { window: {} };
 vm.runInNewContext(fs.readFileSync(path.join(root, 'catalog/games.js'), 'utf8'), catalogContext);
 const layoutContext = {
+    phoneMapLayout:false,
     games: Array.from(catalogContext.window.GAMES_CATALOG.games.filter(game => game.available)),
     document: { querySelectorAll: () => [] }, window: { addEventListener() {} }
 };
@@ -156,7 +157,10 @@ for(const [input,expected] of [[4.2,4.2],[6,6],[9.5,9.5],['7.34',7.3],[-100,4.2]
  assert.equal(layoutContext.setStandViewDistance(input),expected);
  for(let i=0;i<plan.standGroups.length;i++){const point=layoutContext.standViewPoint(i);assert(!layoutContext.insideStandFootprint(point[0],point[2]));for(const closer of [.9,1.2])assert(!layoutContext.insideStandFootprint(point[0],Math.max(plan.standGroups[i].position[2]+4.2,point[2]-closer)))}
 }
-layoutContext.setStandViewDistance(7.1);const restoredDistance={games:layoutContext.games,document:layoutContext.document,window:{addEventListener(){}},localStorage:layoutContext.localStorage};vm.createContext(restoredDistance);vm.runInContext(source.slice(layoutStart,layoutEnd),restoredDistance);assert.equal(restoredDistance.window.PAVILION_LAYOUT.getViewDistance(),7.1);layoutContext.localStorage.setItem=()=>{throw Error('Storage denied')};assert.equal(layoutContext.setStandViewDistance(7.8),7.8);layoutContext.setStandViewDistance(8.8);
+layoutContext.setStandViewDistance(7.1);const restoredDistance={phoneMapLayout:true,games:layoutContext.games,document:layoutContext.document,window:{addEventListener(){}},localStorage:layoutContext.localStorage};vm.createContext(restoredDistance);vm.runInContext(source.slice(layoutStart,layoutEnd),restoredDistance);assert.equal(restoredDistance.window.PAVILION_LAYOUT.getViewDistance(),7.1);layoutContext.localStorage.setItem=()=>{throw Error('Storage denied')};assert.equal(layoutContext.setStandViewDistance(7.8),7.8);layoutContext.setStandViewDistance(8.8);
+assert.deepEqual(Array.from(layoutContext.standViewPoint(-1)),[0,1.7,6],'Desktop entrance remains in place');
+assert.deepEqual(Array.from(restoredDistance.standViewPoint(-1)),[0,1.7,2],'Phone entrance moves forward by two floor cells');
+assert(!restoredDistance.insideStandFootprint(0,2),'Phone entrance stays in a clear lane');
 console.log('Passed: atomic exchanges of all 66 pairs, local persistence, invalid-state recovery and clear aisles for all 12 stands.');
 
 // Exercise the tour controller without waiting through real-time pauses.
