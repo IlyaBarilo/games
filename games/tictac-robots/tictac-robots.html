@@ -149,7 +149,7 @@ button{font:inherit;border:0;cursor:pointer;-webkit-tap-highlight-color:transpar
 button:focus-visible,select:focus-visible{outline:3px solid #18a99a;outline-offset:3px}
 button:disabled{cursor:default;opacity:.45}
 svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
-#stage{position:absolute;inset:0}#stage canvas{display:block;touch-action:none;-webkit-touch-callout:none}
+#stage{position:absolute;inset:0}#stage canvas{display:block;position:absolute;inset:0;width:100%!important;height:100%!important;margin:0!important;touch-action:none;-webkit-touch-callout:none}
 #stage canvas:focus-visible{outline:2px solid #5ab69d;outline-offset:-3px}
 /* The HUD has its own density-compensated coordinate system. */
 #hud{position:absolute;left:0;top:0;pointer-events:none;container-type:size;container-name:hud}
@@ -191,7 +191,7 @@ dialog{zoom:var(--hud-scale,1)}
 .turn-section{display:flex;align-items:center;gap:12px;flex:1;min-width:0}.turn-section>div:last-child{min-width:0}
 .token-x{display:grid;place-items:center;background:#173e39;border:1px solid #59d8bc55;color:#83ead1;width:44px;min-width:44px;height:44px;border-radius:10px;font-size:38px;line-height:1;font-weight:800;transition:background .25s,color .25s}
 .token-x.ai{color:#ffc480;background:#4c3a2e;border-color:#faaf6044;font-size:32px}
-.eyebrow{font-size:12px;letter-spacing:.7px;font-weight:750;color:#a3d6c5;margin-bottom:5px}#status{font-size:14px;line-height:1.4}
+.eyebrow{font-size:12px;letter-spacing:.7px;font-weight:750;color:#a3d6c5;margin-bottom:5px}#status{font-size:14px;line-height:1.4;min-height:2.8em}
 .score-section{display:flex;gap:12px;align-items:center}.score-section>span{display:flex;gap:5px;align-items:center}.score-section i{font-size:24px;font-style:normal;display:inline-flex;align-items:center;justify-content:center;height:32px;flex-shrink:0}.mini-x{color:#84dfc9;width:16.421875px}.mini-o{color:#ffc38a;width:20.671875px}.score-section i svg{display:block;width:100%;height:100%;stroke-width:1.8}.score-section b{font:500 16px Consolas,monospace}
 .console-divider{height:32px;width:1px;background:#ffffff17}
 .scan-button{display:flex;gap:8px;align-items:center;justify-content:center;background:linear-gradient(#4c7164,#3c5e55);color:#f1f2d9;padding:0 13px;min-height:44px;border:1px solid #9ab89955;border-radius:9px;font-size:14px;font-weight:600;box-shadow:0 2px 0 #0c2824,inset 0 1px 0 #a5c69a33}.scan-button:hover{background:#527b6c}.scan-button svg{width:20px;height:20px}
@@ -204,7 +204,7 @@ dialog{zoom:var(--hud-scale,1)}
 body.night{color:#d1e5df;background:#172c38}.night .brand-mark{background:#19313988}.night .light-switch{background:#112a35bb;border-color:#829d9d44}.night .light-switch button{color:#a6bac1}.night .light-switch button.active{background:#3e5960;color:#fff1c5}.night .icon-button{background:#213c46cc;border-color:#829d9d44}.night .live-dot{background:#91d6b5;box-shadow:0 0 8px #67cba9}
 .night .bottom-ui{background:linear-gradient(150deg,#3c5355,#263f43);border-color:#1b353e;box-shadow:0 5px 0 #142c36,0 13px 30px #071c2c70,inset 0 2px 0 #78928d66;color:#c3d9d2}.night .console{background:#162e35;border-color:#0b242b}.night .under-console{color:#a5c1b5}.night .under-console i{background:#8be1b5}
 .zoomed .topbar{background:#e0e2d0f2;box-shadow:0 0 0 12px #e0e2d0f2;border-radius:8px}.zoomed .scene-label{background:#e0e2d0ed;border-radius:4px;padding:4px}.night.zoomed .topbar{background:#183540f5;box-shadow:0 0 0 12px #183540f5}.night.zoomed .scene-label{background:#183540ed}
-dialog{width:min(490px,calc(var(--hud-width,100vw) - 28px));max-width:none;max-height:calc(var(--hud-height,100vh) - 28px);overflow:auto;padding:var(--dialog-padding,32px);border:2px solid #acbda2;border-radius:19px;background:#eef0df;color:#2c4443;box-shadow:0 30px 100px #061b2a55}dialog::backdrop{background:#132b3b66;backdrop-filter:blur(5px)}.dialog-close{position:absolute;right:8px;top:8px;width:44px;height:44px;background:none;color:#667d75;font-size:28px}.dialog-tag{display:block;padding-right:20px;font-size:11px;letter-spacing:.7px;font-weight:750;color:#527365}dialog h2{font-size:30px;line-height:1.15;letter-spacing:-.7px;margin:22px 0}dialog p{font-size:14px;line-height:1.65;color:#4e675b}.help-grid{display:grid;grid-template-columns:var(--help-columns,1fr 1fr);gap:20px;margin:24px 0}.help-grid b{font-size:14px;display:block;margin-bottom:7px}.help-grid span{font-size:14px;line-height:1.5;color:#4f6c5b;display:block}.prototype-note{border-top:1px solid #657c6c33;padding-top:16px;font-size:13px}.start-button{display:flex;justify-content:space-between;width:100%;padding:15px 18px;border-radius:10px;background:#2a6058;color:#f4f1dd;font-size:14px;font-weight:600;margin-top:22px}.start-button:hover{background:#35786d}.start-button .button-arrow{display:block;width:12.09375px;height:19px;stroke-width:1.2}
+dialog{width:min(490px,calc(var(--hud-width,100vw) - 28px));max-width:none;max-height:calc(var(--hud-height,100vh) - 28px);overflow:auto;padding:var(--dialog-padding,32px);border:2px solid #acbda2;border-radius:19px;background:#eef0df;color:#2c4443;box-shadow:0 30px 100px #061b2a55}dialog::backdrop{background:#132b3b66;backdrop-filter:blur(5px)}.dialog-close{position:absolute;right:8px;top:8px;width:44px;height:44px;display:grid;place-items:center;padding:0;background:none;color:#667d75}.dialog-close svg{display:block;width:22px;height:22px;stroke-width:2}.dialog-tag{display:block;padding-right:20px;font-size:11px;letter-spacing:.7px;font-weight:750;color:#527365}dialog h2{font-size:30px;line-height:1.15;letter-spacing:-.7px;margin:22px 0}dialog p{font-size:14px;line-height:1.65;color:#4e675b}.help-grid{display:grid;grid-template-columns:var(--help-columns,1fr 1fr);gap:20px;margin:24px 0}.help-grid b{font-size:14px;display:block;margin-bottom:7px}.help-grid span{font-size:14px;line-height:1.5;color:#4f6c5b;display:block}.prototype-note{border-top:1px solid #657c6c33;padding-top:16px;font-size:13px}.start-button{display:flex;justify-content:space-between;width:100%;padding:15px 18px;border-radius:10px;background:#2a6058;color:#f4f1dd;font-size:14px;font-weight:600;margin-top:22px}.start-button:hover{background:#35786d}.start-button .button-arrow{display:block;width:12.09375px;height:19px;stroke-width:1.2}
 .setting-label{display:block;font-size:14px;font-weight:650;margin:20px 0 9px}select{width:100%;min-height:48px;padding:12px;background:#fffdf2;color:#2b4c40;border:1px solid #91a58e;border-radius:9px;font:inherit;font-size:16px}.settings-summary{padding:13px;border-radius:9px;background:#dce6d3;color:#285541;font-size:14px}.result-actions{display:flex;justify-content:space-between;gap:12px;margin-top:12px}.result-actions button{background:none;min-height:44px;color:#3c6957;font-size:14px}
 .console.game-over .token-x{background:#655435;color:#ffe2a7;border-color:#bc9b61}.console.player-win .token-x{background:#255c4e;color:#bbffd7;border-color:#71bd92}.console.game-over .eyebrow{color:#f2d4a4}.console.player-win .eyebrow{color:#b5f0d0}
 @container hud (max-width:1000px){.brand p{max-width:240px}.score-section{display:none}.under-console span:nth-child(2){display:none}.corner-note{display:none}}
@@ -281,7 +281,7 @@ dialog{width:min(490px,calc(var(--hud-width,100vw) - 28px));max-width:none;max-h
  .quality-button{grid-column:2;grid-row:1;width:66px;min-height:44px;padding:2px}.quality-button span{font-size:10px}.quality-button b{font-size:15px}
  .console{grid-template-columns:minmax(0,1fr) 44px 44px;gap:5px;padding:6px;min-height:0}
  .turn-section{gap:7px}.token-x{width:30px;min-width:30px;height:30px;border-radius:8px}.token-x svg{width:23px;height:23px}
- .eyebrow{font-size:11px;line-height:1.2}#status{font-size:12px;line-height:1.3;min-height:0}
+ .eyebrow{font-size:11px;line-height:1.2}#status{font-size:12px;line-height:1.3;min-height:2.6em}
  .scan-button{height:44px;min-height:44px;font-size:12px;gap:6px;padding:0 6px}.scan-button span{max-width:none}
  #toast{top:116px;font-size:12px;padding:8px 10px}
 }
@@ -336,7 +336,7 @@ dialog{width:min(490px,calc(var(--hud-width,100vw) - 28px));max-width:none;max-h
  .instrument-head:has(.fps-visible){grid-template-columns:1fr auto}
  .match-info{gap:4px}.meter{min-height:44px;padding:3px;gap:2px 4px}.meter>b{font-size:26px}.meter>span{font-size:12px}
  .console{grid-template-columns:1fr 44px 44px 44px;gap:7px;padding:7px}.turn-section{gap:0}.token-x{display:none}
- .eyebrow{font-size:12px;margin-bottom:4px}#status{font-size:14px;line-height:1.35;min-height:0}
+ .eyebrow{font-size:12px;margin-bottom:4px}#status{font-size:14px;line-height:1.35;min-height:2.7em}
  .scan-button,.small-button{width:44px;min-width:44px;height:44px}.scan-button{grid-column:2;padding:0}.scan-button svg{display:block}
  .console.game-over .turn-section{display:flex}.console.game-over .reset-button{grid-column:1/4;width:auto;min-width:0}.console.game-over #speed{grid-column:4}
 }
@@ -393,7 +393,7 @@ dialog{width:min(490px,calc(var(--hud-width,100vw) - 28px));max-width:none;max-h
   </footer>
   </div>
   <dialog id="about">
-    <button id="close-help" class="dialog-close" aria-label="Закрыть">×</button>
+    <button id="close-help" class="dialog-close" aria-label="Закрыть"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m5 5 14 14M19 5 5 19"/></svg></button>
     <span class="dialog-tag">ДОБРО ПОЖАЛОВАТЬ В СЕКТОР 07</span>
     <h2>Здесь у каждого<br>хода есть механика.</h2>
     <p>Соберите 4 или 5 своих энергоблоков в непрерывную линию по горизонтали, вертикали или диагонали. Нужная длина зависит от сложности. Склад отвечает кольцевыми реакторами.</p>
@@ -406,7 +406,7 @@ dialog{width:min(490px,calc(var(--hud-width,100vw) - 28px));max-width:none;max-h
     <button id="start" class="start-button">На склад <svg class="button-arrow" viewBox="0 0 12.09375 19" aria-hidden="true" focusable="false"><path d="M1 9.5h10m-4-4 4 4-4 4"/></svg></button>
   </dialog>
   <dialog id="settings" aria-labelledby="settings-title">
-    <button id="close-settings" class="dialog-close" aria-label="Закрыть настройки">×</button>
+    <button id="close-settings" class="dialog-close" aria-label="Закрыть настройки"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m5 5 14 14M19 5 5 19"/></svg></button>
     <span class="dialog-tag">НОВАЯ СМЕНА</span><h2 id="settings-title">Настроим участок.</h2>
     <form id="settings-form">
       <label class="setting-label" for="field-size">Размер поля</label><select id="field-size"><option value="6x6">6 × 6 — компактное</option><option value="6x12">6 × 12 — вертикальное</option><option value="12x6">12 × 6 — горизонтальное</option><option value="8x8">8 × 8 — квадратное</option><option value="10x12">10 × 12 — просторное</option><option value="10x20">10 × 20 — как в оригинале</option><option value="12x20">12 × 20 — большой склад</option></select>
@@ -430,18 +430,20 @@ dialog{width:min(490px,calc(var(--hud-width,100vw) - 28px));max-width:none;max-h
   const hud=document.getElementById('hud');
   if(!hud)return;
   let screenKey='',reference=window.devicePixelRatio||1,watch;
-  function update(){
+  function update(size){
     const density=window.devicePixelRatio||1,key=`robosklad.ui-density:${screen.width}x${screen.height}`;
     if(key!==screenKey){
       screenKey=key;reference=density;
       try{const saved=Number(sessionStorage.getItem(key));if(saved>=.25&&saved<=8)reference=saved;else sessionStorage.setItem(key,String(reference));}catch{}
     }
-    const m=metrics(window.innerWidth,window.innerHeight,density,reference);window.RoboUI.current=m;
+    const width=Number.isFinite(size?.width)?size.width:window.innerWidth,height=Number.isFinite(size?.height)?size.height:window.innerHeight;
+    const m=metrics(width,height,density,reference);window.RoboUI.current=m;
     // Layout zoom combines with Chrome page zoom before border widths are rounded.
     // A transform magnifies already-rounded 1px borders when the page is zoomed out.
     hud.style.width=m.width+'px';hud.style.height=m.height+'px';hud.style.zoom=String(m.scale);
     const root=document.documentElement.style;root.setProperty('--hud-scale',m.scale);root.setProperty('--hud-width',m.width+'px');root.setProperty('--hud-height',m.height+'px');root.setProperty('--help-columns',m.width<=520?'1fr':'1fr 1fr');root.setProperty('--dialog-padding',m.width<=520?'28px 22px':'32px');
   }
+  window.RoboUI.update=update;
   function watchDensity(){
     if(watch)watch.removeEventListener('change',onDensity);
     watch=window.matchMedia(`(resolution: ${window.devicePixelRatio||1}dppx)`);watch.addEventListener('change',onDensity);
@@ -2165,38 +2167,79 @@ Phaser curves: based on three.js Curve classes by zz85; matrices/vectors adapted
       this.surface=document.createElement('canvas');this.surface.className='scene-surface';this.surface.setAttribute('aria-hidden','true');$('stage').appendChild(this.surface);this.ctx=this.surface.getContext('2d');
       this.events.once('shutdown',()=>this.surface.remove());
       this.arms=[{side:'left',x:0,y:0,lift:1,grip:.5,carrying:false,angle:0},{side:'right',x:0,y:0,lift:1,grip:.5,carrying:false,angle:0}];
-      this.reset(initialConfig());this.resize(this.scale.gameSize);this.scale.on('resize',this.resize,this);this.bindInput();this.bindControls();this.updateSpeed();$('loading').style.display='none';
-      if(window.ResizeObserver){const observer=new ResizeObserver(()=>this.resizeInterface());observer.observe(document.querySelector('.topbar'));observer.observe(document.querySelector('.bottom-ui'));observer.observe($('result'));this.events.once('shutdown',()=>observer.disconnect());}
+      this.reset(initialConfig());this.syncViewport(this.scale.gameSize);this.scale.on('resize',this.onScaleResize,this);this.bindInput();this.bindControls();this.updateSpeed();$('loading').style.display='none';
+      this.bindViewport();
     }
+    viewportBounds(fallback=this.scale.gameSize){
+      const rect=$('stage').getBoundingClientRect();
+      return {width:rect.width>1?rect.width:Math.max(1,fallback.width),height:rect.height>1?rect.height:Math.max(1,fallback.height)};
+    }
+    onScaleResize(size){if(!this.syncingViewport)this.syncViewport(size);}
+    syncViewport(size=this.scale.gameSize){
+      if(this.syncingViewport)return false;
+      const next=this.viewportBounds(size),different=(a,b)=>!a||Math.abs(a.width-b.width)>.1||Math.abs(a.height-b.height)>.1;
+      const ui=window.RoboUI?.current;
+      // Orientation and ResizeObserver notifications can arrive before the HUD resize listener.
+      if(window.RoboUI?.update&&(!ui||different({width:ui.width*ui.scale,height:ui.height*ui.scale},next)))window.RoboUI.update(next);
+      const engine=this.scale.gameSize||this.scale;
+      if(different(engine,next)&&this.scale.getParentBounds&&this.scale.refresh){
+        // RESIZE must read the parent before refresh, or it can reuse the previous orientation.
+        this.syncingViewport=true;
+        try{this.scale.getParentBounds();this.scale.refresh();}finally{this.syncingViewport=false;}
+      }
+      if(different(this.viewport,next)){this.resize(next);return true;}
+      if(this.lastRenderDensity!==(window.devicePixelRatio||1)){
+        this.refreshRendering(next.width,next.height);this.presentFrame();
+      }
+      return false;
+    }
+    bindViewport(){
+      const sync=()=>this.syncViewport(),visual=window.visualViewport;
+      window.addEventListener('resize',sync);window.addEventListener('orientationchange',sync);visual?.addEventListener('resize',sync);
+      let observer;
+      if(window.ResizeObserver){observer=new ResizeObserver(()=>this.resizeInterface());for(const el of [$('stage'),document.querySelector('.topbar'),document.querySelector('.bottom-ui'),$('result')])observer.observe(el);}
+      this.events.once('shutdown',()=>{observer?.disconnect();window.removeEventListener('resize',sync);window.removeEventListener('orientationchange',sync);visual?.removeEventListener('resize',sync);this.scale.off?.('resize',this.onScaleResize,this);});
+    }
+    pointerPosition(p){
+      const viewport=this.viewport||this.scale.gameSize,rect=this.surface?.getBoundingClientRect?.()||$('stage').getBoundingClientRect();
+      const event=p.event,changed=event?.changedTouches;
+      const native=changed?Array.from(changed).find(t=>t.identifier===p.identifier)||(changed.length===1?changed[0]:null):event;
+      if(rect.width>0&&rect.height>0&&Number.isFinite(native?.clientX)&&Number.isFinite(native?.clientY))return{x:(native.clientX-rect.left)*viewport.width/rect.width,y:(native.clientY-rect.top)*viewport.height/rect.height};
+      return{x:p.x*viewport.width/this.scale.width,y:p.y*viewport.height/this.scale.height};
+    }
+    worldAt(point){const viewport=this.viewport||this.scale.gameSize;return{x:(point.x*this.W/viewport.width-this.view.ox)/this.view.zoom,y:(point.y*this.H/viewport.height-this.view.oy)/this.view.zoom};}
     bindInput(){
       // Phaser normalizes mouse and Touch Events into pointers. Keep one gesture owner.
       this.input.on('pointerdown',p=>{
+        this.syncViewport();const point=this.pointerPosition(p);
         if(modalOpen()||(!p.wasTouch&&p.event?.button>0))return;
         const touch=!!p.wasTouch||p.event?.pointerType==='touch'||p.event?.pointerType==='pen';
-        if(touch){this.touches.set(p.id,{x:p.x,y:p.y});if(this.pinchLock||this.touches.size>1){if(!this.pinchLock)this.beginPinch();return;}}
+        if(touch){this.touches.set(p.id,point);if(this.pinchLock||this.touches.size>1){if(!this.pinchLock)this.beginPinch();return;}}
         else if(this.touches.size||Date.now()<this.blockMouseUntil)return;
         if(this.press)return;const pos=this.worldPointer(p),box=this.cargo?.at(pos);
-        this.press={id:p.id,x:p.x,y:p.y,ox:this.view.ox,oy:this.view.oy,dragged:false,cargo:box?.id,touch,threshold:(touch?14:8)*(window.RoboUI?.current?.scale||1),cell:this.cellAt(p),target:this.decorationAt(pos)};
+        this.press={id:p.id,x:point.x,y:point.y,ox:this.view.ox,oy:this.view.oy,dragged:false,cargo:box?.id,touch,threshold:(touch?14:8)*(window.RoboUI?.current?.scale||1),cell:this.cellAt(p),target:this.decorationAt(pos)};
         if(touch)this.hover=null;
         if(box){this.play.cancel('cargo:'+box.id);this.cargo.start(box.id,pos);}
       });
       this.input.on('pointermove',p=>{
-        if(this.touches.has(p.id))this.touches.set(p.id,{x:p.x,y:p.y});
+        this.syncViewport();const point=this.pointerPosition(p);
+        if(this.touches.has(p.id))this.touches.set(p.id,point);
         if(this.pinchLock){this.movePinch();return;}
         if(this.press&&p.id!==this.press.id)return;
-        if(this.press&&p.isDown){const dx=p.x-this.press.x,dy=p.y-this.press.y;if(Math.hypot(dx,dy)>this.press.threshold)this.press.dragged=true;
+        if(this.press&&p.isDown){const dx=point.x-this.press.x,dy=point.y-this.press.y;if(Math.hypot(dx,dy)>this.press.threshold)this.press.dragged=true;
           if(this.press.cargo!==undefined){if(this.press.dragged)this.cargo.move(this.worldPointer(p));this.hover=null;return;}
-          if(this.press.dragged&&this.view.zoom>1){this.view.ox=this.press.ox+dx*this.W/this.scale.width;this.view.oy=this.press.oy+dy*this.H/this.scale.height;this.clampView();this.hover=null;return;}}
+          if(this.press.dragged&&this.view.zoom>1){this.view.ox=this.press.ox+dx*this.W/this.viewport.width;this.view.oy=this.press.oy+dy*this.H/this.viewport.height;this.clampView();this.hover=null;return;}}
         if(p.wasTouch||this.press?.touch){this.hover=null;return;}
         this.hover=this.cellAt(p);this.game.canvas.style.cursor=this.cargo?.at(this.worldPointer(p))?'grab':this.hover||this.decorationAt(this.worldPointer(p))?'pointer':'default';
       });
       this.input.on('pointerup',p=>{
+        this.syncViewport();const point=this.pointerPosition(p);
         if(this.releaseTouch(p.id))return;
         const press=this.press;if(!press||press.id!==p.id)return;
         // Phaser also emits pointerup for touchcancel: it must never place a figure or cargo.
         if(p.wasCanceled||modalOpen()){this.cancelCargoDrag();return;}
         this.press=null;this.hover=null;this.game.canvas.style.cursor='default';
-        press.dragged ||= Math.hypot(p.x-press.x,p.y-press.y)>press.threshold;
+        press.dragged ||= Math.hypot(point.x-press.x,point.y-press.y)>press.threshold;
         if(press.cargo!==undefined){if(press.dragged){this.cargo.move(this.worldPointer(p));const ok=this.cargo.drop(this.bot,!reduced);announce(ok?'Груз на месте. Бип уберёт ящики с дороги.':'Здесь тесно. Оставьте ящик на свободном полу вокруг поля.');}else{this.cargo.cancel();this.reactTo({key:'cargo:'+press.cargo,kind:'crate'});}return;}
         if(press.dragged)return;
         const cell=this.cellAt(p);
@@ -2222,11 +2265,11 @@ Phaser curves: based on three.js Curve classes by zz85; matrices/vectors adapted
     beginPinch(){
       const points=[...this.touches.entries()].slice(0,2),a=points[0][1],b=points[1][1],mid={x:(a.x+b.x)/2,y:(a.y+b.y)/2};
       this.cargo?.cancel();this.press=null;this.hover=null;this.pinchLock=true;
-      this.pinch={ids:points.map(p=>p[0]),distance:Math.max(8,Math.hypot(a.x-b.x,a.y-b.y)),zoom:this.view.zoom,anchor:this.worldPointer(mid)};
+      this.pinch={ids:points.map(p=>p[0]),distance:Math.max(8,Math.hypot(a.x-b.x,a.y-b.y)),zoom:this.view.zoom,anchor:this.worldAt(mid)};
     }
     movePinch(){
       const gesture=this.pinch;if(!gesture)return;const [a,b]=gesture.ids.map(id=>this.touches.get(id));if(!a||!b)return;
-      const z=clamp(gesture.zoom*Math.hypot(a.x-b.x,a.y-b.y)/gesture.distance,1,3),x=(a.x+b.x)/2*this.W/this.scale.width,y=(a.y+b.y)/2*this.H/this.scale.height;
+      const z=clamp(gesture.zoom*Math.hypot(a.x-b.x,a.y-b.y)/gesture.distance,1,3),x=(a.x+b.x)/2*this.W/this.viewport.width,y=(a.y+b.y)/2*this.H/this.viewport.height;
       this.view={zoom:z,ox:x-gesture.anchor.x*z,oy:y-gesture.anchor.y*z};this.clampView();this.updateZoomUI();
     }
     releaseTouch(id){
@@ -2258,12 +2301,26 @@ Phaser curves: based on three.js Curve classes by zz85; matrices/vectors adapted
       this.cancelCargoDrag();this.play.clear();this.hintFade.clear();this.cargo=null;this.model=new R.Game(options);this.config=this.model.config;this.cells=[];this.action=null;this.pendingAI=0;this.effects=[];this.press=null;this.hover=null;this.resultShown=false;this.failure=null;this.scanTime=this.timeNow;this.hintAttentionUntil=0;this.winTime=0;this.focusCell={r:0,c:0};this.view={zoom:1,ox:0,oy:0};
       this.ambient.reset();this.ambientCaptionUntil=0;this.botGreeting=0;$('result').hidden=true;$('hud').classList.remove('match-finished');clearTimeout(toastTimer);$('toast').classList.remove('visible');document.querySelector('.console').classList.remove('game-over','player-win');this.setStatus('player');this.updateHUD();if(this.board)this.resize(this.scale.gameSize);this.updateZoomUI();
     }
+    interfaceFrame(){
+      const {width,height}=this.viewport||this.scale.gameSize,ui=window.RoboUI?.current||{width,height,scale:1},top=document.querySelector('.topbar').getBoundingClientRect().bottom,deck=document.querySelector('.bottom-ui').getBoundingClientRect();
+      const sidebar=(ui.height<=600&&ui.width>600)||ui.width>=1100;
+      return [width,height,ui.width,ui.height,ui.scale,top,sidebar?deck.left:deck.top];
+    }
     resizeInterface(){
-      // Result banners must not reframe the scene. Actual viewport changes still resize it.
-      if(!this.resultShown)this.resize(this.scale.gameSize);
+      if(this.syncViewport())return;
+      // Status text, results and FPS readouts must not rebuild an active warehouse.
+      // Real viewport changes and a new game use resize() directly.
+      if(this.resultShown||this.action||this.pendingAI||this.model?.playerMoves||this.showRenderFPS)return;
+      const frame=this.interfaceFrame();
+      if(this.lastInterfaceFrame?.every((v,i)=>Math.abs(v-frame[i])<.1))return;
+      this.resize(this.scale.gameSize);
+    }
+    presentFrame(){
+      // Canvas resizing clears its pixels, including between animation-frame callbacks.
+      if(typeof this.ctx?.setTransform==='function'&&this.bot)this.paint();
     }
     resize(size){
-      this.cancelCargoDrag();this.play.clear();const vw=Math.max(1,size.width),vh=Math.max(1,size.height);this.portrait=vw/vh<.85;this.W=this.portrait?840:1440;this.H=Math.round(this.W*vh/vw);
+      this.cancelCargoDrag();this.play.clear();const measured=this.viewportBounds(size),vw=measured.width,vh=measured.height;this.viewport=measured;this.portrait=vw/vh<.85;this.W=this.portrait?840:1440;this.H=this.W*vh/vw;
       const ui=window.RoboUI?.current||{width:vw,height:vh,scale:1},ratio=this.W/vw,top=document.querySelector('.topbar').getBoundingClientRect().bottom,deck=document.querySelector('.bottom-ui').getBoundingClientRect(),compact=ui.height<=600,sidebar=(compact&&ui.width>600)||ui.width>=1100;
       const floorBottom=sidebar?vh:deck.top,playWidth=sidebar?Math.max(200*ui.scale,deck.left-12*ui.scale):vw,mobile=ui.width<ui.height||ui.width<=700||(compact&&ui.width<=1000),robotScale=mobile?.7:1,aisleGap=mobile?34:35,clearance=robotScale*108+aisleGap+7;
       const exclusions=sidebar&&Number.isFinite(deck.width)&&Number.isFinite(deck.height)?[{x:deck.left*ratio,y:deck.top*ratio,w:deck.width*ratio,h:deck.height*ratio}]:[];
@@ -2297,12 +2354,14 @@ Phaser curves: based on three.js Curve classes by zz85; matrices/vectors adapted
         this.layout=L.create(this.W,this.H,this.board,{top:(floorTop+16*ui.scale)*ratio,bottom:floorBottom*ratio,right:playWidth*ratio,exclusions,compact,robotScale,aisleGap,edgeFixtures:mobile,pixelRatio:ratio*ui.scale});
       }
       this.cargo=new window.RoboCargo.Cargo(this.layout,this.board);this.delivery=new window.RoboDelivery.Delivery(this.layout,reduced,Math.random,this.cargo);
-      this.refreshRendering(vw,vh);this.arms.forEach(a=>this.restArm(a));this.makeRoute();this.hover=null;this.press=null;this.lastPaint=0;this.setZoom(this.view.zoom,true);
+      this.refreshRendering(vw,vh);this.arms.forEach(a=>this.restArm(a));this.makeRoute();this.hover=null;this.press=null;this.lastPaint=0;this.setZoom(this.view.zoom,true);this.lastInterfaceFrame=this.interfaceFrame();this.presentFrame();
     }
-    refreshRendering(vw=this.scale.width,vh=this.scale.height){
+    refreshRendering(vw=this.viewport?.width??this.scale.width,vh=this.viewport?.height??this.scale.height){
       // Rebuild pixels only. Never reset the match, gestures, cargo or animation clocks here.
-      const quality=this.renderPercent/100;this.renderMetrics=A.renderMetrics(vw,vh,this.W,this.H,window.devicePixelRatio||1,quality);
-      this.surface.width=this.renderMetrics.width;this.surface.height=this.renderMetrics.height;this.ctx.roboResolutionScale=quality;
+      const quality=this.renderPercent/100;this.lastRenderDensity=window.devicePixelRatio||1;this.renderMetrics=A.renderMetrics(vw,vh,this.W,this.H,window.devicePixelRatio||1,quality);
+      if(this.surface.width!==this.renderMetrics.width)this.surface.width=this.renderMetrics.width;
+      if(this.surface.height!==this.renderMetrics.height)this.surface.height=this.renderMetrics.height;
+      this.ctx.roboResolutionScale=quality;
       this.layout.renderQuality=quality;this.layout.renderScale=Math.max(this.renderMetrics.sx,this.renderMetrics.sy);
       this.backdrop=A.background(this.W,this.H,this.board,this.layout);this.lastPaint=0;
     }
@@ -2323,7 +2382,7 @@ Phaser curves: based on three.js Curve classes by zz85; matrices/vectors adapted
       this.showRenderFPS=true;this.fpsFrames=[];this.renderFPS=null;this.fpsRefreshAt=0;
       this.renderPercent=RENDER_LEVELS[(RENDER_LEVELS.indexOf(this.renderPercent)+1)%RENDER_LEVELS.length];
       try{localStorage.setItem(RENDER_KEY,String(this.renderPercent));}catch{}
-      this.refreshRendering();this.updateRenderQualityUI();announce('Чёткость сцены: '+this.renderPercent+'%. Эффекты сохранены.');
+      this.refreshRendering();this.updateRenderQualityUI();this.presentFrame();announce('Чёткость сцены: '+this.renderPercent+'%. Эффекты сохранены.');
     }
     restArm(a){const b=this.board,left=a.side==='left';a.x=left?b.x-100:b.x+b.w+100;a.y=b.y+b.h*(left?.4:.6);a.lift=.6;a.grip=.8;a.carrying=false;a.workLight=0;a.angle=0;a.parkedAt=this.idleTime;delete a.faulted;delete a.sparkPower;}
     clampView(){this.view.ox=clamp(this.view.ox,this.W*(1-this.view.zoom),0);this.view.oy=clamp(this.view.oy,this.H*(1-this.view.zoom),0);}
@@ -2332,10 +2391,10 @@ Phaser curves: based on three.js Curve classes by zz85; matrices/vectors adapted
     }
     updateZoomUI(){const z=this.view.zoom;document.body.classList.toggle('zoomed',z>1);$('view-hint').textContent=z>1?'Перетаскивайте поле · 0 — общий вид':'Вы ставите × · склад отвечает ○';}
     ensureVisible(pos){
-      if(this.view.zoom===1)return;const ui=window.RoboUI?.current||{width:this.scale.width,height:this.scale.height},f=this.W/this.scale.width,deck=document.querySelector('.bottom-ui').getBoundingClientRect(),sidebar=(ui.height<=600&&ui.width>600)||ui.width>=1100,left=30*f,right=(sidebar?deck.left-24:this.scale.width-30)*f,top=(document.querySelector('.topbar').getBoundingClientRect().bottom+35)*f,bottom=(sidebar?this.scale.height-25:deck.top-25)*f;
+      if(this.view.zoom===1)return;const {width,height}=this.viewport||this.scale.gameSize,ui=window.RoboUI?.current||{width,height},f=this.W/width,deck=document.querySelector('.bottom-ui').getBoundingClientRect(),sidebar=(ui.height<=600&&ui.width>600)||ui.width>=1100,left=30*f,right=(sidebar?deck.left-24:width-30)*f,top=(document.querySelector('.topbar').getBoundingClientRect().bottom+35)*f,bottom=(sidebar?height-25:deck.top-25)*f;
       const x=pos.x*this.view.zoom+this.view.ox,y=pos.y*this.view.zoom+this.view.oy;this.view.ox+=x<left?left-x:x>right?right-x:0;this.view.oy+=y<top?top-y:y>bottom?bottom-y:0;this.clampView();
     }
-    worldPointer(p){return{x:(p.x*this.W/this.scale.width-this.view.ox)/this.view.zoom,y:(p.y*this.H/this.scale.height-this.view.oy)/this.view.zoom};}
+    worldPointer(p){return this.worldAt(this.pointerPosition(p));}
     cellAt(p){const pt=this.worldPointer(p),b=this.board,c=Math.floor((pt.x-b.x)/b.cell),r=Math.floor((pt.y-b.y)/b.cell);return r>=0&&r<b.rows&&c>=0&&c<b.cols?{r,c}:null;}
     center(r,c){const b=this.board;return{x:b.x+(c+.5)*b.cell,y:b.y+(r+.5)*b.cell};}
     tokenCenter(r,c){return this.center(r,c);}
